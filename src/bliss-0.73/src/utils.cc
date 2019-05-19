@@ -25,9 +25,9 @@ namespace bliss {
 
 void
 print_permutation(FILE* const fp,
-		  const unsigned int N,
-		  const unsigned int* perm,
-		  const unsigned int offset)
+        	  const unsigned int N,
+        	  const unsigned int* perm,
+        	  const unsigned int offset)
 {
   assert(N > 0);
   assert(perm);
@@ -59,8 +59,8 @@ print_permutation(FILE* const fp,
 
 void
 print_permutation(FILE* const fp,
-		  const std::vector<unsigned int>& perm,
-		  const unsigned int offset)
+        	  const std::vector<unsigned int>& perm,
+        	  const unsigned int offset)
 {
   const unsigned int N = perm.size();
   for(unsigned int i = 0; i < N; i++) {

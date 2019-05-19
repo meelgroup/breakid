@@ -107,7 +107,7 @@ void UintSeqHash::update(unsigned int i)
       const unsigned int b = h & 0x80000000;
       h = h << 1;
       if(b != 0)
-	h++;
+        h++;
       i = i >> 8;
 #endif
     }

@@ -177,11 +177,11 @@ BlissGraph *bliss_permute(BlissGraph *graph, const unsigned int *perm);
  */
 void
 bliss_find_automorphisms(BlissGraph *graph,
-			 void (*hook)(void *user_param,
-				      unsigned int N,
-				      const unsigned int *aut),
-			 void *hook_user_param,
-			 BlissStats *stats);
+        		 void (*hook)(void *user_param,
+        			      unsigned int N,
+        			      const unsigned int *aut),
+        		 void *hook_user_param,
+        		 BlissStats *stats);
 
 
 /**
@@ -197,10 +197,10 @@ bliss_find_automorphisms(BlissGraph *graph,
  */
 const unsigned int *
 bliss_find_canonical_labeling(BlissGraph *graph,
-			      void (*hook)(void *user_param,
-					   unsigned int N,
-					   const unsigned int *aut),
-			      void *hook_user_param,
-			      BlissStats *stats);
+        		      void (*hook)(void *user_param,
+        				   unsigned int N,
+        				   const unsigned int *aut),
+        		      void *hook_user_param,
+        		      BlissStats *stats);
 
 #endif

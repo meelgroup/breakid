@@ -84,7 +84,7 @@ usage(FILE* const fp, const char* argv0)
 "  -version    print the version number and exit\n"
 "  -help       print this help and exit\n"
           ,program_name
-	  );
+          );
 }
 
 
@@ -96,57 +96,57 @@ parse_options(const int argc, const char** argv)
   for(int i = 1; i < argc; i++)
     {
       if(strcmp(argv[i], "-can") == 0)
-	opt_canonize = true;
+        opt_canonize = true;
       else if((strncmp(argv[i], "-ocan=", 6) == 0) and (strlen(argv[i]) > 6))
-	{
-	  opt_canonize = true;
-	  opt_output_can_file = argv[i]+6;
-	}
+        {
+          opt_canonize = true;
+          opt_output_can_file = argv[i]+6;
+        }
       else if(sscanf(argv[i], "-v=%u", &tmp) == 1)
-	verbose_level = tmp;
+        verbose_level = tmp;
       else if(strcmp(argv[i], "-directed") == 0)
-	opt_directed = true;
+        opt_directed = true;
       else if(strcmp(argv[i], "-fr=n") == 0)
-	opt_use_failure_recording = false;
+        opt_use_failure_recording = false;
       else if(strcmp(argv[i], "-fr=y") == 0)
-	opt_use_failure_recording = true;
+        opt_use_failure_recording = true;
       else if(strcmp(argv[i], "-cr=n") == 0)
-	opt_use_component_recursion = false;
+        opt_use_component_recursion = false;
       else if(strcmp(argv[i], "-cr=y") == 0)
-	opt_use_component_recursion = true;
+        opt_use_component_recursion = true;
       else if((strncmp(argv[i], "-sh=", 4) == 0) and (strlen(argv[i]) > 4))
-	{
-	  opt_splitting_heuristics = argv[i]+4;
-	}
+        {
+          opt_splitting_heuristics = argv[i]+4;
+        }
       else if(strcmp(argv[i], "-version") == 0)
-	{
-	  fprintf(stdout, "bliss version %s\n", bliss::version);
-	  exit(0);
-	}
+        {
+          fprintf(stdout, "bliss version %s\n", bliss::version);
+          exit(0);
+        }
       else if(strcmp(argv[i], "-help") == 0)
-	{
-	  usage(stdout, argv[0]);
-	  exit(0);
-	}
+        {
+          usage(stdout, argv[0]);
+          exit(0);
+        }
       else if(argv[i][0] == '-')
-	{
-	  fprintf(stderr, "Unknown command line argument `%s'\n", argv[i]);
-	  usage(stderr, argv[0]);
-	  exit(1);
-	}
+        {
+          fprintf(stderr, "Unknown command line argument `%s'\n", argv[i]);
+          usage(stderr, argv[0]);
+          exit(1);
+        }
       else
-	{
-	  if(infilename)
-	    {
-	      fprintf(stderr, "Too many file arguments\n");
-	      usage(stderr, argv[0]);
-	      exit(1);
-	    }
-	  else
-	    {
-	      infilename = argv[i];
-	    }
-	}
+        {
+          if(infilename)
+            {
+              fprintf(stderr, "Too many file arguments\n");
+              usage(stderr, argv[0]);
+              exit(1);
+            }
+          else
+            {
+              infilename = argv[i];
+            }
+        }
     }
 }
 
@@ -194,36 +194,36 @@ main(const int argc, const char** argv)
   if(opt_directed)
     {
       if(strcmp(opt_splitting_heuristics, "f") == 0)
-	shs_directed = bliss::Digraph::shs_f;
+        shs_directed = bliss::Digraph::shs_f;
       else if(strcmp(opt_splitting_heuristics, "fs") == 0)
-	shs_directed = bliss::Digraph::shs_fs;
+        shs_directed = bliss::Digraph::shs_fs;
       else if(strcmp(opt_splitting_heuristics, "fl") == 0)
-	shs_directed = bliss::Digraph::shs_fl;
+        shs_directed = bliss::Digraph::shs_fl;
       else if(strcmp(opt_splitting_heuristics, "fm") == 0)
-	shs_directed = bliss::Digraph::shs_fm;
+        shs_directed = bliss::Digraph::shs_fm;
       else if(strcmp(opt_splitting_heuristics, "fsm") == 0)
-	shs_directed = bliss::Digraph::shs_fsm;
+        shs_directed = bliss::Digraph::shs_fsm;
       else if(strcmp(opt_splitting_heuristics, "flm") == 0)
-	shs_directed = bliss::Digraph::shs_flm;
+        shs_directed = bliss::Digraph::shs_flm;
       else
-	_fatal("Illegal option -sh=%s, aborting", opt_splitting_heuristics);
+        _fatal("Illegal option -sh=%s, aborting", opt_splitting_heuristics);
     }
   else
     {
       if(strcmp(opt_splitting_heuristics, "f") == 0)
-	shs_undirected = bliss::Graph::shs_f;
+        shs_undirected = bliss::Graph::shs_f;
       else if(strcmp(opt_splitting_heuristics, "fs") == 0)
-	shs_undirected = bliss::Graph::shs_fs;
+        shs_undirected = bliss::Graph::shs_fs;
       else if(strcmp(opt_splitting_heuristics, "fl") == 0)
-	shs_undirected = bliss::Graph::shs_fl;
+        shs_undirected = bliss::Graph::shs_fl;
       else if(strcmp(opt_splitting_heuristics, "fm") == 0)
-	shs_undirected = bliss::Graph::shs_fm;
+        shs_undirected = bliss::Graph::shs_fm;
       else if(strcmp(opt_splitting_heuristics, "fsm") == 0)
-	shs_undirected = bliss::Graph::shs_fsm;
+        shs_undirected = bliss::Graph::shs_fsm;
       else if(strcmp(opt_splitting_heuristics, "flm") == 0)
-	shs_undirected = bliss::Graph::shs_flm;
+        shs_undirected = bliss::Graph::shs_flm;
       else
-	_fatal("Illegal option -sh=%s, aborting", opt_splitting_heuristics);
+        _fatal("Illegal option -sh=%s, aborting", opt_splitting_heuristics);
     }
 
   /* Open the input file */
@@ -232,7 +232,7 @@ main(const int argc, const char** argv)
     {
       infile = fopen(infilename, "r");
       if(!infile)
-	_fatal("Cannot not open `%s' for input, aborting", infilename);
+        _fatal("Cannot not open `%s' for input, aborting", infilename);
     }
 
   /* Read the graph from the file */
@@ -288,15 +288,15 @@ main(const int argc, const char** argv)
       fprintf(stdout, "\n");
 
       if(opt_output_can_file)
-	{
-	  bliss::AbstractGraph* cf = g->permute(cl);
-	  FILE* const fp = fopen(opt_output_can_file, "w");
-	  if(!fp)
-	    _fatal("Cannot open '%s' for outputting the canonical form, aborting", opt_output_can_file);
-	  cf->write_dimacs(fp);
-	  fclose(fp);
-	  delete cf;
-	}
+        {
+          bliss::AbstractGraph* cf = g->permute(cl);
+          FILE* const fp = fopen(opt_output_can_file, "w");
+          if(!fp)
+            _fatal("Cannot open '%s' for outputting the canonical form, aborting", opt_output_can_file);
+          cf->write_dimacs(fp);
+          fclose(fp);
+          delete cf;
+        }
     }
 
   /* Output search statistics */
