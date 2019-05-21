@@ -9,6 +9,7 @@
 #include "Algebraic.hpp"
 #include "Theory.hpp"
 #include "Breaking.hpp"
+#include "GitSHA1.h"
 
 using namespace std;
 
@@ -122,7 +123,7 @@ namespace options {
 }
 
 void printUsage() {
-  std::clog << "BreakID version " << VERSION << std::endl;
+  std::clog << "BreakID version " << BreakID::get_version_sha1() << std::endl;
   std::clog << "Usage: ./BreakID <cnf-file> " <<
           "[" << options::help << "] " <<
           "[" << options::nointch << "] " <<
