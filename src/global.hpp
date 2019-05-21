@@ -164,7 +164,7 @@ public:
     return hashValue;
   }
 
-  void print(std::ostream& ostr) {
+  void print(std::ostream& /*ostr*/) {
     std::cerr << "Not implemented: printing rules\n";
     /*std::cerr << "WARNING: printing rules is NOT in the right order for lparse format\n";
      if (basicRule && headLits.size() == 0) {
