@@ -13,6 +13,7 @@
 #include <stdlib.h> /* malloc, calloc, and free */
 #include <string.h> /* memcpy */
 #include <time.h> /* time_t */
+#include <stdbool.h>
 
 #include "saucy.h"
 
@@ -1366,7 +1367,7 @@ do_search(struct saucy *s)
 
 	/* Keep going while there are tree nodes to expand */
     //timeLimitReach is a HACK! TODO fix
-	while (s->lev && not timeLimitReached(s)) {
+	while (s->lev && !timeLimitReached(s)) {
 
 		/* Descend to a new leaf node */	
 		if (descend(s, &s->right, s->start[s->lev], min)
@@ -1557,7 +1558,7 @@ static char *bits(int n) { return (char*) calloc(n, sizeof(char)); }
 struct saucy *
 saucy_alloc(int n, uint tlim)
 {
-	struct saucy *s = (saucy*) malloc(sizeof(struct saucy));
+	struct saucy *s = (struct saucy*) malloc(sizeof(struct saucy));
 	if (s == NULL) return NULL;
 
 	time(&(s->startTime));
