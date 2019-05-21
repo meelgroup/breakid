@@ -10,8 +10,6 @@ Breaker::Breaker(sptr<Specification> origTheo) : originalTheory(origTheo) {
 
 
 void Breaker::print(std::string& origfile) {
-
-  if (not aspinput) {
     std::cout << "c number of breaking clauses added: " << getAddedNbClauses() << "\n";
     std::cout << "c max original variable: " << nVars << "\n";
     std::cout << "c auxiliary variables: " << getAuxiliaryNbVars() << "\n";
@@ -22,34 +20,6 @@ void Breaker::print(std::string& origfile) {
     for (auto c : clauses) {
       c->print(std::cout);
     }
-  } else {
-    if (verbosity > 0) {
-      std::clog << "*** number of breaking clauses added: " << getAddedNbClauses() << "\n";
-      std::clog << "*** max original variable: " << nVars << "\n";
-    }
-    //This number represents the falsity symbol;
-    auto falsevar = nVars + nbExtraVars + 1;
-    if(nbExtraVars > 0){
-		std::cout << "3 " << nbExtraVars << " ";
-		for(auto var = nVars + 1; var < getTotalNbVars() + 1; ++var){
-			std::cout << var << " ";
-		}
-		std::cout << "0 0\n";
-    }
-    for (auto c : clauses) {
-      c->printAsRule(std::cout, falsevar);
-    }
-
-    std::ifstream file(origfile);
-    std::string line;
-
-    while (getline(file, line)) {
-      std::cout << line << "\n";
-      if(line.size() > 1 && line.at(0) == 'B' && line.at(1) == '-'){
-        std::cout << falsevar << "\n";
-      }
-    }
-  }
 }
 
 void Breaker::add(sptr<Clause> cl) {

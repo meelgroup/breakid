@@ -16,7 +16,6 @@ bool printGeneratorFile = false;
 bool useShatterTranslation = false;
 bool useFullTranslation = false;
 int symBreakingFormLength = 50;
-bool aspinput = false;
 uint verbosity = 1;
 int timeLim = INT_MAX;
 

@@ -119,7 +119,6 @@ namespace options {
   string onlybreakers = "-print-only-breakers";
   string generatorfile = "-with-generator-file";
   string symmetryinput = "-addsym";
-  string aspinput = "-asp";
 }
 
 void printUsage() {
@@ -137,7 +136,6 @@ void printUsage() {
           "[" << options::onlybreakers << "] " <<
           "[" << options::generatorfile << "] " <<
           "[" << options::symmetryinput << "<file with symmetry info>] " <<
-          "[" << options::aspinput << "] " <<
           "\n";
   std::clog << "\nOptions:\n";
   std::clog << options::help << "\n  ";
@@ -164,8 +162,6 @@ void printUsage() {
   std::clog << "Return the generator symmetries as a <path-to-cnf>.sym file.\n";
   std::clog << options::symmetryinput << " <default: none>\n  ";
   std::clog << "Pass a file with symmetry generators or row-interchangeable matrices to use as additional symmetry information. Same format as BreakID's output by " << options::generatorfile << ".\n";
-  std::clog << options::aspinput << "\n  ";
-  std::clog << "Parse input in the smodels-lparse intermediate format instead of DIMACS.\n";
   gracefulError("");
 }
 
@@ -203,8 +199,6 @@ void parseOptions(int argc, char *argv[]) {
       ++i;
       string filename = argv[i];
       setFixedLits(filename);
-    } else if (0 == input.compare(options::aspinput)) {
-      aspinput = true;
     } else if (0 == input.compare(options::symmetryinput)) {
       ++i;
       inputSymFile = argv[i];
@@ -224,20 +218,11 @@ void parseOptions(int argc, char *argv[]) {
             (useShatterTranslation ? options::nosmall : "") << " " <<
             (useFullTranslation ? options::norelaxed : "") << " " <<
             (fixedLits.size()==0 ? "" : options::fixedvars) << " " <<
-            (aspinput ? options::aspinput : " ") << " " <<
             std::endl;
   }
 }
 
 // ==== main
-
-void checkOptionsCompatible(){
-  if(aspinput && onlyPrintBreakers){
-    std::stringstream ss;
-    ss << "Options " << options::aspinput << " and " << options::onlybreakers << " are incompatible since asp output is intertwined with extra clauses.\n";
-    gracefulError(ss.str());
-  }
-}
 
 void mktmpfile(string& filename_) {
   /* Get TMPDIR env variable or fall back to /tmp/ */
@@ -278,7 +263,6 @@ void mktmpfile(string& filename_) {
 
 int main(int argc, char *argv[]) {
   parseOptions(argc, argv);
-  checkOptionsCompatible();
 
   time(&startTime);
   string filename_ = argv[1];
@@ -290,11 +274,7 @@ int main(int argc, char *argv[]) {
   }
 
   sptr<Specification> theory;
-  if(aspinput){
-    theory = make_shared<LogicProgram>(filename_);
-  } else{
-    theory = make_shared<CNF>(filename_);
-  }
+  theory = make_shared<CNF>(filename_);
 
   if (verbosity > 3) {
     theory->getGraph()->print();

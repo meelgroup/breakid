@@ -57,10 +57,8 @@ class LogicProgram: public Specification  {
 
 private:
   std::unordered_set<sptr<Rule>, UVecHash, UvecEqual> rules; // must be an unordered_set, since we need to be able to test whether a rule exists to detect symmetries
-  void readLogicProgram(std::string& filename);
 
 public:
-  LogicProgram(std::string& filename);
   LogicProgram(std::vector<sptr<Rule> >& rls, sptr<Group> grp);
   ~LogicProgram();
 

@@ -31,7 +31,6 @@ extern bool printGeneratorFile;
 extern bool useMatrixDetection;
 extern bool useShatterTranslation;
 extern bool useFullTranslation;
-extern bool aspinput;
 extern uint verbosity;
 extern int timeLim;
 
