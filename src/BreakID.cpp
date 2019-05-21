@@ -227,55 +227,11 @@ void parseOptions(int argc, char *argv[]) {
 }
 
 // ==== main
-
-void mktmpfile(string& filename_) {
-  /* Get TMPDIR env variable or fall back to /tmp/ */
-  std::stringstream ss;
-  auto tmpdir = getenv("TMPDIR");
-  if (tmpdir == NULL){
-    ss << "/tmp";
-  } else{
-    ss << tmpdir;
-  }
-  ss << "/" << "breakid.tempfile.";
-  srand ( time(NULL) );
-  //REALLY RANDOM TMPFILE
-  ss << rand()<< rand()<< rand();
-  ss << "XXXXXXX";
-
-  auto tmp = std::string(ss.str());
-  char * filename = new char[tmp.size() + 1];
-  std::copy(tmp.begin(), tmp.end(), filename);
-  filename[tmp.size()] = '\0'; // don't forget the terminating 0
-
-  filename_ = mktemp(filename);
-
-  // don't forget to free the string after finished using it
-  delete[] filename;
-
-  if (verbosity > 0) {
-    std::clog << "*** Reading stdin. Using temporary file: " << filename_ << '\n';
-  }
-  std::ofstream out(filename_);
-
-  std::string line;
-  while (std::getline(std::cin, line)) {
-    out << line << std::endl;
-  }
-  out.close();
-}
-
 int main(int argc, char *argv[]) {
   parseOptions(argc, argv);
 
   time(&startTime);
   string filename_ = argv[1];
-
-  bool tmpfile = (filename_.size() == 1 && filename_.front() == '-');
-
-  if (tmpfile) {
-    mktmpfile(filename_);
-  }
 
   sptr<Specification> theory;
   theory = make_shared<CNF>(filename_);
@@ -360,13 +316,6 @@ int main(int argc, char *argv[]) {
       grp->print(fp_out);
     }
     fp_out.close();
-  }
-
-  if(tmpfile){
-    if(verbosity>0){
-      std::clog << "*** removing temporary file\n";
-    }
-    std::remove(filename_.c_str());
   }
 
   return 0;
