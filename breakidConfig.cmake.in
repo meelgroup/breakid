@@ -1,0 +1,20 @@
+# Config file for the @EXPORT_TYPE@ breakid Package
+# It defines the following variables
+#  BREAKID_INCLUDE_DIRS - include directories for breakid
+#  BREAKID_LIBRARIES    - libraries to link against
+#  BREAKID_EXECUTABLE   - the breakid executable
+
+# Compute paths
+get_filename_component(BREAKID_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(BREAKID_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${BREAKID_CMAKE_DIR}/@BREAKID_TARGETS_FILENAME@")
+
+# These are IMPORTED targets created by @BREAKID_TARGETS_FILENAME@
+set(BREAKID_LIBRARIES breakid)
+set(BREAKID_STATIC_LIBRARIES breakid)
+set(BREAKID_STATIC_LIBRARIES_DEPS @BREAKID_STATIC_DEPS@)
+set(BREAKID_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(BREAKID_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(BREAKID_EXECUTABLE breakid)
