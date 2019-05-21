@@ -1,3 +1,7 @@
+/******************************************
+Copyright (c) 2019 JO DEVRIENDT - KU LEUVEN
+***********************************************/
+
 #include "global.hpp"
 #include "limits.h"
 
