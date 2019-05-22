@@ -23,7 +23,6 @@ THE SOFTWARE.
 #include "Graph.hpp"
 #include "bliss/graph.hh"
 
-
 void Graph::initializeGraph(uint nbNodes, uint nbEdges, std::map<uint,uint>& lit2color,  std::vector<std::vector<uint> >& neighbours){
     bliss_g = new bliss::Graph(nbNodes);
     for(size_t n = 0; n < nbNodes; n++){
