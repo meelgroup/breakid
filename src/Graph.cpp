@@ -36,7 +36,7 @@ void Graph::initializeGraph(uint32_t nbNodes, uint32_t nbEdges,
             bliss_g->add_edge(n, other);
         }
     }
-};
+}
 
 void Graph::freeGraph()
 {
@@ -53,16 +53,16 @@ uint32_t Graph::getNbEdgesFromGraph()
     return 0; //Not supported, not important
 }
 
-uint32_t Graph::getColorOf(uint32_t node)
+uint32_t Graph::getColorOf(uint32_t /*node*/)
 {
     return 0; //Not supported, only used for printing
 }
 
-uint32_t Graph::nbNeighbours(uint32_t node)
+uint32_t Graph::nbNeighbours(uint32_t /*node*/)
 {
     return 0; //Not supported, only used for printing
 }
-uint32_t Graph::getNeighbour(uint32_t node, uint32_t nbthNeighbour)
+uint32_t Graph::getNeighbour(uint32_t /*node*/, uint32_t /*nbthNeighbour*/)
 {
     return 0; //Not supported, only used for printing
 }
@@ -80,7 +80,7 @@ static void addBlissPermutation(void* param, const unsigned int n,
     //TODO: currently, this cannot take the timeouts into account!
 
     sptr<Permutation> permu = std::make_shared<Permutation>();
-    for (int i = 0; i < n; ++i) {
+    for (unsigned i = 0; i < n; ++i) {
         if (i != aut[i]) {
             permu->addFromTo(i, aut[i]);
         }
@@ -332,7 +332,7 @@ Graph::~Graph()
 void Graph::print()
 {
     for (size_t i = 0; i < getNbNodes(); ++i) {
-        fprintf(stderr, "node %i with color %i has neighbours\n", i,
+        fprintf(stderr, "node %i with color %i has neighbours\n", (int)i,
                 getColorOf(i));
         for (size_t j = 0; j < nbNeighbours(i); ++j) {
             fprintf(stderr, "%i ", getNeighbour(i, j));
