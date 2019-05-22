@@ -41,7 +41,7 @@ void addInputSym(sptr<Group> group)
         return; // no input symmetry
     }
     if (verbosity > 0) {
-        std::clog << "*** Reading input symmetry from: " << inputSymFile
+        std::cout << "*** Reading input symmetry from: " << inputSymFile
                   << std::endl;
     }
 
@@ -55,7 +55,7 @@ void addInputSym(sptr<Group> group)
     while (getline(file, line)) {
         if (line.front() == '(') { // this is a symmetry generator line
             if (verbosity > 1) {
-                std::clog << "**** adding input symmetry generator"
+                std::cout << "**** adding input symmetry generator"
                           << std::endl;
             }
 
@@ -79,7 +79,7 @@ void addInputSym(sptr<Group> group)
         } else if (line.front() ==
                    'r') { // this is an interchangeability matrix block
             if (verbosity > 1) {
-                std::clog << "**** adding input symmetry matrix" << std::endl;
+                std::cout << "**** adding input symmetry matrix" << std::endl;
             }
             uint32_t nbRows;
             uint32_t nbColumns;
@@ -130,8 +130,8 @@ string symmetryinput = "-addsym";
 
 void printUsage()
 {
-    std::clog << "BreakID version " << BreakID::get_version_sha1() << std::endl;
-    std::clog << "Usage: ./BreakID <cnf-file> "
+    std::cout << "BreakID version " << BreakID::get_version_sha1() << std::endl;
+    std::cout << "Usage: ./BreakID <cnf-file> "
               << "[" << options::help << "] "
               << "[" << options::nointch << "] "
               << "[" << options::nobinary << "] "
@@ -144,39 +144,39 @@ void printUsage()
               << "[" << options::generatorfile << "] "
               << "[" << options::symmetryinput << "<file with symmetry info>] "
               << "\n";
-    std::clog << "\nOptions:\n";
-    std::clog << options::help << "\n  ";
-    std::clog << "Display this help message instead of running BreakID.\n";
-    std::clog << options::nointch << "\n  ";
-    std::clog << "Disable detection and breaking of row interchangeability.\n";
-    std::clog << options::nobinary << "\n  ";
-    std::clog << "Disable construction of additional binary symmetry breaking "
+    std::cout << "\nOptions:\n";
+    std::cout << options::help << "\n  ";
+    std::cout << "Display this help message instead of running BreakID.\n";
+    std::cout << options::nointch << "\n  ";
+    std::cout << "Disable detection and breaking of row interchangeability.\n";
+    std::cout << options::nobinary << "\n  ";
+    std::cout << "Disable construction of additional binary symmetry breaking "
                  "clauses based on stabilizer subgroups.\n";
-    std::clog << options::nosmall << "\n  ";
-    std::clog << "Disable compact symmetry breaking encoding, use Shatter's "
+    std::cout << options::nosmall << "\n  ";
+    std::cout << "Disable compact symmetry breaking encoding, use Shatter's "
                  "encoding instead.\n";
-    std::clog << options::norelaxed << "\n  ";
-    std::clog << "Disable relaxing constraints on auxiliary encoding "
+    std::cout << options::norelaxed << "\n  ";
+    std::cout << "Disable relaxing constraints on auxiliary encoding "
                  "variables, use longer encoding instead.\n";
-    std::clog << options::formlength << " <default: " << symBreakingFormLength
+    std::cout << options::formlength << " <default: " << symBreakingFormLength
               << ">\n  ";
-    std::clog << "Limit the size of the constructed symmetry breaking "
+    std::cout << "Limit the size of the constructed symmetry breaking "
                  "formula's, measured as the number of auxiliary variables "
                  "introduced. <-1> means no symmetry breaking.\n";
-    std::clog << options::timelim << " <default: " << timeLim << ">\n  ";
-    std::clog << "Upper limit on time spent by Saucy detecting symmetry "
+    std::cout << options::timelim << " <default: " << timeLim << ">\n  ";
+    std::cout << "Upper limit on time spent by Saucy detecting symmetry "
                  "measured in seconds.\n";
-    std::clog << options::verbosity << " <default: " << verbosity << ">\n  ";
-    std::clog << "Verbosity of the output. <0> means no output other than the "
+    std::cout << options::verbosity << " <default: " << verbosity << ">\n  ";
+    std::cout << "Verbosity of the output. <0> means no output other than the "
                  "CNF augmented with symmetry breaking clauses.\n";
-    std::clog << options::onlybreakers << "\n  ";
-    std::clog << "Do not print original theory, only the symmetry breaking "
+    std::cout << options::onlybreakers << "\n  ";
+    std::cout << "Do not print original theory, only the symmetry breaking "
                  "clauses.\n";
-    std::clog << options::generatorfile << "\n  ";
-    std::clog
+    std::cout << options::generatorfile << "\n  ";
+    std::cout
         << "Return the generator symmetries as a <path-to-cnf>.sym file.\n";
-    std::clog << options::symmetryinput << " <default: none>\n  ";
-    std::clog << "Pass a file with symmetry generators or row-interchangeable "
+    std::cout << options::symmetryinput << " <default: none>\n  ";
+    std::cout << "Pass a file with symmetry generators or row-interchangeable "
                  "matrices to use as additional symmetry information. Same "
                  "format as BreakID's output by "
               << options::generatorfile << ".\n";
@@ -221,7 +221,7 @@ void parseOptions(int argc, char *argv[])
     }
 
     if (verbosity > 1) {
-        std::clog << "Options used: " << options::formlength << " "
+        std::cout << "Options used: " << options::formlength << " "
                   << symBreakingFormLength << " " << options::timelim << " "
                   << timeLim << " " << options::verbosity << " " << verbosity
                   << " " << (useMatrixDetection ? "" : options::nointch) << " "
@@ -251,31 +251,31 @@ int main(int argc, char *argv[])
     }
 
     if (verbosity > 0) {
-        std::clog << "**** symmetry generators detected: "
+        std::cout << "**** symmetry generators detected: "
                   << theory->getGroup()->getSize() << std::endl;
         if (verbosity > 2) {
-            theory->getGroup()->print(std::clog);
+            theory->getGroup()->print(std::cout);
         }
     }
 
     addInputSym(theory->getGroup());
 
     if (verbosity > 0) {
-        std::clog << "*** Detecting subgroups..." << std::endl;
+        std::cout << "*** Detecting subgroups..." << std::endl;
     }
     vector<sptr<Group> > subgroups;
     theory->getGroup()->getDisjointGenerators(subgroups);
     if (verbosity > 0) {
-        std::clog << "**** subgroups detected: " << subgroups.size()
+        std::cout << "**** subgroups detected: " << subgroups.size()
                   << std::endl;
     }
 
     if (verbosity > 1) {
         for (auto grp : subgroups) {
-            std::clog << "group size: " << grp->getSize()
+            std::cout << "group size: " << grp->getSize()
                       << " support: " << grp->getSupportSize() << std::endl;
             if (verbosity > 2) {
-                grp->print(std::clog);
+                grp->print(std::cout);
             }
         }
     }
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     for (auto grp : subgroups) {
         if (grp->getSize() > 1 && useMatrixDetection) {
             if (verbosity > 1) {
-                std::clog << "*** Detecting row interchangeability..."
+                std::cout << "*** Detecting row interchangeability..."
                           << std::endl;
             }
             theory->setSubTheory(grp);
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
         }
         if (symBreakingFormLength > -1) {
             if (verbosity > 1) {
-                std::clog << "*** Constructing symmetry breaking formula..."
+                std::cout << "*** Constructing symmetry breaking formula..."
                           << std::endl;
             }
             grp->addBreakingClausesTo(brkr);
@@ -308,20 +308,20 @@ int main(int argc, char *argv[])
     }
 
     if (verbosity > 0) {
-        std::clog << "**** matrices detected: " << totalNbMatrices << std::endl;
-        std::clog << "**** row swaps detected: " << totalNbRowSwaps
+        std::cout << "**** matrices detected: " << totalNbMatrices << std::endl;
+        std::cout << "**** row swaps detected: " << totalNbRowSwaps
                   << std::endl;
-        std::clog << "**** extra binary symmetry breaking clauses added: "
+        std::cout << "**** extra binary symmetry breaking clauses added: "
                   << brkr.getNbBinClauses() << "\n";
-        std::clog << "**** regular symmetry breaking clauses added: "
+        std::cout << "**** regular symmetry breaking clauses added: "
                   << brkr.getNbRegClauses() << "\n";
-        std::clog << "**** row interchangeability breaking clauses added: "
+        std::cout << "**** row interchangeability breaking clauses added: "
                   << brkr.getNbRowClauses() << "\n";
-        std::clog << "**** total symmetry breaking clauses added: "
+        std::cout << "**** total symmetry breaking clauses added: "
                   << brkr.getAddedNbClauses() << "\n";
-        std::clog << "**** auxiliary variables introduced: "
+        std::cout << "**** auxiliary variables introduced: "
                   << brkr.getAuxiliaryNbVars() << "\n";
-        std::clog
+        std::cout
             << "*** Printing resulting theory with symmetry breaking clauses..."
             << std::endl;
     }
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
     if (printGeneratorFile) {
         string symFile = filename_ + ".sym";
         if (verbosity > 0) {
-            std::clog << "*** Printing generators to file " + symFile
+            std::cout << "*** Printing generators to file " + symFile
                       << std::endl;
         }
         ofstream fp_out;
