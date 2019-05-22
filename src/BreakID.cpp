@@ -51,7 +51,7 @@ void addInputSym(sptr<Group> group)
     }
 
     string line;
-    std::vector<uint> cycle;
+    std::vector<uint32_t> cycle;
     while (getline(file, line)) {
         if (line.front() == '(') { // this is a symmetry generator line
             if (verbosity > 1) {
@@ -81,26 +81,26 @@ void addInputSym(sptr<Group> group)
             if (verbosity > 1) {
                 std::clog << "**** adding input symmetry matrix" << std::endl;
             }
-            uint nbRows;
-            uint nbColumns;
+            uint32_t nbRows;
+            uint32_t nbColumns;
             char tmp;
             istringstream iss(line);
-            for (uint i = 0; i < 4; ++i) {
+            for (uint32_t i = 0; i < 4; ++i) {
                 iss >> tmp;
             } // skip "rows"
             iss >> nbRows;
-            for (uint i = 0; i < 7; ++i) {
+            for (uint32_t i = 0; i < 7; ++i) {
                 iss >> tmp;
             } // skip "columns"
             iss >> nbColumns;
             sptr<Matrix> mat = std::make_shared<Matrix>();
 
-            for (uint r = 0; r < nbRows; ++r) {
-                std::vector<uint> *newRow = new std::vector<uint>(nbColumns);
+            for (uint32_t r = 0; r < nbRows; ++r) {
+                std::vector<uint32_t> *newRow = new std::vector<uint32_t>(nbColumns);
                 getline(file, line);
                 istringstream iss_row(line);
                 int tmp;
-                for (uint c = 0; c < nbColumns; ++c) {
+                for (uint32_t c = 0; c < nbColumns; ++c) {
                     iss_row >> tmp;
                     (*newRow)[c] = encode(tmp);
                 }
@@ -282,8 +282,8 @@ int main(int argc, char *argv[])
 
     theory->cleanUp(); // improve some memory overhead
 
-    uint totalNbMatrices = 0;
-    uint totalNbRowSwaps = 0;
+    uint32_t totalNbMatrices = 0;
+    uint32_t totalNbRowSwaps = 0;
 
     Breaker brkr(theory);
     for (auto grp : subgroups) {

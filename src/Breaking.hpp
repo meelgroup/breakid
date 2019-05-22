@@ -32,18 +32,18 @@ class Breaker
    private:
     std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
     sptr<Specification> originalTheory;
-    uint nbExtraVars = 0;
-    uint nbBinClauses = 0;
-    uint nbRowClauses = 0;
-    uint nbRegClauses = 0;
+    uint32_t nbExtraVars = 0;
+    uint32_t nbBinClauses = 0;
+    uint32_t nbRowClauses = 0;
+    uint32_t nbRegClauses = 0;
 
-    void addBinary(uint l1, uint l2);
-    void addTernary(uint l1, uint l2, uint l3);
-    void addQuaternary(uint l1, uint l2, uint l3, uint l4);
+    void addBinary(uint32_t l1, uint32_t l2);
+    void addTernary(uint32_t l1, uint32_t l2, uint32_t l3);
+    void addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4);
     void add(sptr<Clause> cl);
-    void add(sptr<Permutation> perm, std::vector<uint>& order,
+    void add(sptr<Permutation> perm, std::vector<uint32_t>& order,
              bool limitExtraConstrs);
-    void addShatter(sptr<Permutation> perm, std::vector<uint>& order,
+    void addShatter(sptr<Permutation> perm, std::vector<uint32_t>& order,
                     bool limitExtraConstrs);
 
    public:
@@ -54,18 +54,18 @@ class Breaker
     //Prints the current breaker. Gets the original file as input to recover information lost in the process
     void print(std::string& origfile);
 
-    void addBinClause(uint l1, uint l2);
-    void addRegSym(sptr<Permutation> perm, std::vector<uint>& order);
-    void addRowSym(sptr<Permutation> perm, std::vector<uint>& order);
+    void addBinClause(uint32_t l1, uint32_t l2);
+    void addRegSym(sptr<Permutation> perm, std::vector<uint32_t>& order);
+    void addRowSym(sptr<Permutation> perm, std::vector<uint32_t>& order);
 
-    uint getAuxiliaryNbVars();
-    uint getTotalNbVars();
-    uint getAddedNbClauses();
-    uint getTotalNbClauses();
+    uint32_t getAuxiliaryNbVars();
+    uint32_t getTotalNbVars();
+    uint32_t getAddedNbClauses();
+    uint32_t getTotalNbClauses();
 
-    uint getNbBinClauses();
-    uint getNbRowClauses();
-    uint getNbRegClauses();
+    uint32_t getNbBinClauses();
+    uint32_t getNbRowClauses();
+    uint32_t getNbRegClauses();
 
-    uint getTseitinVar();
+    uint32_t getTseitinVar();
 };

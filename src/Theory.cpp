@@ -46,16 +46,16 @@ void CNF::readCNF(std::string& filename)
         gracefulError("No CNF file found.");
     }
     string line;
-    set<uint> inclause = set<uint>();
+    set<uint32_t> inclause = set<uint32_t>();
     while (getline(file, line)) {
         if (line.size() == 0 || line.front() == 'c') {
             // do nothing, this is a comment line
         } else if (line.front() == 'p') {
             string info = line.substr(6);
             istringstream iss(info);
-            uint nbVars;
+            uint32_t nbVars;
             iss >> nbVars;
-            uint nbClauses;
+            uint32_t nbClauses;
             iss >> nbClauses;
             if (verbosity > 1) {
                 std::clog << "CNF header stated " << nbVars << " vars and "
@@ -85,7 +85,7 @@ void CNF::readCNF(std::string& filename)
                     }
                     inclause.clear();
                 } else {
-                    if ((uint)abs(l) > nVars) {
+                    if ((uint32_t)abs(l) > nVars) {
                         nVars = abs(l);
                     }
                     inclause.insert(encode(l));
@@ -125,14 +125,14 @@ CNF::CNF(std::vector<sptr<Clause> >& clss, sptr<Group> grp)
     clauses.insert(clss.cbegin(), clss.cend());
     graph = make_shared<Graph>(clauses);
     group = grp;
-    for (uint l = 0; l < 2 * nVars; ++l) {
+    for (uint32_t l = 0; l < 2 * nVars; ++l) {
         if (not grp->permutes(l)) {
             graph->setUniqueColor(l);
         }
     }
-    for (uint m = 0; m < grp->getNbMatrices(); ++m) {
+    for (uint32_t m = 0; m < grp->getNbMatrices(); ++m) {
         auto mat = grp->getMatrix(m);
-        for (uint r = 0; r < mat->nbRows() - 1; ++r) {
+        for (uint32_t r = 0; r < mat->nbRows() - 1; ++r) {
             getGraph()->setUniqueColor(*(mat->getRow(r)));
         }
     }
@@ -149,7 +149,7 @@ void CNF::print(std::ostream& out)
     }
 }
 
-uint CNF::getSize()
+uint32_t CNF::getSize()
 {
     return clauses.size();
 }
@@ -219,7 +219,7 @@ void Specification::cleanUp()
 
 void checkVarExists(int lit)
 {
-    if ((uint)abs(lit) > nVars) {
+    if ((uint32_t)abs(lit) > nVars) {
         nVars = abs(lit);
     }
 }
@@ -229,14 +229,14 @@ LogicProgram::LogicProgram(std::vector<sptr<Rule> >& rls, sptr<Group> grp)
     rules.insert(rls.cbegin(), rls.cend());
     graph = make_shared<Graph>(rules);
     group = grp;
-    for (uint l = 0; l < 2 * nVars; ++l) {
+    for (uint32_t l = 0; l < 2 * nVars; ++l) {
         if (not grp->permutes(l)) {
             graph->setUniqueColor(l);
         }
     }
-    for (uint m = 0; m < grp->getNbMatrices(); ++m) {
+    for (uint32_t m = 0; m < grp->getNbMatrices(); ++m) {
         auto mat = grp->getMatrix(m);
-        for (uint r = 0; r < mat->nbRows() - 1; ++r) {
+        for (uint32_t r = 0; r < mat->nbRows() - 1; ++r) {
             getGraph()->setUniqueColor(*(mat->getRow(r)));
         }
     }
@@ -254,7 +254,7 @@ void LogicProgram::print(std::ostream& out)
     }
 }
 
-uint LogicProgram::getSize()
+uint32_t LogicProgram::getSize()
 {
     return rules.size();
 }

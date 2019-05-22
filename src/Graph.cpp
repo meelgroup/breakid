@@ -23,9 +23,9 @@ THE SOFTWARE.
 #include "Graph.hpp"
 #include "bliss/graph.hh"
 
-void Graph::initializeGraph(uint nbNodes, uint nbEdges,
-                            std::map<uint, uint>& lit2color,
-                            std::vector<std::vector<uint> >& neighbours)
+void Graph::initializeGraph(uint32_t nbNodes, uint32_t nbEdges,
+                            std::map<uint32_t, uint32_t>& lit2color,
+                            std::vector<std::vector<uint32_t> >& neighbours)
 {
     bliss_g = new bliss::Graph(nbNodes);
     for (size_t n = 0; n < nbNodes; n++) {
@@ -43,30 +43,30 @@ void Graph::freeGraph()
     delete (bliss_g);
 }
 
-uint Graph::getNbNodesFromGraph()
+uint32_t Graph::getNbNodesFromGraph()
 {
     return bliss_g->get_nof_vertices();
 }
 
-uint Graph::getNbEdgesFromGraph()
+uint32_t Graph::getNbEdgesFromGraph()
 {
     return 0; //Not supported, not important
 }
 
-uint Graph::getColorOf(uint node)
+uint32_t Graph::getColorOf(uint32_t node)
 {
     return 0; //Not supported, only used for printing
 }
 
-uint Graph::nbNeighbours(uint node)
+uint32_t Graph::nbNeighbours(uint32_t node)
 {
     return 0; //Not supported, only used for printing
 }
-uint Graph::getNeighbour(uint node, uint nbthNeighbour)
+uint32_t Graph::getNeighbour(uint32_t node, uint32_t nbthNeighbour)
 {
     return 0; //Not supported, only used for printing
 }
-void Graph::setNodeToNewColor(uint node)
+void Graph::setNodeToNewColor(uint32_t node)
 {
     bliss_g->change_color(node, colorcount.size());
 }
@@ -105,10 +105,10 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
 
     int n = 2 * nVars + clauses.size();
 
-    std::map<uint, uint> lit2color{};
+    std::map<uint32_t, uint32_t> lit2color{};
 
     // Initialize colors:
-    for (uint i = 0; i < 2 * nVars; ++i) {
+    for (uint32_t i = 0; i < 2 * nVars; ++i) {
         lit2color[i] = 0;
     }
     colorcount.push_back(2 * nVars);
@@ -118,21 +118,21 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
     }
     colorcount.push_back(clauses.size());
 
-    uint nbedges = 0;
+    uint32_t nbedges = 0;
 
     // Initialize edge lists
     // First construct for each node the list of neighbors
-    std::vector<std::vector<uint> > neighbours(n);
+    std::vector<std::vector<uint32_t> > neighbours(n);
     // Literals have their negations as neighbors
-    for (uint l = 1; l <= nVars; ++l) {
-        uint posID = encode(l);
-        uint negID = encode(-l);
+    for (uint32_t l = 1; l <= nVars; ++l) {
+        uint32_t posID = encode(l);
+        uint32_t negID = encode(-l);
         neighbours[posID].push_back(negID);
         neighbours[negID].push_back(posID);
         nbedges += 2;
     }
     // Clauses have as neighbors the literals occurring in them
-    uint c = 2 * nVars;
+    uint32_t c = 2 * nVars;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
             neighbours[lit].push_back(c);
@@ -147,14 +147,14 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
 
     // look for unused lits, make their color unique so that no symmetries on them are found
     // useful for subgroups
-    std::unordered_set<uint> usedLits;
+    std::unordered_set<uint32_t> usedLits;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
             usedLits.insert(lit);
             usedLits.insert(neg(lit));
         }
     }
-    for (uint i = 0; i < 2 * nVars; ++i) {
+    for (uint32_t i = 0; i < 2 * nVars; ++i) {
         if (usedLits.count(i) == 0) {
             setUniqueColor(i);
         }
@@ -208,8 +208,8 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
     //The three is to make sure that all colors are used (cfr colorcount documentation)
     int n = 2 * nVars + 2 * rules.size() + 4 + nbextralits;
 
-    std::map<uint, uint> lit2color{};
-    uint current_node_index = 0;
+    std::map<uint32_t, uint32_t> lit2color{};
+    uint32_t current_node_index = 0;
     for (; current_node_index < 2 * nVars; ++current_node_index) {
         //Positive lits are colored with color0
         lit2color[current_node_index] = 0;
@@ -233,14 +233,14 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
         colorcount.push_back(0);
     }
 
-    uint nbedges = 0;
+    uint32_t nbedges = 0;
     // Initialize edge lists
     // First construct for each node the list of neighbors
-    std::vector<std::vector<uint> > neighbours(n);
+    std::vector<std::vector<uint32_t> > neighbours(n);
     // Literals have their negations as neighbors
-    for (uint l = 1; l <= nVars; ++l) {
-        uint posID = encode(l);
-        uint negID = encode(-l);
+    for (uint32_t l = 1; l <= nVars; ++l) {
+        uint32_t posID = encode(l);
+        uint32_t negID = encode(-l);
         neighbours[posID].push_back(negID);
         neighbours[negID].push_back(posID);
         nbedges += 2;
@@ -303,7 +303,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
 
     // look for unused lits, make their color unique so that no symmetries on them are found
     // useful for subgroups
-    std::unordered_set<uint> usedLits;
+    std::unordered_set<uint32_t> usedLits;
     for (auto cl : rules) {
         for (auto lit : cl->headLits) {
             usedLits.insert(lit);
@@ -314,7 +314,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
             usedLits.insert(neg(lit));
         }
     }
-    for (uint i = 0; i < 2 * nVars; ++i) {
+    for (uint32_t i = 0; i < 2 * nVars; ++i) {
         if (usedLits.count(i) == 0) {
             setUniqueColor(i);
         }
@@ -341,20 +341,20 @@ void Graph::print()
     }
 }
 
-uint Graph::getNbNodes()
+uint32_t Graph::getNbNodes()
 {
     return getNbNodesFromGraph();
 }
 
-uint Graph::getNbEdges()
+uint32_t Graph::getNbEdges()
 {
     return getNbEdgesFromGraph();
 }
 
-void Graph::setUniqueColor(uint lit)
+void Graph::setUniqueColor(uint32_t lit)
 {
     auto color = getColorOf(lit);
-    uint currentcount = colorcount[getColorOf(lit)];
+    uint32_t currentcount = colorcount[getColorOf(lit)];
     if (currentcount == 1) {
         return; // color was already unique
     }
@@ -363,7 +363,7 @@ void Graph::setUniqueColor(uint lit)
     colorcount.push_back(1);
 }
 
-void Graph::setUniqueColor(const std::vector<uint>& lits)
+void Graph::setUniqueColor(const std::vector<uint32_t>& lits)
 {
     for (auto lit : lits) {
         setUniqueColor(lit);

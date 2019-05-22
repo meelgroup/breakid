@@ -51,7 +51,7 @@ void Breaker::add(sptr<Clause> cl)
     clauses.insert(cl);
 }
 
-void Breaker::addBinary(uint l1, uint l2)
+void Breaker::addBinary(uint32_t l1, uint32_t l2)
 {
     sptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
@@ -59,7 +59,7 @@ void Breaker::addBinary(uint l1, uint l2)
     add(toAdd);
 }
 
-void Breaker::addTernary(uint l1, uint l2, uint l3)
+void Breaker::addTernary(uint32_t l1, uint32_t l2, uint32_t l3)
 {
     sptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
@@ -68,7 +68,7 @@ void Breaker::addTernary(uint l1, uint l2, uint l3)
     add(toAdd);
 }
 
-void Breaker::addQuaternary(uint l1, uint l2, uint l3, uint l4)
+void Breaker::addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4)
 {
     sptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
@@ -78,15 +78,15 @@ void Breaker::addQuaternary(uint l1, uint l2, uint l3, uint l4)
     add(toAdd);
 }
 
-void Breaker::addBinClause(uint l1, uint l2)
+void Breaker::addBinClause(uint32_t l1, uint32_t l2)
 {
     ++nbBinClauses;
     addBinary(l1, l2);
 }
 
-void Breaker::addRegSym(sptr<Permutation> perm, std::vector<uint>& order)
+void Breaker::addRegSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
 {
-    uint current = getTotalNbClauses();
+    uint32_t current = getTotalNbClauses();
     if (useShatterTranslation) {
         addShatter(perm, order, true);
     } else {
@@ -95,9 +95,9 @@ void Breaker::addRegSym(sptr<Permutation> perm, std::vector<uint>& order)
     nbRegClauses += getTotalNbClauses() - current;
 }
 
-void Breaker::addRowSym(sptr<Permutation> perm, std::vector<uint>& order)
+void Breaker::addRowSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
 {
-    uint current = getTotalNbClauses();
+    uint32_t current = getTotalNbClauses();
     if (useShatterTranslation) {
         addShatter(perm, order, false);
     } else {
@@ -106,15 +106,15 @@ void Breaker::addRowSym(sptr<Permutation> perm, std::vector<uint>& order)
     nbRowClauses += getTotalNbClauses() - current;
 }
 
-void Breaker::add(sptr<Permutation> perm, std::vector<uint>& order,
+void Breaker::add(sptr<Permutation> perm, std::vector<uint32_t>& order,
                   bool limitExtraConstrs)
 {
-    std::unordered_set<uint>
+    std::unordered_set<uint32_t>
         allowedLits; // which are not the last lit in their cycle, unless they map to their negation
-    for (uint i = order.size(); i > 0; --i) {
-        uint lit = order.at(i - 1);
+    for (uint32_t i = order.size(); i > 0; --i) {
+        uint32_t lit = order.at(i - 1);
         if (allowedLits.count(lit) == 0) { // we have a last lit of a cycle
-            uint sym = perm->getImage(lit);
+            uint32_t sym = perm->getImage(lit);
             while (
                 sym !=
                 lit) { // add the other lits of the cycle and the negated cycle
@@ -126,16 +126,16 @@ void Breaker::add(sptr<Permutation> perm, std::vector<uint>& order,
     }
 
     int nrExtraConstrs = 0;
-    uint prevLit = 0;
-    uint prevSym = 0;
-    uint prevTst = 0; // previous tseitin
+    uint32_t prevLit = 0;
+    uint32_t prevSym = 0;
+    uint32_t prevTst = 0; // previous tseitin
     for (auto l : order) {
         if (limitExtraConstrs && nrExtraConstrs > symBreakingFormLength) {
             break;
         }
-        uint sym = perm->getImage(l);
+        uint32_t sym = perm->getImage(l);
         if (sym != l && allowedLits.count(l)) {
-            uint tst = 0;
+            uint32_t tst = 0;
             if (nrExtraConstrs == 0) {
                 // adding clause for l => sym :
                 // ~l | sym
@@ -183,15 +183,15 @@ void Breaker::add(sptr<Permutation> perm, std::vector<uint>& order,
     }
 }
 
-void Breaker::addShatter(sptr<Permutation> perm, std::vector<uint>& order,
+void Breaker::addShatter(sptr<Permutation> perm, std::vector<uint32_t>& order,
                          bool limitExtraConstrs)
 {
-    std::unordered_set<uint>
+    std::unordered_set<uint32_t>
         allowedLits; // which are not the last lit in their cycle, unless they map to their negation
-    for (uint i = order.size(); i > 0; --i) {
-        uint lit = order.at(i - 1);
+    for (uint32_t i = order.size(); i > 0; --i) {
+        uint32_t lit = order.at(i - 1);
         if (allowedLits.count(lit) == 0) { // we have a last lit of a cycle
-            uint sym = perm->getImage(lit);
+            uint32_t sym = perm->getImage(lit);
             while (
                 sym !=
                 lit) { // add the other lits of the cycle and the negated cycle
@@ -203,16 +203,16 @@ void Breaker::addShatter(sptr<Permutation> perm, std::vector<uint>& order,
     }
 
     int nrExtraConstrs = 0;
-    uint prevLit = 0;
-    uint prevSym = 0;
-    uint prevTst = 0; // previous tseitin
+    uint32_t prevLit = 0;
+    uint32_t prevSym = 0;
+    uint32_t prevTst = 0; // previous tseitin
     for (auto l : order) {
         if (limitExtraConstrs && nrExtraConstrs > symBreakingFormLength) {
             break;
         }
-        uint sym = perm->getImage(l);
+        uint32_t sym = perm->getImage(l);
         if (sym != l && allowedLits.count(l)) {
-            uint tst = 0;
+            uint32_t tst = 0;
             if (nrExtraConstrs == 0) {
                 // adding clause for l => sym :
                 // ~l | sym
@@ -250,42 +250,42 @@ void Breaker::addShatter(sptr<Permutation> perm, std::vector<uint>& order,
     }
 }
 
-uint Breaker::getAuxiliaryNbVars()
+uint32_t Breaker::getAuxiliaryNbVars()
 {
     return nbExtraVars;
 }
 
-uint Breaker::getTotalNbVars()
+uint32_t Breaker::getTotalNbVars()
 {
     return nVars + nbExtraVars;
 }
 
-uint Breaker::getAddedNbClauses()
+uint32_t Breaker::getAddedNbClauses()
 {
     return clauses.size();
 }
 
-uint Breaker::getTotalNbClauses()
+uint32_t Breaker::getTotalNbClauses()
 {
     return originalTheory->getSize() + clauses.size();
 }
 
-uint Breaker::getNbBinClauses()
+uint32_t Breaker::getNbBinClauses()
 {
     return nbBinClauses;
 }
 
-uint Breaker::getNbRowClauses()
+uint32_t Breaker::getNbRowClauses()
 {
     return nbRowClauses;
 }
 
-uint Breaker::getNbRegClauses()
+uint32_t Breaker::getNbRegClauses()
 {
     return nbRegClauses;
 }
 
-uint Breaker::getTseitinVar()
+uint32_t Breaker::getTseitinVar()
 {
     ++nbExtraVars;
     return encode(getTotalNbVars());

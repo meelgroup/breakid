@@ -30,34 +30,34 @@ class Breaker;
 class Permutation : public std::enable_shared_from_this<Permutation>
 {
    private:
-    std::unordered_map<uint, uint> perm;
-    std::vector<uint> cycleReprs; // smallest lit in each cycle
-    uint maxCycleSize;
+    std::unordered_map<uint32_t, uint32_t> perm;
+    std::vector<uint32_t> cycleReprs; // smallest lit in each cycle
+    uint32_t maxCycleSize;
     size_t hash;
 
    public:
-    std::vector<uint> domain;
-    std::vector<uint> posDomain;
-    std::vector<uint> image;
+    std::vector<uint32_t> domain;
+    std::vector<uint32_t> posDomain;
+    std::vector<uint32_t> image;
 
-    void addFromTo(uint from, uint to);
-    void addCycle(std::vector<uint>& cyc);
+    void addFromTo(uint32_t from, uint32_t to);
+    void addCycle(std::vector<uint32_t>& cyc);
     void addPrimeSplitToVector(std::vector<sptr<Permutation> >& newPerms);
 
     Permutation();
-    Permutation(std::vector<std::pair<uint, uint> >& tuples);
+    Permutation(std::vector<std::pair<uint32_t, uint32_t> >& tuples);
     // Permutation constructed from swapping two rows.
-    Permutation(std::vector<uint>& row1, std::vector<uint>& row2);
+    Permutation(std::vector<uint32_t>& row1, std::vector<uint32_t>& row2);
 
     ~Permutation(){};
 
-    uint getImage(uint from);
+    uint32_t getImage(uint32_t from);
     // return value is true iff the image is different from the original
-    bool getImage(std::vector<uint>& orig, std::vector<uint>& img);
-    void getCycle(uint lit, std::vector<uint>& orb);
+    bool getImage(std::vector<uint32_t>& orig, std::vector<uint32_t>& img);
+    void getCycle(uint32_t lit, std::vector<uint32_t>& orb);
     bool isInvolution();
-    bool permutes(uint lit);
-    uint supportSize();
+    bool permutes(uint32_t lit);
+    uint32_t supportSize();
     bool isIdentity();
 
     void print(std::ostream& out);
@@ -65,10 +65,10 @@ class Permutation : public std::enable_shared_from_this<Permutation>
     bool formsMatrixWith(sptr<Permutation> other);
     std::pair<sptr<Permutation>, sptr<Permutation> > getLargest(
         sptr<Permutation> other);
-    void getSharedLiterals(sptr<Permutation> other, std::vector<uint>& shared);
-    std::vector<uint>& getCycleReprs();
-    uint getMaxCycleSize();
-    uint getNbCycles();
+    void getSharedLiterals(sptr<Permutation> other, std::vector<uint32_t>& shared);
+    std::vector<uint32_t>& getCycleReprs();
+    uint32_t getMaxCycleSize();
+    uint32_t getNbCycles();
 
     bool equals(sptr<Permutation> other);
 };
@@ -76,31 +76,31 @@ class Permutation : public std::enable_shared_from_this<Permutation>
 class Matrix
 {
    private:
-    std::vector<std::vector<uint>*>
+    std::vector<std::vector<uint32_t>*>
         rows; // TODO: refactor this as 1 continuous vector
-    std::unordered_map<uint, uint> rowco;
-    std::unordered_map<uint, uint> colco;
+    std::unordered_map<uint32_t, uint32_t> rowco;
+    std::unordered_map<uint32_t, uint32_t> colco;
 
    public:
     Matrix();
     ~Matrix();
     void print(std::ostream& out);
 
-    void add(std::vector<uint>* row);
-    uint nbColumns();
-    uint nbRows();
-    void tryToAddNewRow(sptr<Permutation> p, uint rowIndex,
+    void add(std::vector<uint32_t>* row);
+    uint32_t nbColumns();
+    uint32_t nbRows();
+    void tryToAddNewRow(sptr<Permutation> p, uint32_t rowIndex,
                         Specification* theory);
-    std::vector<uint>* getRow(uint rowindex);
-    bool permutes(uint x);
-    uint getLit(uint row, uint column);
+    std::vector<uint32_t>* getRow(uint32_t rowindex);
+    bool permutes(uint32_t x);
+    uint32_t getLit(uint32_t row, uint32_t column);
 
-    uint getRowNb(uint x);
-    uint getColumnNb(uint x);
+    uint32_t getRowNb(uint32_t x);
+    uint32_t getColumnNb(uint32_t x);
 
     sptr<Permutation> testMembership(const sptr<Permutation> p);
-    sptr<Permutation> getProductWithRowsWap(const sptr<Permutation> p, uint r1,
-                                            uint r2); // return p*swap(r1,r2)
+    sptr<Permutation> getProductWithRowsWap(const sptr<Permutation> p, uint32_t r1,
+                                            uint32_t r2); // return p*swap(r1,r2)
 };
 
 class Group
@@ -108,7 +108,7 @@ class Group
    private:
     std::vector<sptr<Permutation> > permutations;
     std::vector<sptr<Matrix> > matrices;
-    std::unordered_set<uint> support;
+    std::unordered_set<uint32_t> support;
 
     void cleanPermutations(
         sptr<Matrix> matrix); // remove permutations implied by the matrix
@@ -128,24 +128,24 @@ class Group
     void addMatrix(
         sptr<Matrix>
             m); // cnf-parameter, otherwise we have to store a pointer to the cnf here :(
-    uint getNbMatrices();
-    uint getNbRowSwaps();
+    uint32_t getNbMatrices();
+    uint32_t getNbRowSwaps();
 
-    sptr<Matrix> getMatrix(uint idx);
+    sptr<Matrix> getMatrix(uint32_t idx);
 
     void getDisjointGenerators(std::vector<sptr<Group> >& subgroups);
-    uint getSize();
+    uint32_t getSize();
 
-    bool permutes(uint lit);
-    uint getSupportSize();
+    bool permutes(uint32_t lit);
+    uint32_t getSupportSize();
 
     void getOrderAndAddBinaryClausesTo(
         Breaker& brkr,
-        std::vector<uint>&
+        std::vector<uint32_t>&
             out_order); // returns a vector containing a lit for literals relevant to construct sym breaking clauses
-    void addBinaryClausesTo(Breaker& brkr, std::vector<uint>& out_order,
-                            const std::unordered_set<uint>& excludedLits);
+    void addBinaryClausesTo(Breaker& brkr, std::vector<uint32_t>& out_order,
+                            const std::unordered_set<uint32_t>& excludedLits);
     void addBreakingClausesTo(Breaker& brkr);
 
-    void maximallyExtend(sptr<Matrix> matrix, uint indexOfFirstNewRow);
+    void maximallyExtend(sptr<Matrix> matrix, uint32_t indexOfFirstNewRow);
 };

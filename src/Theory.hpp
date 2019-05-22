@@ -43,7 +43,7 @@ class Specification
     virtual ~Specification();
 
     virtual void print(std::ostream& out) = 0;
-    virtual uint getSize() = 0;
+    virtual uint32_t getSize() = 0;
 
     sptr<Graph> getGraph();
     sptr<Group> getGroup();
@@ -71,7 +71,7 @@ class CNF : public Specification
     ~CNF();
 
     void print(std::ostream& out);
-    uint getSize();
+    uint32_t getSize();
 
     void setSubTheory(sptr<Group> subgroup);
 
@@ -92,7 +92,7 @@ class LogicProgram : public Specification
 
     void print(std::ostream& out);
 
-    uint getSize();
+    uint32_t getSize();
 
     void setSubTheory(sptr<Group> subgroup);
 
