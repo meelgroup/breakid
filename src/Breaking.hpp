@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
-#pragma once
+#ifndef BREAKING_H
+#define BREAKING_H
 
 #include "global.hpp"
 
@@ -69,3 +70,5 @@ class Breaker
 
     uint32_t getTseitinVar();
 };
+
+#endif

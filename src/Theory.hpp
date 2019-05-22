@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
-#pragma once
+#ifndef THEORY_H
+#define THEORY_H
 
 #include "global.hpp"
 
@@ -49,9 +50,7 @@ class Specification
     sptr<Group> getGroup();
 
     virtual void cleanUp();
-
     virtual void setSubTheory(sptr<Group> subgroup) = 0;
-
     virtual bool isSymmetry(Permutation& prm) = 0;
 };
 
@@ -60,8 +59,10 @@ class CNF : public Specification
     friend class Breaker;
 
    private:
-    std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>
-        clauses; // must be an unordered_set, since we need to be able to test whether a clause exists to detect symmetries
+
+    ///must be an unordered_set, since we need to be able to test
+    ///whether a clause exists to detect symmetries
+    std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
 
     void readCNF(std::string& filename);
 
@@ -72,9 +73,7 @@ class CNF : public Specification
 
     void print(std::ostream& out);
     uint32_t getSize();
-
     void setSubTheory(sptr<Group> subgroup);
-
     bool isSymmetry(Permutation& prm);
 };
 
@@ -83,18 +82,19 @@ class LogicProgram : public Specification
     friend class Breaker;
 
    private:
-    std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>
-        rules; // must be an unordered_set, since we need to be able to test whether a rule exists to detect symmetries
+
+    ///Must be an unordered_set, since we need to be able to test
+    ///whether a rule exists to detect symmetries
+    std::unordered_set<sptr<Rule>, UVecHash, UvecEqual> rules;
 
    public:
     LogicProgram(std::vector<sptr<Rule> >& rls, sptr<Group> grp);
     ~LogicProgram();
 
     void print(std::ostream& out);
-
     uint32_t getSize();
-
     void setSubTheory(sptr<Group> subgroup);
-
     bool isSymmetry(Permutation& prm);
 };
+
+#endif
