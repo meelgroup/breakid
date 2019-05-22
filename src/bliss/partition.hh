@@ -25,9 +25,9 @@ class Partition;
 }
 
 #include <climits>
-#include <vector>
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 //#include "graph.hh"
 #include "heap.hh"
 #include "kqueue.hh"

@@ -30,41 +30,37 @@
  * please consider using the C++ API whenever possible.
  */
 
-#include <stdlib.h>
 #include <stdio.h>
-
+#include <stdlib.h>
 
 /**
  * \brief The true bliss graph is hiding behind this typedef.
  */
 typedef struct bliss_graph_struct BlissGraph;
 
-
 /**
  * \brief The C API version of the statistics returned by
  * the bliss search algorithm.
  */
-typedef struct bliss_stats_struct
-{
-  /**
+typedef struct bliss_stats_struct {
+    /**
    * An approximation (due to possible rounding errors) of
    * the size of the automorphism group.
    */
-  long double group_size_approx;
-  /** The number of nodes in the search tree. */
-  long unsigned int nof_nodes;
-  /** The number of leaf nodes in the search tree. */
-  long unsigned int nof_leaf_nodes;
-  /** The number of bad nodes in the search tree. */
-  long unsigned int nof_bad_nodes;
-  /** The number of canonical representative updates. */
-  long unsigned int nof_canupdates;
-  /** The number of generator permutations. */
-  long unsigned int nof_generators;
-  /** The maximal depth of the search tree. */
-  unsigned long int max_level;
+    long double group_size_approx;
+    /** The number of nodes in the search tree. */
+    long unsigned int nof_nodes;
+    /** The number of leaf nodes in the search tree. */
+    long unsigned int nof_leaf_nodes;
+    /** The number of bad nodes in the search tree. */
+    long unsigned int nof_bad_nodes;
+    /** The number of canonical representative updates. */
+    long unsigned int nof_canupdates;
+    /** The number of generator permutations. */
+    long unsigned int nof_generators;
+    /** The maximal depth of the search tree. */
+    unsigned long int max_level;
 } BlissStats;
-
 
 /**
  * Create a new graph instance with \a N vertices and no edges.
@@ -72,7 +68,6 @@ typedef struct bliss_stats_struct
  * to add new vertices on-the-fly.
  */
 BlissGraph *bliss_new(const unsigned int N);
-
 
 /**
  * Read an undirected graph from a file in the DIMACS format into a new bliss
@@ -84,7 +79,6 @@ BlissGraph *bliss_new(const unsigned int N);
  */
 BlissGraph *bliss_read_dimacs(FILE *fp);
 
-
 /**
  * Output the graph in the file stream \a fp in the DIMACS format.
  * See the User's Guide for the file format details.
@@ -92,7 +86,6 @@ BlissGraph *bliss_read_dimacs(FILE *fp);
  * in bliss they are from 0 to N-1.
  */
 void bliss_write_dimacs(BlissGraph *graph, FILE *fp);
-
 
 /**
  * Release the graph.
@@ -102,18 +95,15 @@ void bliss_write_dimacs(BlissGraph *graph, FILE *fp);
  */
 void bliss_release(BlissGraph *graph);
 
-
 /**
  * Print the graph in graphviz dot format.
  */
 void bliss_write_dot(BlissGraph *graph, FILE *fp);
 
-
 /**
  * Return the number of vertices in the graph.
  */
 unsigned int bliss_get_nof_vertices(BlissGraph *graph);
-
 
 /**
  * Add a new vertex with color \a c in the graph \a graph and return its index.
@@ -121,7 +111,6 @@ unsigned int bliss_get_nof_vertices(BlissGraph *graph);
  * [0,bliss::bliss_get_nof_vertices(\a bliss)-1].
  */
 unsigned int bliss_add_vertex(BlissGraph *graph, unsigned int c);
-
 
 /**
  * Add a new undirected edge in the graph.
@@ -131,7 +120,6 @@ unsigned int bliss_add_vertex(BlissGraph *graph, unsigned int c);
  * a while so please try to avoid adding duplicate edges whenever possible).
  */
 void bliss_add_edge(BlissGraph *graph, unsigned int v1, unsigned int v2);
-
 
 /**
  * Compare two graphs according to a total order.
@@ -143,12 +131,10 @@ void bliss_add_edge(BlissGraph *graph, unsigned int v1, unsigned int v2);
  */
 int bliss_cmp(BlissGraph *graph1, BlissGraph *graph2);
 
-
 /**
  * Get a hash value for the graph.
  */
 unsigned int bliss_hash(BlissGraph *graph);
-
 
 /**
  * Permute the graph with the given permutation \a perm.
@@ -158,7 +144,6 @@ unsigned int bliss_hash(BlissGraph *graph);
  * a bijection on {0,...,N-1}.
  */
 BlissGraph *bliss_permute(BlissGraph *graph, const unsigned int *perm);
-
 
 /**
  * Find a set of generators for the automorphism group of the graph.
@@ -175,14 +160,10 @@ BlissGraph *bliss_permute(BlissGraph *graph, const unsigned int *perm);
  * Do not call bliss_* functions in the hook.
  * If \a stats is non-null, then some search statistics are copied there.
  */
-void
-bliss_find_automorphisms(BlissGraph *graph,
-        		 void (*hook)(void *user_param,
-        			      unsigned int N,
-        			      const unsigned int *aut),
-        		 void *hook_user_param,
-        		 BlissStats *stats);
-
+void bliss_find_automorphisms(BlissGraph *graph,
+                              void (*hook)(void *user_param, unsigned int N,
+                                           const unsigned int *aut),
+                              void *hook_user_param, BlissStats *stats);
 
 /**
  * Otherwise the same as bliss_find_automorphisms() except that
@@ -195,12 +176,9 @@ bliss_find_automorphisms(BlissGraph *graph,
  * Note that the computed canonical version may depend on the applied version
  * of bliss.
  */
-const unsigned int *
-bliss_find_canonical_labeling(BlissGraph *graph,
-        		      void (*hook)(void *user_param,
-        				   unsigned int N,
-        				   const unsigned int *aut),
-        		      void *hook_user_param,
-        		      BlissStats *stats);
+const unsigned int *bliss_find_canonical_labeling(
+    BlissGraph *graph,
+    void (*hook)(void *user_param, unsigned int N, const unsigned int *aut),
+    void *hook_user_param, BlissStats *stats);
 
 #endif
