@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+add_subdirectory(bliss)
+
 include_directories( ${PROJECT_SOURCE_DIR} )
 include_directories( ${ZLIB_INCLUDE_DIR}   )
 include_directories( ${Boost_INCLUDE_DIRS} )
@@ -34,6 +36,7 @@ set(breakid_lib_files
     Theory.cpp
     saucy.c
     ${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp
+    $<TARGET_OBJECTS:bliss>
 )
 
 add_library(breakid
