@@ -35,28 +35,6 @@ THE SOFTWARE.
 
 using namespace std;
 
-void setFixedLits(std::string& filename) {
-  if (verbosity > 0) {
-    std::clog << "*** Reading fixed variables: " << filename << std::endl;
-  }
-
-  ifstream file(filename);
-  if (!file) {
-    gracefulError("No fixed variables file found.");
-  }
-  
-  fixedLits.clear();
-  string line;
-  while (getline(file, line)) {
-    istringstream iss(line);
-    int l;
-    while (iss >> l) {
-      fixedLits.push_back(encode(l));
-      fixedLits.push_back(encode(-l));
-    }
-  }
-}
-
 void addInputSym(sptr<Group> group) {
   if(inputSymFile == ""){
   	return; // no input symmetry
@@ -137,7 +115,6 @@ namespace options {
   string help = "-h";
   string nosmall = "-no-small";
   string norelaxed = "-no-relaxed";
-  string fixedvars = "-fixed";
   string onlybreakers = "-print-only-breakers";
   string generatorfile = "-with-generator-file";
   string symmetryinput = "-addsym";
@@ -154,7 +131,6 @@ void printUsage() {
           "[" << options::formlength << " <nat>] " <<
           "[" << options::timelim << " <nat>] " <<
           "[" << options::verbosity << " <nat>] " <<
-          "[" << options::fixedvars << " <file with fixed vars>] " <<
           "[" << options::onlybreakers << "] " <<
           "[" << options::generatorfile << "] " <<
           "[" << options::symmetryinput << "<file with symmetry info>] " <<
@@ -176,8 +152,6 @@ void printUsage() {
   std::clog << "Upper limit on time spent by Saucy detecting symmetry measured in seconds.\n";
   std::clog << options::verbosity << " <default: " << verbosity << ">\n  ";
   std::clog << "Verbosity of the output. <0> means no output other than the CNF augmented with symmetry breaking clauses.\n";
-  std::clog << options::fixedvars << " <default: none>\n  ";
-  std::clog << "File with a list of variables that should be fixed, separated by whitespace.\n";
   std::clog << options::onlybreakers << "\n  ";
   std::clog << "Do not print original theory, only the symmetry breaking clauses.\n";
   std::clog << options::generatorfile << "\n  ";
@@ -217,10 +191,6 @@ void parseOptions(int argc, char *argv[]) {
       verbosity = stoi(argv[i]);
     } else if (0 == input.compare(options::help)) {
       printUsage();
-    } else if (0 == input.compare(options::fixedvars)) {
-      ++i;
-      string filename = argv[i];
-      setFixedLits(filename);
     } else if (0 == input.compare(options::symmetryinput)) {
       ++i;
       inputSymFile = argv[i];
@@ -239,7 +209,6 @@ void parseOptions(int argc, char *argv[]) {
             (inputSymFile != "" ? options::symmetryinput : " ") << " " <<
             (useShatterTranslation ? options::nosmall : "") << " " <<
             (useFullTranslation ? options::norelaxed : "") << " " <<
-            (fixedLits.size()==0 ? "" : options::fixedvars) << " " <<
             std::endl;
   }
 }

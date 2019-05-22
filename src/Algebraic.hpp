@@ -111,12 +111,6 @@ public:
   // NOTE: if a group has a shared pointer to a theory, and a theory a shared pointer to a group, none of the memory pointed to by these pointers will ever be freed :(
   Specification* theory; // non-owning pointer
 
-  Group() {
-  };
-
-  ~Group() {
-  };
-
   void add(sptr<Permutation> p);
   void checkColumnInterchangeability(sptr<Matrix> m);
 
