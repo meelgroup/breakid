@@ -42,84 +42,6 @@ using std::istringstream;
 using std::make_shared;
 using std::vector;
 
-void addInputSym(sptr<Group> group)
-{
-    if (inputSymFile == "") {
-        return; // no input symmetry
-    }
-    if (verbosity > 0) {
-        cout << "*** Reading input symmetry from: " << inputSymFile
-                  << endl;
-    }
-
-    std::ifstream file(inputSymFile);
-    if (!file) {
-        gracefulError("No input symmetry file found.");
-    }
-
-    string line;
-    std::vector<uint32_t> cycle;
-    while (getline(file, line)) {
-        if (line.front() == '(') { // this is a symmetry generator line
-            if (verbosity > 1) {
-                cout << "**** adding input symmetry generator"
-                          << endl;
-            }
-
-            sptr<Permutation> perm = std::make_shared<Permutation>();
-
-            stringstream sym(line);
-            string cycle_str;
-
-            getline(sym, cycle_str, '('); // skip first empty line
-            while (std::getline(sym, cycle_str, '(')) {
-                stringstream cycle_ss(cycle_str);
-                cycle.clear();
-                int l = 0;
-                while (cycle_ss >> l) {
-                    cycle.push_back(encode(l));
-                }
-                perm->addCycle(cycle);
-            }
-            group->add(perm);
-            perm->print(std::cerr);
-        } else if (line.front() ==
-                   'r') { // this is an interchangeability matrix block
-            if (verbosity > 1) {
-                cout << "**** adding input symmetry matrix" << endl;
-            }
-            uint32_t nbRows;
-            uint32_t nbColumns;
-            char tmp;
-            istringstream iss(line);
-            for (uint32_t i = 0; i < 4; ++i) {
-                iss >> tmp;
-            } // skip "rows"
-            iss >> nbRows;
-            for (uint32_t i = 0; i < 7; ++i) {
-                iss >> tmp;
-            } // skip "columns"
-            iss >> nbColumns;
-            sptr<Matrix> mat = std::make_shared<Matrix>();
-
-            for (uint32_t r = 0; r < nbRows; ++r) {
-                std::vector<uint32_t> *newRow = new std::vector<uint32_t>(nbColumns);
-                getline(file, line);
-                istringstream iss_row(line);
-                int tmp;
-                for (uint32_t c = 0; c < nbColumns; ++c) {
-                    iss_row >> tmp;
-                    (*newRow)[c] = encode(tmp);
-                }
-                mat->add(newRow);
-            }
-            group->addMatrix(mat);
-        } else {
-            gracefulError("Unexpected line in input symmetry file: " + line);
-        }
-    }
-}
-
 namespace options {
 // option strings:
 string nointch = "-no-row";
@@ -132,7 +54,6 @@ string nosmall = "-no-small";
 string norelaxed = "-no-relaxed";
 string onlybreakers = "-print-only-breakers";
 string generatorfile = "-with-generator-file";
-string symmetryinput = "-addsym";
 } // namespace options
 
 void printUsage()
@@ -149,7 +70,6 @@ void printUsage()
               << "[" << options::verbosity << " <nat>] "
               << "[" << options::onlybreakers << "] "
               << "[" << options::generatorfile << "] "
-              << "[" << options::symmetryinput << "<file with symmetry info>] "
               << "\n";
 
     cout
@@ -191,11 +111,6 @@ void printUsage()
 
     << options::generatorfile << "\n"
     << " Return the generator symmetries as a <path-to-cnf>.sym file.\n"
-
-    << options::symmetryinput << " <default: none>\n"
-    << " Pass a file with symmetry generators or row-interchangeable\n"
-    << " matrices to use as additional symmetry information. Same\n"
-    << " format as BreakID's output by " << options::generatorfile << ".\n"
     ;
 }
 
@@ -230,9 +145,6 @@ void parseOptions(int argc, char *argv[])
             verbosity = std::stoi(argv[i]);
         } else if (0 == input.compare(options::help)) {
             printUsage();
-        } else if (0 == input.compare(options::symmetryinput)) {
-            ++i;
-            inputSymFile = argv[i];
         }
     }
 
@@ -244,7 +156,6 @@ void parseOptions(int argc, char *argv[])
                   << (useBinaryClauses ? "" : options::nobinary) << " "
                   << (onlyPrintBreakers ? options::onlybreakers : "") << " "
                   << (printGeneratorFile ? options::generatorfile : "") << " "
-                  << (inputSymFile != "" ? options::symmetryinput : " ") << " "
                   << (useShatterTranslation ? options::nosmall : "") << " "
                   << (useFullTranslation ? options::norelaxed : "") << " "
                   << endl;
@@ -273,8 +184,6 @@ int main(int argc, char *argv[])
             theory->getGroup()->print(cout);
         }
     }
-
-    addInputSym(theory->getGroup());
 
     if (verbosity > 0) {
         cout << "*** Detecting subgroups..." << endl;
