@@ -30,7 +30,7 @@ Breaker::Breaker(sptr<Specification> origTheo) : originalTheory(origTheo) {
 }
 
 
-void Breaker::print(std::string& origfile) {
+void Breaker::print(std::string& /*origfile*/) {
     std::cout << "c number of breaking clauses added: " << getAddedNbClauses() << "\n";
     std::cout << "c max original variable: " << nVars << "\n";
     std::cout << "c auxiliary variables: " << getAuxiliaryNbVars() << "\n";
