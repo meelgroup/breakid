@@ -34,7 +34,6 @@ set(breakid_lib_files
     global.cpp
     Graph.cpp
     Theory.cpp
-    saucy.c
     ${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp
     $<TARGET_OBJECTS:bliss>
 )
