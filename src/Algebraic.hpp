@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
-#pragma once
+#ifndef ALGEBRAIC_H
+#define ALGEBRAIC_H
 
 #include "global.hpp"
 
@@ -149,3 +150,5 @@ class Group
 
     void maximallyExtend(sptr<Matrix> matrix, uint32_t indexOfFirstNewRow);
 };
+
+#endif

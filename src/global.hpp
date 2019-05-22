@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
-#pragma once
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 #define sptr std::shared_ptr
 
@@ -324,3 +325,5 @@ void swapErase(std::vector<T>& vec, uint32_t index)
     vec[index] = vec.back();
     vec.pop_back();
 }
+
+#endif
