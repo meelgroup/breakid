@@ -331,10 +331,10 @@ Graph::~Graph()
 
 void Graph::print()
 {
-    for (int i = 0; i < getNbNodes(); ++i) {
+    for (size_t i = 0; i < getNbNodes(); ++i) {
         fprintf(stderr, "node %i with color %i has neighbours\n", i,
                 getColorOf(i));
-        for (int j = 0; j < nbNeighbours(i); ++j) {
+        for (size_t j = 0; j < nbNeighbours(i); ++j) {
             fprintf(stderr, "%i ", getNeighbour(i, j));
         }
         fprintf(stderr, "\n");
