@@ -1,32 +1,25 @@
-/******************************************
-Copyright (c) 2019 Jo Devriendt - KU Leuven
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-***********************************************/
-
 /* Graph is a class used as a wrapper for saucy methods
  */
 
 #pragma once
 
+#define BLISS
+#undef SAUCY
+#undef NAUTY
+#undef TRACES
+
+
 #include "global.hpp"
 #include "Algebraic.hpp"
+#if defined(NAUTY) || defined(TRACES)
+//TODO/ only for  struct sparsegraph;
+extern "C" {
+#include "nauty/nausparse.h"
+}
+#endif
+
+
+
 
 // TODO: make a die function for mem-assignment issues?
 /*static void die(string& s){
@@ -36,13 +29,38 @@ THE SOFTWARE.
 
 class Matrix;
 class Group;
+
+#ifdef SAUCY
 struct saucy_graph;
+#endif
+
+//#ifdef NAUTY
+//struct sparsegraph;
+//#endif
+
+#ifdef BLISS
+namespace bliss {
+    class Graph;
+}
+#endif
 
 class Graph : public std::enable_shared_from_this<Graph> {
 private:
 
 public:
-  saucy_graph* sg;
+#ifdef SAUCY
+  saucy_graph* saucy_g;
+#endif
+#if defined(NAUTY) || defined(TRACES)
+    sparsegraph* sparse_graph;
+    //Colorings:
+    int* lab;
+    int* ptn;
+    std::map<uint, uint> node2pos; //maps literal to their position in the color vector
+#endif
+#ifdef BLISS
+    bliss::Graph* bliss_g;
+#endif
   std::vector<uint> colorcount; // keeps track of the number of times a color is used, so that no color is never used (seems to give Saucy trouble)
   // @INVAR: for all x: colorcount[x]>0
 
@@ -50,6 +68,20 @@ public:
   Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules);
   ~Graph();
 
+private:
+    //Interaction with saucy:
+    void initializeGraph(uint nbNodes, uint nbEdges, std::map<uint, uint> &lit2color, std::vector<std::vector<uint> > &neighbours);
+    void freeGraph();
+    uint getNbNodesFromGraph();
+    uint getNbEdgesFromGraph();
+    uint getColorOf(uint node);
+    uint nbNeighbours(uint node);
+    uint getNeighbour(uint node, uint nbthNeighbour);
+    void setNodeToNewColor(uint node);
+    void getSymmetryGeneratorsInternal(std::vector<sptr<Permutation> > &out_perms);
+
+
+public:
   uint getNbNodes();
   uint getNbEdges();
   void print();

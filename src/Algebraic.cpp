@@ -27,8 +27,9 @@ THE SOFTWARE.
 #include "Breaking.hpp"
 #include "Graph.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 #include <limits.h>
+#include <cmath>
 
 using namespace std;
 
@@ -42,6 +43,98 @@ void Permutation::addFromTo(uint from, uint to) {
     }
   }
 }
+
+void Permutation::addPrimeSplitToVector(std::vector<sptr<Permutation> >& newPerms){
+    std::map<size_t, std::vector<std::vector<uint> > > lengthToCycles;
+    std::map<size_t, std::set<size_t> > primeToPowers;
+
+    //First, we split each cycle up in its relative prime components.
+    //E.g., if we have a cycle of length 2^3 * 3 * 5^2
+    //We will split it up in 2^3, 3 and 5^2. We also store the information that 2, 3 and 5 are occurring prime components.
+    //The prime2powers then containss the information that for prime 2, power 3 occurs, for prime 3, power 1 etcetera.
+
+    for (auto l: getCycleReprs()) {
+        std::vector<uint> cycle;
+        getCycle(l, cycle);
+        auto cycleSize = cycle.size();
+        for (size_t i = 2; i <= cycleSize; i++) {
+            size_t nbOcc = 0;
+            while (cycleSize % i == 0) {
+                nbOcc++;
+                cycleSize /= i;
+            }
+            if (nbOcc != 0) {
+                size_t newCycleLength = (size_t) pow(i,nbOcc);
+                if(primeToPowers.find(i) == primeToPowers.cend()){
+                    primeToPowers[i] = {};
+                }
+                primeToPowers[i].insert(nbOcc);
+                if(lengthToCycles.find(newCycleLength) == lengthToCycles.cend()){
+                    lengthToCycles[newCycleLength] = {};
+                }
+                size_t nbNewCycles = cycle.size()/newCycleLength;
+                for(size_t j = 0; j<nbNewCycles; j++){
+                    std::vector<uint> newCycle;
+                    for(size_t k = 0; k<newCycleLength; k++){
+                        newCycle.push_back(cycle[j+nbNewCycles*k]);
+                    }
+                    lengthToCycles[newCycleLength].push_back(newCycle);
+                }
+            }
+        }
+    }
+
+    //Next, we split up the permutation as much as possible.
+    //First of all, if there are different relative prime components, we can forget about the original permutation: for each prime component, we keep that generator
+    //Next: for each prime component, we also wish to keep "special" generators, namely those that have cycles of equal length. There can be multiple of those.
+
+    for(auto p2p: primeToPowers){
+
+        auto prime = p2p.first;
+        auto powers = p2p.second;
+
+        auto genPerm = std::make_shared<Permutation>();
+        size_t smallestPow = SIZE_MAX;
+        size_t biggestPow  = 0;
+        for(auto power: powers){
+            smallestPow = min(power,smallestPow);
+            biggestPow = max(power, biggestPow);
+            for(auto c: lengthToCycles[pow(prime,power)]){
+                genPerm->addCycle(c);
+            }
+        }
+
+        newPerms.push_back(genPerm);
+
+        while (smallestPow >= 1) {
+            if(smallestPow == biggestPow){
+                smallestPow --;
+                continue;
+            }
+            auto equalCycleGen = std::make_shared<Permutation>();
+            for(auto power: powers){
+                for(auto c: lengthToCycles[pow(prime,power)]){
+                    size_t cycleLength = pow(prime, smallestPow);
+                    size_t jump = c.size()/cycleLength;
+                    for(int i = 0; i<jump;i++){
+                        std::vector<uint> newCycle;
+                        for(int j = 0; j< cycleLength; j++){
+                            newCycle.push_back(c[i+j*jump]);
+                        }
+                        equalCycleGen->addCycle(newCycle);
+
+                    }
+                }
+            }
+
+            newPerms.push_back(equalCycleGen);
+            smallestPow --;
+        }
+
+
+    }
+}
+
 
 void Permutation::addCycle(std::vector<uint>& cyc){
   uint n = cyc.size();

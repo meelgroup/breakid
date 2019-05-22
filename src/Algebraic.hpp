@@ -43,6 +43,7 @@ public:
   
   void addFromTo(uint from, uint to);
   void addCycle(std::vector<uint>& cyc);
+  void addPrimeSplitToVector(std::vector<sptr<Permutation> >& newPerms);
 
   Permutation();
   Permutation(std::vector<std::pair<uint, uint> >& tuples);

@@ -21,49 +21,462 @@ THE SOFTWARE.
 ***********************************************/
 
 #include "Graph.hpp"
-#include "saucy.h"
 
-//=====================SAUCYWRAPPER=METHODS=====================================
+#define BLISS
+#undef SAUCY
+#undef NAUTY
+#undef TRACES
+
+#ifdef SAUCY
+#include "saucy.h"
+#endif
+#if defined(TRACES)
+extern "C" {
+#include "nauty/traces.h"
+#include "nauty/nausparse.h"
+};
+#endif
+
+#if defined(NAUTY)
+extern "C" {
+#include "nauty/nausparse.h"
+};
+#endif
+#ifdef BLISS
+#include "bliss/graph.hh"
+#endif
+
+//=====================GRAPH====================================================
+
+//------------------------------------------------------------------------------
+//           INTERACTION WITH SAUCY
+#ifdef SAUCY
+void Graph::initializeGraph(uint nbNodes, uint nbEdges, std::map<uint,uint>& lit2color,  std::vector<std::vector<uint> >& neighbours){
+    saucy_g = (saucy_graph*) malloc(sizeof (struct saucy_graph));
+    saucy_g->colors = (int*) malloc(nbNodes * sizeof (int));
+    for(uint i = 0; i < lit2color.size(); i ++){
+        saucy_g->colors[i] = lit2color[i];
+    }
+
+    // now count the number of neighboring nodes
+    saucy_g->adj = (int*) malloc((nbNodes + 1) * sizeof (int));
+    saucy_g->adj[0] = 0;
+    int ctr = 0;
+    for (auto nblist : neighbours) {
+        saucy_g->adj[ctr + 1] = saucy_g->adj[ctr] + nblist.size();
+        ++ctr;
+    }
+
+    // finally, initialize the lists of neighboring nodes, C-style
+    saucy_g->edg = (int*) malloc(saucy_g->adj[nbNodes] * sizeof (int));
+    ctr = 0;
+    for (auto nblist : neighbours) {
+        for (auto l : nblist) {
+            saucy_g->edg[ctr] = l;
+            ++ctr;
+        }
+    }
+
+    saucy_g->n = nbNodes;
+    saucy_g->e = saucy_g->adj[nbNodes] / 2;
+};
+
+void Graph::freeGraph() {
+    free(saucy_g->adj);
+    free(saucy_g->edg);
+    free(saucy_g->colors);
+    free(saucy_g);
+}
+
+
+uint Graph::getNbNodesFromGraph(){
+    return (uint) saucy_g->n;
+}
+
+uint Graph::getNbEdgesFromGraph() {
+    return (uint) saucy_g->e;
+}
+
+uint Graph::getColorOf(uint node) {
+    return saucy_g->colors[node];
+}
+
+uint Graph::nbNeighbours(uint node){
+    return saucy_g->adj[node + 1] - saucy_g->adj[node];
+}
+uint Graph::getNeighbour(uint node, uint nbthNeighbour){
+    return saucy_g->edg[saucy_g->adj[node] + nbthNeighbour];
+}
+void Graph::setNodeToNewColor(uint node) {
+    saucy_g->colors[node] = colorcount.size() ;
+}
 
 std::vector<sptr<Permutation> > perms;
 
 // This method is given to Saucy as a polymorphic consumer of the detected generator permutations
 
-static int addPermutation(int n, const int *ct_perm, int nsupp, int *support, void *arg) {
-  if (n == 0 || nsupp == 0) {
-    return not timeLimitPassed();
-  }
-
-  sptr<Permutation> perm = std::make_shared<Permutation>();
-  for (int i = 0; i < n; ++i) {
-    if (i != ct_perm[i]) {
-      perm->addFromTo(i, ct_perm[i]);
+static int addSaucyPermutation(int n, const int *ct_perm, int nsupp, int *, void *) {
+    if (n == 0 || nsupp == 0) {
+        return not timeLimitPassed();
     }
-  }
-  perms.push_back(perm);
 
-  return not timeLimitPassed();
+    sptr<Permutation> perm = std::make_shared<Permutation>();
+    for (int i = 0; i < n; ++i) {
+        if (i != ct_perm[i]) {
+            perm->addFromTo(i, ct_perm[i]);
+        }
+    }
+    perm->addPrimeSplitToVector(perms);
+
+    return not timeLimitPassed();
 }
 
-//=====================GRAPH====================================================
+void Graph::getSymmetryGeneratorsInternal(std::vector<sptr<Permutation> >& out_perms){
+    if (getNbNodes() <= 2 * nVars) { // Saucy does not like empty graphs, so don't call Saucy with an empty graph
+        return;
+    }
+
+    // WARNING: make sure that maximum color does not surpass the number of colors, as this seems to give saucy trouble...
+    struct saucy *s = saucy_alloc(saucy_g->n, timeLeft());
+    struct saucy_stats stats;
+    saucy_search(s, saucy_g, 0, addSaucyPermutation, 0, &stats);
+    saucy_free(s);
+    // TODO: how to check whether sg is correctly freed?
+
+    std::swap(out_perms, perms);
+}
+
+
+#endif
+
+//          END INTERACTION WITH SAUCY
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//           INTERACTION WITH NAUTY/TRACES
+
+#if defined(NAUTY) || defined(TRACES)
+void Graph::initializeGraph(uint nbNodes, uint nbEdges, std::map<uint,uint>& lit2color,  std::vector<std::vector<uint> >& neighbours){
+    sparse_graph = (sparsegraph*) malloc(sizeof (sparsegraph));
+    SG_INIT(*sparse_graph);
+    sparse_graph->nv = nbNodes;
+
+    lab = (int*) malloc((nbNodes) * sizeof (int)); //Label ordering
+    ptn = (int*) malloc((nbNodes) * sizeof (int)); //0s indicate end-of-color
+
+    //Initialize the colors
+    uint index = 0;
+    for(uint color = 0; color < colorcount.size(); color++){
+        uint nbFound = 0;
+        auto needed = colorcount[color];
+        for(uint vertex = 0; vertex < nbNodes && nbFound < needed; vertex++){
+             if(lit2color[vertex] == color){
+                 nbFound++;
+                 lab[index]= vertex;
+                 node2pos[vertex] = index;
+                 if(nbFound == needed){
+                     //End of color
+                     ptn[index]=0;
+                 } else{
+                     ptn[index]=1;
+                 }
+                 index++;
+             }
+        }
+    }
+
+    sparse_graph->nde = nbEdges;
+
+    sparse_graph->v = (size_t*) malloc((sparse_graph->nv) * sizeof (size_t));
+    sparse_graph->d = (int*) malloc((sparse_graph->nv) * sizeof (int));
+
+    int ctr = 0;
+    int neighboursSeen = 0;
+    for (auto nblist : neighbours) {
+        sparse_graph->d[ctr] = nblist.size();
+        sparse_graph->v[ctr] = neighboursSeen;
+        neighboursSeen += nblist.size();
+        ++ctr;
+    }
+
+    sparse_graph->e = (int*) malloc((sparse_graph->nde) * sizeof (int));
+
+
+
+    ctr = 0;
+    for (auto nblist : neighbours) {
+        for (auto l : nblist) {
+            sparse_graph->e[ctr] = l;
+            ++ctr;
+        }
+    }
+};
+
+void Graph::freeGraph() {
+    free(sparse_graph->e);
+    free(sparse_graph->d);
+    free(sparse_graph->v);
+    free(sparse_graph);
+    //free(lab);
+    //free(ptn)
+}
+
+
+uint Graph::getNbNodesFromGraph(){
+    return (uint) sparse_graph->nv;
+}
+
+uint Graph::getNbEdgesFromGraph() {
+    return (uint) sparse_graph->nde;
+}
+
+uint Graph::getColorOf(uint node) {
+    uint result = 0;
+    size_t pos = node2pos[node];
+    for(size_t i = 0; i<pos; i++){
+        if(ptn[i] == 0){
+            result++;
+        }
+    }
+    return result;
+}
+
+uint Graph::nbNeighbours(uint node){
+    return (uint) sparse_graph->d[node];
+}
+uint Graph::getNeighbour(uint node, uint nbthNeighbour){
+    return (uint) sparse_graph->e[sparse_graph->v[node]+nbthNeighbour];
+}
+void Graph::setNodeToNewColor(uint node) {
+    auto pos = node2pos[node];
+    if (pos>0 && ptn[pos] == 0){
+        ptn[pos-1]=0;
+    }
+    for(size_t i = pos; i < sparse_graph->nv -1; i++ ){
+        lab[i] = lab[i+1];
+        ptn[i] = ptn[i+1];
+        node2pos[lab[i]] = i;
+    }
+    lab[sparse_graph->nv-1]=node;
+    node2pos[node] = sparse_graph->nv-1;
+    ptn[sparse_graph->nv-1] = 0;
+}
+std::vector<sptr<Permutation> > perms;
+
+// This method is given to Saucy as a polymorphic consumer of the detected generator permutations
+
+//    void (*userautomproc)(int,int*,int);
+
+#endif
+
+#if  defined(TRACES)
+
+static void addNautyPermutation(int,int* perm,int n) {
+    //TODO: currently, this cannot take the timeouts into account!
+
+    sptr<Permutation> permu = std::make_shared<Permutation>();
+    for (int i = 0; i < n; ++i) {
+        if (i != perm[i]) {
+            permu->addFromTo(i, perm[i]);
+        }
+    }
+        permu->addPrimeSplitToVector(perms);
+
+
+    //TODO return not timeLimitPassed();
+
+}
+
+void Graph::getSymmetryGeneratorsInternal(std::vector<sptr<Permutation> >& out_perms){
+    if (getNbNodes() <= 2 * nVars) { // Saucy does not like empty graphs, so don't call Saucy with an empty graph
+        return;
+    }
+
+
+
+
+    static DEFAULTOPTIONS_TRACES(options);
+    options.userautomproc = addNautyPermutation;
+    options.defaultptn = false;
+
+    int* orbits = (int*) malloc((sparse_graph->nv) * sizeof (int));
+    TracesStats stats;
+   // auto stats = (TracesStats*) malloc(sizeof(TracesStats));
+
+    Traces(sparse_graph,lab,ptn,orbits,&options,&stats,NULL);
+
+    /*
+    // WARNING: make sure that maximum color does not surpass the number of colors, as this seems to give saucy trouble...
+    struct saucy *s = saucy_alloc(saucy_g->n, timeLeft());
+    struct saucy_stats stats;
+    saucy_search(s, saucy_g, 0, addSaucyPermutation, 0, &stats);
+    saucy_free(s);
+    // TODO: how to check whether sg is correctly freed?
+
+     */
+    std::swap(out_perms, perms);
+
+    free(orbits);
+}
+
+
+#endif
+
+#if  defined(NAUTY)
+
+//(c) userautomproc(count, perm, orbits, numorbits, stabvertex, n)
+
+static void addNautyPermutation(int,int* perm, int* , int , int,     int n) {
+    //TODO: currently, this cannot take the timeouts into account!
+    sptr<Permutation> permu = std::make_shared<Permutation>();
+    for (int i = 0; i < n; ++i) {
+        if (i != perm[i]) {
+            permu->addFromTo(i, perm[i]);
+        }
+    }
+    permu->addPrimeSplitToVector(perms);
+
+
+    //TODO return not timeLimitPassed();
+
+}
+
+void Graph::getSymmetryGeneratorsInternal(std::vector<sptr<Permutation> >& out_perms){
+    if (getNbNodes() <= 2 * nVars) { // Saucy does not like empty graphs, so don't call Saucy with an empty graph
+        return;
+    }
+
+
+
+
+    DEFAULTOPTIONS_SPARSEGRAPH(options);
+    options.userautomproc = addNautyPermutation;
+    options.defaultptn = false;
+    options.getcanon=FALSE;
+
+    int* orbits = (int*) malloc((sparse_graph->nv) * sizeof (int));
+    statsblk stats;
+
+    sparsenauty(sparse_graph,lab,ptn,orbits,&options,&stats,NULL);
+
+    /*
+    // WARNING: make sure that maximum color does not surpass the number of colors, as this seems to give saucy trouble...
+    struct saucy *s = saucy_alloc(saucy_g->n, timeLeft());
+    struct saucy_stats stats;
+    saucy_search(s, saucy_g, 0, addSaucyPermutation, 0, &stats);
+    saucy_free(s);
+    // TODO: how to check whether sg is correctly freed?
+
+     */
+    std::swap(out_perms, perms);
+
+    free(orbits);
+}
+
+#endif
+
+//          END INTERACTION WITH NAUTY/TRACES
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//           INTERACTION WITH BLISS
+
+#ifdef BLISS
+void Graph::initializeGraph(uint nbNodes, uint nbEdges, std::map<uint,uint>& lit2color,  std::vector<std::vector<uint> >& neighbours){
+    bliss_g = new bliss::Graph(nbNodes);
+    for(size_t n = 0; n < nbNodes; n++){
+        bliss_g->change_color(n,lit2color[n]);
+    }
+    for(size_t n = 0; n < nbNodes; n++){
+        for(auto other: neighbours[n]){
+            bliss_g->add_edge(n,other);
+        }
+    }
+
+};
+
+void Graph::freeGraph() {
+    delete(bliss_g);
+}
+
+
+uint Graph::getNbNodesFromGraph(){
+    return bliss_g->get_nof_vertices();
+}
+
+uint Graph::getNbEdgesFromGraph() {
+    return 0; //Not supported, not important
+}
+
+uint Graph::getColorOf(uint node) {
+    return 0; //Not supported, only used for printing
+}
+
+uint Graph::nbNeighbours(uint node){
+    return 0; //Not supported, only used for printing
+}
+uint Graph::getNeighbour(uint node, uint nbthNeighbour){
+    return 0; //Not supported, only used for printing
+}
+void Graph::setNodeToNewColor(uint node) {
+    bliss_g->change_color(node,colorcount.size());
+}
+std::vector<sptr<Permutation> > perms;
+
+// This method is given to BLISS as a polymorphic consumer of the detected generator permutations
+
+static void addBlissPermutation(void* param, const unsigned int n, const unsigned int* aut) {
+    //TODO: currently, this cannot take the timeouts into account!
+
+    sptr<Permutation> permu = std::make_shared<Permutation>();
+    for (int i = 0; i < n; ++i) {
+        if (i != aut[i]) {
+            permu->addFromTo(i, aut[i]);
+        }
+    }
+    permu->addPrimeSplitToVector(perms);
+
+}
+
+void Graph::getSymmetryGeneratorsInternal(std::vector<sptr<Permutation> >& out_perms){
+
+    bliss::Stats stats;
+    //bliss_g->set_splitting_heuristic(bliss::Graph::SplittingHeuristic::shs_fl); //TODO: to decide
+
+    bliss_g->find_automorphisms(stats, &addBlissPermutation, stdout);
+
+    std::swap(out_perms, perms);
+}
+
+
+#endif
+
+
+//          END INTERACTION WITH BLISS
+//------------------------------------------------------------------------------
+
 
 Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses) {
   //TODO: Why are we making undirected graphs? Efficiency? In principle, a lot could be directed (e.g., only edge from clause to lit -> more in LP)
-  sg = (saucy_graph*) malloc(sizeof (struct saucy_graph));
 
   int n = 2 * nVars + clauses.size();
 
+    std::map<uint,uint> lit2color{};
+
   // Initialize colors:
-  sg->colors = (int*) malloc(n * sizeof (int));
   for (uint i = 0; i < 2 * nVars; ++i) {
-    sg->colors[i] = 0;
+      lit2color[i] = 0;
   }
   colorcount.push_back(2 * nVars);
 
   for (int i = 2 * nVars; i < n; ++i) {
-    sg->colors[i] = 1;
+      lit2color[i] = 1;
   }
   colorcount.push_back(clauses.size());
+
+    uint nbedges = 0;
 
   // Initialize edge lists
   // First construct for each node the list of neighbors
@@ -74,6 +487,7 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses) {
     uint negID = encode(-l);
     neighbours[posID].push_back(negID);
     neighbours[negID].push_back(posID);
+      nbedges += 2;
   }
   // Clauses have as neighbors the literals occurring in them
   uint c = 2 * nVars;
@@ -81,31 +495,17 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses) {
     for (auto lit : cl->lits) {
       neighbours[lit].push_back(c);
       neighbours[c].push_back(lit);
+        nbedges += 2;
     }
     ++c;
   }
 
-  // now count the number of neighboring nodes
-  sg->adj = (int*) malloc((n + 1) * sizeof (int));
-  sg->adj[0] = 0;
-  int ctr = 0;
-  for (auto nblist : neighbours) {
-    sg->adj[ctr + 1] = sg->adj[ctr] + nblist.size();
-    ++ctr;
-  }
 
-  // finally, initialize the lists of neighboring nodes, C-style
-  sg->edg = (int*) malloc(sg->adj[n] * sizeof (int));
-  ctr = 0;
-  for (auto nblist : neighbours) {
-    for (auto l : nblist) {
-      sg->edg[ctr] = l;
-      ++ctr;
-    }
-  }
+  //Now, initialize the internal graph
+  initializeGraph(n,nbedges,lit2color,neighbours);
 
-  sg->n = n;
-  sg->e = sg->adj[n] / 2;
+
+
 
   // look for unused lits, make their color unique so that no symmetries on them are found
   // useful for subgroups
@@ -126,8 +526,6 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses) {
   setUniqueColor(fixedLits);
 }
 Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules) {
-  sg = (saucy_graph*) malloc(sizeof (struct saucy_graph));
-
   //We create this graph:
   // color0 for positive literals
   // color1 for negative literals
@@ -171,22 +569,21 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules) {
   //The three is to make sure that all colors are used (cfr colorcount documentation)
   int n = 2 * nVars + 2 * rules.size() + 4 + nbextralits;
 
-  // Initialize colors: take enough space
-  sg->colors = (int*) malloc(n * sizeof (int));
+    std::map<uint,uint> lit2color{};
   uint current_node_index = 0;
   for (; current_node_index < 2 * nVars; ++current_node_index) {
     //Positive lits are colored with color0
-    sg->colors[current_node_index] = 0;
+      lit2color[current_node_index] = 0;
     ++current_node_index;
     //Negative lits are colored with color0
-    sg->colors[current_node_index] = 1;
+      lit2color[current_node_index] = 1;
   }
   colorcount.push_back(nVars);
   colorcount.push_back(nVars);
 
   //initialise the 4 extra nodes
   for(auto i: {2,3,4,5}) {
-    sg->colors[current_node_index] = i;
+      lit2color[current_node_index] = i;
     current_node_index++;
     colorcount.push_back(1);
   }
@@ -197,6 +594,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules) {
     colorcount.push_back(0);
   }
 
+    uint nbedges = 0 ;
   // Initialize edge lists
   // First construct for each node the list of neighbors
   std::vector<std::vector<uint> > neighbours(n);
@@ -206,6 +604,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules) {
     uint negID = encode(-l);
     neighbours[posID].push_back(negID);
     neighbours[negID].push_back(posID);
+      nbedges +=2;
   }
 
   for(auto r:rules) {
@@ -214,36 +613,39 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules) {
     auto headNode = current_node_index;
     current_node_index++;
 
-    sg->colors[headNode] = 2;
+      lit2color[headNode] = 2;
     colorcount[2]++;
 
     if(r->ruleType == 1) {
-      sg->colors[bodyNode] = 3;
+        lit2color[bodyNode] = 3;
     }
     else if(r->ruleType == 3) {
-      sg->colors[bodyNode] = 4;
+        lit2color[bodyNode] = 4;
     }
     else if(r->ruleType == 2 || r->ruleType == 5) {
       auto color = boundToColor[r->bound];
-      sg->colors[bodyNode] = color;
+        lit2color[bodyNode] = color;
     }
     else if(r->ruleType == 6) {
-      sg->colors[bodyNode] = 6;
+        lit2color[bodyNode] = 6;
     }
 
-    colorcount[sg->colors[bodyNode]]++;
+    colorcount[lit2color[bodyNode]]++;
 
     neighbours[bodyNode].push_back(headNode);
     neighbours[headNode].push_back(bodyNode);
+      nbedges +=2;
 
     for(auto lit: r->headLits) {
       neighbours[lit].push_back(headNode);
       neighbours[headNode].push_back(lit);
+        nbedges +=2;
     }
     if(r->ruleType != 5 && r->ruleType != 6) {
       for(auto lit: r->bodyLits) {
         neighbours[lit].push_back(bodyNode);
         neighbours[bodyNode].push_back(lit);
+          nbedges +=2;
       }
     } else {
       for(u_int index = 0; index < r->bodyLits.size(); index++) {
@@ -251,37 +653,18 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules) {
         auto weight = r->weights[index];
         auto extranode = current_node_index;
         current_node_index++;
-        sg->colors[extranode] = boundToColor[weight];
+          lit2color[extranode] = boundToColor[weight];
         neighbours[extranode].push_back(bodyNode);
         neighbours[bodyNode].push_back(extranode);
         neighbours[extranode].push_back(lit);
         neighbours[lit].push_back(extranode);
+          nbedges +=4;
       }
     }
 
   }
 
-  // now count the number of neighboring nodes
-  sg->adj = (int*) malloc((n + 1) * sizeof (int));
-  sg->adj[0] = 0;
-  int ctr = 0;
-  for (auto nblist : neighbours) {
-    sg->adj[ctr + 1] = sg->adj[ctr] + nblist.size();
-    ++ctr;
-  }
-
-// finally, initialize the lists of neighboring nodes, C-style
-  sg->edg = (int*) malloc(sg->adj[n] * sizeof (int));
-  ctr = 0;
-  for (auto nblist : neighbours) {
-    for (auto l : nblist) {
-      sg->edg[ctr] = l;
-      ++ctr;
-    }
-  }
-
-  sg->n = n;
-  sg->e = sg->adj[n] / 2;
+  initializeGraph(n,nbedges,lit2color, neighbours);
 
 // look for unused lits, make their color unique so that no symmetries on them are found
 // useful for subgroups
@@ -307,37 +690,35 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules) {
 }
 
 Graph::~Graph() {
-  free(sg->adj);
-  free(sg->edg);
-  free(sg->colors);
-  free(sg);
+  freeGraph();
 }
 
 void Graph::print() {
-  for (int i = 0; i < sg->n; ++i) {
-    fprintf(stderr, "node %i with color %i has neighbours\n", i, sg->colors[i]);
-    for (int j = sg->adj[i]; j < sg->adj[i + 1]; ++j) {
-      fprintf(stderr, "%i ", sg->edg[j]);
+  for (int i = 0; i < getNbNodes(); ++i) {
+    fprintf(stderr, "node %i with color %i has neighbours\n", i, getColorOf(i));
+    for (int j = 0; j < nbNeighbours(i); ++j) {
+      fprintf(stderr, "%i ", getNeighbour(i,j));
     }
     fprintf(stderr, "\n");
   }
 }
 
-uint Graph::getNbNodes() {
-  return (uint) sg->n;
+uint Graph::getNbNodes(){
+        return getNbNodesFromGraph();
 }
 
 uint Graph::getNbEdges() {
-  return (uint) sg->e;
+  return getNbEdgesFromGraph();
 }
 
 void Graph::setUniqueColor(uint lit) {
-  uint currentcount = colorcount[sg->colors[lit]];
+    auto color = getColorOf(lit);
+  uint currentcount = colorcount[getColorOf(lit)];
   if (currentcount == 1) {
     return; // color was already unique
   }
-  colorcount[sg->colors[lit]] = currentcount - 1;
-  sg->colors[lit] = colorcount.size() ;
+  colorcount[color] = currentcount - 1;
+  setNodeToNewColor(lit);
   colorcount.push_back(1);
 }
 
@@ -348,25 +729,19 @@ void Graph::setUniqueColor(const std::vector<uint>& lits) {
 }
 
 void Graph::getSymmetryGenerators(std::vector<sptr<Permutation> >& out_perms) {
-  out_perms.clear();
-
-  if(getNbNodes()<=2*nVars) { // Saucy does not like empty graphs, so don't call Saucy with an empty graph
-      return;
-    }
-
+    out_perms.clear();
     if (timeLimitPassed()) { // do not call saucy again when interrupted by time limit previously
-      return;
+        return;
     }
+
     if (verbosity > 1) {
-      std::clog << "Running Saucy with time limit: " << timeLeft() << std::endl;
+        std::clog << "Searching graph automorphisms with time limit: " << timeLeft() << std::endl;
     }
 
-    // WARNING: make sure that maximum color does not surpass the number of colors, as this seems to give saucy trouble...
-    struct saucy* s = saucy_alloc(sg->n, timeLeft());
-    struct saucy_stats stats;
-    saucy_search(s, sg, 0, addPermutation, 0, &stats);
-    saucy_free(s);
-    // TODO: how to check whether sg is correctly freed?
+    getSymmetryGeneratorsInternal(out_perms);
 
-    std::swap(out_perms,perms);
-  }
+
+
+
+
+}
