@@ -151,43 +151,52 @@ void printUsage()
               << "[" << options::generatorfile << "] "
               << "[" << options::symmetryinput << "<file with symmetry info>] "
               << "\n";
-    cout << "\nOptions:\n";
-    cout << options::help << "\n  ";
-    cout << "Display this help message instead of running BreakID.\n";
-    cout << options::nointch << "\n  ";
-    cout << "Disable detection and breaking of row interchangeability.\n";
-    cout << options::nobinary << "\n  ";
-    cout << "Disable construction of additional binary symmetry breaking "
-                 "clauses based on stabilizer subgroups.\n";
-    cout << options::nosmall << "\n  ";
-    cout << "Disable compact symmetry breaking encoding, use Shatter's "
-                 "encoding instead.\n";
-    cout << options::norelaxed << "\n  ";
-    cout << "Disable relaxing constraints on auxiliary encoding "
-                 "variables, use longer encoding instead.\n";
-    cout << options::formlength << " <default: " << symBreakingFormLength
-              << ">\n  ";
-    cout << "Limit the size of the constructed symmetry breaking "
-                 "formula's, measured as the number of auxiliary variables "
-                 "introduced. <-1> means no symmetry breaking.\n";
-    cout << options::timelim << " <default: " << timeLim << ">\n  ";
-    cout << "Upper limit on time spent by Saucy detecting symmetry "
-                 "measured in seconds.\n";
-    cout << options::verbosity << " <default: " << verbosity << ">\n  ";
-    cout << "Verbosity of the output. <0> means no output other than the "
-                 "CNF augmented with symmetry breaking clauses.\n";
-    cout << options::onlybreakers << "\n  ";
-    cout << "Do not print original theory, only the symmetry breaking "
-                 "clauses.\n";
-    cout << options::generatorfile << "\n  ";
+
     cout
-        << "Return the generator symmetries as a <path-to-cnf>.sym file.\n";
-    cout << options::symmetryinput << " <default: none>\n  ";
-    cout << "Pass a file with symmetry generators or row-interchangeable "
-                 "matrices to use as additional symmetry information. Same "
-                 "format as BreakID's output by "
-              << options::generatorfile << ".\n";
-    gracefulError("");
+    << "\nOptions:\n"
+    << options::help << "\n"
+    << " Display this help message instead of running BreakID.\n"
+
+    << options::nointch << "\n"
+    << " Disable detection and breaking of row interchangeability.\n"
+
+    << options::nobinary << "\n"
+    << " Disable construction of additional binary symmetry breaking\n"
+    << " clauses based on stabilizer subgroups.\n"
+
+    << options::nosmall << "\n"
+    << " Disable compact symmetry breaking encoding, use Shatter's\n"
+    << " encoding instead.\n"
+
+    << options::norelaxed << "\n"
+    << " Disable relaxing constraints on auxiliary encoding\n"
+    << " variables, use longer encoding instead.\n"
+
+    << options::formlength << " <default: " << symBreakingFormLength << ">\n"
+    << " Limit the size of the constructed symmetry breaking\n"
+    << " formula's, measured as the number of auxiliary variables\n"
+    << " introduced. <-1> means no symmetry breaking.\n"
+
+    << options::timelim << " <default: " << timeLim << ">\n"
+    << " Upper limit on time spent by Saucy detecting symmetry\n"
+    << " measured in seconds.\n"
+
+    << options::verbosity << " <default: " << verbosity << ">\n"
+    << " Verbosity of the output. <0> means no output other than the\n"
+    << " CNF augmented with symmetry breaking clauses.\n"
+
+    << options::onlybreakers << "\n"
+    << " Do not print original theory, only the symmetry breaking"
+    << " clauses.\n"
+
+    << options::generatorfile << "\n"
+    << " Return the generator symmetries as a <path-to-cnf>.sym file.\n"
+
+    << options::symmetryinput << " <default: none>\n"
+    << " Pass a file with symmetry generators or row-interchangeable\n"
+    << " matrices to use as additional symmetry information. Same\n"
+    << " format as BreakID's output by " << options::generatorfile << ".\n"
+    ;
 }
 
 void parseOptions(int argc, char *argv[])
