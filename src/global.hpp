@@ -43,21 +43,23 @@ using std::endl;
 using std::vector;
 
 // GLOBALS:
-extern uint32_t nVars;
-extern vector<uint32_t> fixedLits;
-extern std::string inputSymFile;
-extern time_t startTime;
+struct Config {
+    uint32_t nVars;
+    vector<uint32_t> fixedLits;
+    std::string inputSymFile;
+    time_t startTime;
 
-// OPTIONS:
-extern int symBreakingFormLength;
-extern bool useBinaryClauses;
-extern bool onlyPrintBreakers;
-extern bool printGeneratorFile;
-extern bool useMatrixDetection;
-extern bool useShatterTranslation;
-extern bool useFullTranslation;
-extern uint32_t verbosity;
-extern int timeLim;
+    // OPTIONS
+    int symBreakingFormLength;
+    bool useBinaryClauses;
+    bool onlyPrintBreakers;
+    bool printGeneratorFile;
+    bool useMatrixDetection;
+    bool useShatterTranslation;
+    bool useFullTranslation;
+    uint32_t verbosity;
+    int timeLim;
+};
 
 size_t _getHash(const vector<uint32_t>& xs);
 size_t _getHash(const vector<int>& xs);

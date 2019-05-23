@@ -35,8 +35,8 @@ using namespace std;
 
 void Permutation::addFromTo(uint32_t from, uint32_t to)
 {
-    if (from != to && from < 2 * nVars &&
-        to < 2 * nVars) { // only ID's < 2*nVars represent literals
+    if (from != to && from < 2 * conf->nVars &&
+        to < 2 * conf->nVars) { // only ID's < 2*conf->nVars represent literals
         perm[from] = to;
         domain.push_back(from);
         image.push_back(to);
@@ -97,7 +97,7 @@ void Permutation::addPrimeSplitToVector(
         auto prime = p2p.first;
         auto powers = p2p.second;
 
-        auto genPerm = std::make_shared<Permutation>();
+        auto genPerm = std::make_shared<Permutation>(conf);
         size_t smallestPow = SIZE_MAX;
         size_t biggestPow = 0;
         for (auto power : powers) {
@@ -115,7 +115,7 @@ void Permutation::addPrimeSplitToVector(
                 smallestPow--;
                 continue;
             }
-            auto equalCycleGen = std::make_shared<Permutation>();
+            auto equalCycleGen = std::make_shared<Permutation>(conf);
             for (auto power : powers) {
                 for (auto c : lengthToCycles[pow(prime, power)]) {
                     size_t cycleLength = pow(prime, smallestPow);
@@ -144,13 +144,15 @@ void Permutation::addCycle(vector<uint32_t>& cyc)
     }
 }
 
-Permutation::Permutation()
+Permutation::Permutation(Config* _conf) :
+    conf(_conf)
 {
     hash = 0;
     maxCycleSize = 1;
 }
 
-Permutation::Permutation(vector<std::pair<uint32_t, uint32_t> >& tuples)
+Permutation::Permutation(vector<std::pair<uint32_t, uint32_t> >& tuples, Config* _conf) :
+    conf(_conf)
 {
     for (auto tup : tuples) {
         addFromTo(tup.first, tup.second);
@@ -159,7 +161,8 @@ Permutation::Permutation(vector<std::pair<uint32_t, uint32_t> >& tuples)
     maxCycleSize = 1;
 }
 
-Permutation::Permutation(vector<uint32_t>& row1, vector<uint32_t>& row2)
+Permutation::Permutation(vector<uint32_t>& row1, vector<uint32_t>& row2, Config* _conf) :
+    conf(_conf)
 {
     for (uint32_t i = 0; i < row1.size() && i < row2.size(); ++i) {
         uint32_t from = row1[i];
@@ -337,6 +340,10 @@ bool Permutation::equals(sptr<Permutation> other)
 
 // =========Group=========================
 
+Group::Group(Config* _conf) :
+    conf(_conf)
+{}
+
 void Group::add(sptr<Permutation> p)
 {
     permutations.push_back(p);
@@ -352,10 +359,10 @@ void Group::addMatrix(sptr<Matrix> m)
         support.insert(row->cbegin(), row->cend());
     }
 
-    if (verbosity > 1) {
+    if (conf->verbosity > 1) {
         cout << "Matrix with " << m->nbRows() << " rows and "
                   << m->nbColumns() << " columns detected" << endl;
-    } else if (verbosity > 2) {
+    } else if (conf->verbosity > 2) {
         m->print(cout);
     }
 }
@@ -385,7 +392,7 @@ sptr<Matrix> Group::getInitialMatrix()
         }
     }
 
-    sptr<Matrix> result(new Matrix());
+    sptr<Matrix> result(new Matrix(conf));
     for (auto it = involutions.cbegin(); it != involutions.cend();
          ++it) { // looping over all involution sizes
         for (uint32_t i = 0; i < it->second.size(); ++i) {
@@ -480,7 +487,7 @@ void Group::checkColumnInterchangeability(sptr<Matrix> m)
             break;
         }
     }
-    sptr<Matrix> newM(new Matrix());
+    sptr<Matrix> newM(new Matrix(conf));
     newM->add(first);
 
     // test for all swaps of first column with another one
@@ -494,7 +501,7 @@ void Group::checkColumnInterchangeability(sptr<Matrix> m)
                 other->push_back(neg(l));
             }
             // create swap of column i with column firstCol
-            Permutation swap(*first, *other);
+            Permutation swap(*first, *other, conf);
             if (theory->isSymmetry(swap)) {
                 newM->add(other);
             } else {
@@ -548,7 +555,7 @@ void Group::getDisjointGenerators(vector<sptr<Group> >& subgroups)
     subgroups.clear();
 
     if (matrices.size() > 0) {
-        sptr<Group> current(new Group());
+        sptr<Group> current(new Group(conf));
         for (auto m : matrices) {
             current->addMatrix(m);
         }
@@ -571,7 +578,7 @@ void Group::getDisjointGenerators(vector<sptr<Group> >& subgroups)
 
     while (permutations.size() > 0) {
         uint32_t previoussize = 0;
-        sptr<Group> current(new Group());
+        sptr<Group> current(new Group(conf));
         current->add(permutations.back());
         permutations.pop_back();
         while (current->getSize() > previoussize) {
@@ -732,8 +739,8 @@ void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
         }
     }
 
-    if (useBinaryClauses) {
-        if (verbosity > 1) {
+    if (conf->useBinaryClauses) {
+        if (conf->verbosity > 1) {
             cout << "Adding binary symmetry breaking clauses for group..."
                       << endl;
         }
@@ -781,7 +788,7 @@ void Group::addBreakingClausesTo(Breaker& brkr)
     vector<uint32_t> order;
     getOrderAndAddBinaryClausesTo(brkr, order);
 
-    if (verbosity > 1) {
+    if (conf->verbosity > 1) {
         cout << "order: ";
         for (auto x : order) {
             cout << decode(x) << " ";
@@ -798,7 +805,7 @@ void Group::addBreakingClausesTo(Breaker& brkr)
     for (auto m : matrices) {
         for (uint32_t idx = 0; idx < m->nbRows() - 1; ++idx) {
             sptr<Permutation> rowswap(
-                new Permutation(*m->getRow(idx), *m->getRow(idx + 1)));
+                new Permutation(*m->getRow(idx), *m->getRow(idx + 1), conf));
             brkr.addRowSym(rowswap, order);
         }
     }
@@ -806,7 +813,8 @@ void Group::addBreakingClausesTo(Breaker& brkr)
 
 // =================MATRIX======================
 
-Matrix::Matrix()
+Matrix::Matrix(Config* _conf) :
+    conf(_conf)
 {
 }
 
@@ -871,7 +879,7 @@ void Matrix::tryToAddNewRow(sptr<Permutation> p, uint32_t rowIndex,
         }
     }
     // create new row-swapping permutation, test whether it is a symmetry, add the resulting row
-    Permutation rowSwap(*getRow(rowIndex), *image);
+    Permutation rowSwap(*getRow(rowIndex), *image, conf);
     if (theory->isSymmetry(rowSwap)) {
         add(image);
     } else {
@@ -941,7 +949,7 @@ sptr<Permutation> Matrix::getProductWithRowsWap(const sptr<Permutation> p,
     if (r1 == r2) {
         return p;
     } else if (p->isIdentity()) {
-        sptr<Permutation> result(new Permutation(*getRow(r1), *getRow(r2)));
+        sptr<Permutation> result(new Permutation(*getRow(r1), *getRow(r2), conf));
         return result;
     }
 
@@ -976,6 +984,6 @@ sptr<Permutation> Matrix::getProductWithRowsWap(const sptr<Permutation> p,
         }
     }
 
-    sptr<Permutation> result(new Permutation(protoPerm));
+    sptr<Permutation> result(new Permutation(protoPerm, conf));
     return result;
 }

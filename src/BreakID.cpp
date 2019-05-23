@@ -43,18 +43,20 @@ using std::make_shared;
 using std::vector;
 
 namespace options {
-// option strings:
-string nointch = "-no-row";
-string nobinary = "-no-bin";
-string formlength = "-s";
-string verbosity = "-v";
-string timelim = "-t";
-string help = "-h";
-string nosmall = "-no-small";
-string norelaxed = "-no-relaxed";
-string onlybreakers = "-print-only-breakers";
-string generatorfile = "-with-generator-file";
+    // option strings:
+    string nointch = "-no-row";
+    string nobinary = "-no-bin";
+    string formlength = "-s";
+    string verbosity = "-v";
+    string timelim = "-t";
+    string help = "-h";
+    string nosmall = "-no-small";
+    string norelaxed = "-no-relaxed";
+    string onlybreakers = "-print-only-breakers";
+    string generatorfile = "-with-generator-file";
 } // namespace options
+
+Config conf;
 
 void printUsage()
 {
@@ -92,16 +94,16 @@ void printUsage()
     << " Disable relaxing constraints on auxiliary encoding\n"
     << " variables, use longer encoding instead.\n"
 
-    << options::formlength << " <default: " << symBreakingFormLength << ">\n"
+    << options::formlength << " <default: " << conf.symBreakingFormLength << ">\n"
     << " Limit the size of the constructed symmetry breaking\n"
     << " formula's, measured as the number of auxiliary variables\n"
     << " introduced. <-1> means no symmetry breaking.\n"
 
-    << options::timelim << " <default: " << timeLim << ">\n"
+    << options::timelim << " <default: " << conf.timeLim << ">\n"
     << " Upper limit on time spent by Saucy detecting symmetry\n"
     << " measured in seconds.\n"
 
-    << options::verbosity << " <default: " << verbosity << ">\n"
+    << options::verbosity << " <default: " << conf.verbosity << ">\n"
     << " Verbosity of the output. <0> means no output other than the\n"
     << " CNF augmented with symmetry breaking clauses.\n"
 
@@ -123,42 +125,47 @@ void parseOptions(int argc, char *argv[])
     for (int i = 1; i < argc; ++i) {
         string input = argv[i];
         if (0 == input.compare(options::nobinary)) {
-            useBinaryClauses = false;
+            conf.useBinaryClauses = false;
         } else if (0 == input.compare(options::nointch)) {
-            useMatrixDetection = false;
+            conf.useMatrixDetection = false;
         } else if (0 == input.compare(options::onlybreakers)) {
-            onlyPrintBreakers = true;
+            conf.onlyPrintBreakers = true;
         } else if (0 == input.compare(options::generatorfile)) {
-            printGeneratorFile = true;
+            conf.printGeneratorFile = true;
         } else if (0 == input.compare(options::nosmall)) {
-            useShatterTranslation = true;
+            conf.useShatterTranslation = true;
         } else if (0 == input.compare(options::norelaxed)) {
-            useFullTranslation = true;
+            conf.useFullTranslation = true;
         } else if (0 == input.compare(options::formlength)) {
             ++i;
-            symBreakingFormLength = std::stoi(argv[i]);
+            conf.symBreakingFormLength = std::stoi(argv[i]);
         } else if (0 == input.compare(options::timelim)) {
             ++i;
-            timeLim = std::stoi(argv[i]);
+            conf.timeLim = std::stoi(argv[i]);
         } else if (0 == input.compare(options::verbosity)) {
             ++i;
-            verbosity = std::stoi(argv[i]);
+            conf.verbosity = std::stoi(argv[i]);
         } else if (0 == input.compare(options::help)) {
             printUsage();
         }
     }
 
-    if (verbosity > 1) {
-        cout << "Options used: " << options::formlength << " "
-                  << symBreakingFormLength << " " << options::timelim << " "
-                  << timeLim << " " << options::verbosity << " " << verbosity
-                  << " " << (useMatrixDetection ? "" : options::nointch) << " "
-                  << (useBinaryClauses ? "" : options::nobinary) << " "
-                  << (onlyPrintBreakers ? options::onlybreakers : "") << " "
-                  << (printGeneratorFile ? options::generatorfile : "") << " "
-                  << (useShatterTranslation ? options::nosmall : "") << " "
-                  << (useFullTranslation ? options::norelaxed : "") << " "
-                  << endl;
+    if (conf.verbosity > 1) {
+        cout << "Options used:"
+            << " " << options::formlength << " " << conf.symBreakingFormLength
+
+            << " " << options::timelim << " " << conf.timeLim
+
+            << " " << options::verbosity << " " << conf.verbosity
+
+            << " "
+            << (conf.useMatrixDetection ? "" : options::nointch) << " "
+            << (conf.useBinaryClauses ? "" : options::nobinary) << " "
+            << (conf.onlyPrintBreakers ? options::onlybreakers : "") << " "
+            << (conf.printGeneratorFile ? options::generatorfile : "") << " "
+            << (conf.useShatterTranslation ? options::nosmall : "") << " "
+            << (conf.useFullTranslation ? options::norelaxed : "") << " "
+            << endl;
     }
 }
 
@@ -167,39 +174,39 @@ int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
 
-    time(&startTime);
+    time(&conf.startTime);
     string filename_ = argv[1];
 
     sptr<Specification> theory;
-    theory = make_shared<CNF>(filename_);
+    theory = make_shared<CNF>(filename_, &conf);
 
-    if (verbosity > 3) {
+    if (conf.verbosity > 3) {
         theory->getGraph()->print();
     }
 
-    if (verbosity > 0) {
+    if (conf.verbosity > 0) {
         cout << "**** symmetry generators detected: "
                   << theory->getGroup()->getSize() << endl;
-        if (verbosity > 2) {
+        if (conf.verbosity > 2) {
             theory->getGroup()->print(cout);
         }
     }
 
-    if (verbosity > 0) {
+    if (conf.verbosity > 0) {
         cout << "*** Detecting subgroups..." << endl;
     }
     vector<sptr<Group> > subgroups;
     theory->getGroup()->getDisjointGenerators(subgroups);
-    if (verbosity > 0) {
+    if (conf.verbosity > 0) {
         cout << "**** subgroups detected: " << subgroups.size()
                   << endl;
     }
 
-    if (verbosity > 1) {
+    if (conf.verbosity > 1) {
         for (auto grp : subgroups) {
             cout << "group size: " << grp->getSize()
                       << " support: " << grp->getSupportSize() << endl;
-            if (verbosity > 2) {
+            if (conf.verbosity > 2) {
                 grp->print(cout);
             }
         }
@@ -210,52 +217,54 @@ int main(int argc, char *argv[])
     uint32_t totalNbMatrices = 0;
     uint32_t totalNbRowSwaps = 0;
 
-    Breaker brkr(theory);
+    Breaker brkr(theory, &conf);
     for (auto grp : subgroups) {
-        if (grp->getSize() > 1 && useMatrixDetection) {
-            if (verbosity > 1) {
-                cout << "*** Detecting row interchangeability..."
-                          << endl;
+        if (grp->getSize() > 1 && conf.useMatrixDetection) {
+            if (conf.verbosity > 1) {
+                cout << "*** Detecting row interchangeability..." << endl;
             }
             theory->setSubTheory(grp);
             grp->addMatrices();
             totalNbMatrices += grp->getNbMatrices();
             totalNbRowSwaps += grp->getNbRowSwaps();
         }
-        if (symBreakingFormLength > -1) {
-            if (verbosity > 1) {
-                cout << "*** Constructing symmetry breaking formula..."
-                          << endl;
+        if (conf.symBreakingFormLength > -1) {
+            if (conf.verbosity > 1) {
+                cout << "*** Constructing symmetry breaking formula..." << endl;
             }
             grp->addBreakingClausesTo(brkr);
         } // else no symmetry breaking formulas are needed :)
         grp.reset();
     }
 
-    if (verbosity > 0) {
+    if (conf.verbosity) {
         cout << "**** matrices detected: " << totalNbMatrices << endl;
-        cout << "**** row swaps detected: " << totalNbRowSwaps
-                  << endl;
+        cout << "**** row swaps detected: " << totalNbRowSwaps << endl;
+
         cout << "**** extra binary symmetry breaking clauses added: "
                   << brkr.getNbBinClauses() << "\n";
+
         cout << "**** regular symmetry breaking clauses added: "
                   << brkr.getNbRegClauses() << "\n";
+
         cout << "**** row interchangeability breaking clauses added: "
                   << brkr.getNbRowClauses() << "\n";
+
         cout << "**** total symmetry breaking clauses added: "
                   << brkr.getAddedNbClauses() << "\n";
+
         cout << "**** auxiliary variables introduced: "
                   << brkr.getAuxiliaryNbVars() << "\n";
-        cout
-            << "*** Printing resulting theory with symmetry breaking clauses..."
-            << endl;
+
+        cout << "*** Printing resulting theory with symm breaking clauses..."
+        << endl;
     }
 
     brkr.print(filename_);
 
-    if (printGeneratorFile) {
+    if (conf.printGeneratorFile) {
         string symFile = filename_ + ".sym";
-        if (verbosity > 0) {
+        if (conf.verbosity > 0) {
             cout << "*** Printing generators to file " + symFile
                       << endl;
         }

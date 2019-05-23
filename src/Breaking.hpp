@@ -30,26 +30,8 @@ class Specification;
 
 class Breaker
 {
-   private:
-    std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
-    sptr<Specification> originalTheory;
-    uint32_t nbExtraVars = 0;
-    uint32_t nbBinClauses = 0;
-    uint32_t nbRowClauses = 0;
-    uint32_t nbRegClauses = 0;
-
-    void addBinary(uint32_t l1, uint32_t l2);
-    void addTernary(uint32_t l1, uint32_t l2, uint32_t l3);
-    void addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4);
-    void add(sptr<Clause> cl);
-    void add(sptr<Permutation> perm, vector<uint32_t>& order,
-             bool limitExtraConstrs);
-    void addShatter(sptr<Permutation> perm, vector<uint32_t>& order,
-                    bool limitExtraConstrs);
-
-   public:
-    Breaker(sptr<Specification> origTheo);
-
+public:
+    Breaker(sptr<Specification> origTheo, Config* conf);
     ~Breaker(){};
 
     //Prints the current breaker. Gets the original file as input to recover information lost in the process
@@ -67,8 +49,26 @@ class Breaker
     uint32_t getNbBinClauses();
     uint32_t getNbRowClauses();
     uint32_t getNbRegClauses();
-
     uint32_t getTseitinVar();
+
+private:
+    std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
+    sptr<Specification> originalTheory;
+    uint32_t nbExtraVars = 0;
+    uint32_t nbBinClauses = 0;
+    uint32_t nbRowClauses = 0;
+    uint32_t nbRegClauses = 0;
+
+    void addBinary(uint32_t l1, uint32_t l2);
+    void addTernary(uint32_t l1, uint32_t l2, uint32_t l3);
+    void addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4);
+    void add(sptr<Clause> cl);
+    void add(sptr<Permutation> perm, vector<uint32_t>& order,
+             bool limitExtraConstrs);
+    void addShatter(sptr<Permutation> perm, vector<uint32_t>& order,
+                    bool limitExtraConstrs);
+
+    Config* conf;
 };
 
 #endif

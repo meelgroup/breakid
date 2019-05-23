@@ -73,22 +73,22 @@ void Graph::setNodeToNewColor(uint32_t node)
 {
     bliss_g->change_color(node, colorcount.size());
 }
-vector<sptr<Permutation> > perms;
 
 // This method is given to BLISS as a polymorphic consumer of the detected generator permutations
 
-static void addBlissPermutation(void* param, const unsigned int n,
-                                const unsigned int* aut)
+static void addBlissPermutation(
+    void* param, const unsigned int n,
+    const unsigned int* aut)
 {
-    //TODO: currently, this cannot take the timeouts into account!
+    Graph* g = (Graph*)param;
 
-    sptr<Permutation> permu = std::make_shared<Permutation>();
+    sptr<Permutation> permu = std::make_shared<Permutation>(g->conf);
     for (unsigned i = 0; i < n; ++i) {
         if (i != aut[i]) {
             permu->addFromTo(i, aut[i]);
         }
     }
-    permu->addPrimeSplitToVector(perms);
+    permu->addPrimeSplitToVector(g->perms);
 }
 
 void Graph::getSymmetryGeneratorsInternal(
@@ -97,26 +97,27 @@ void Graph::getSymmetryGeneratorsInternal(
     bliss::Stats stats;
     //bliss_g->set_splitting_heuristic(bliss::Graph::SplittingHeuristic::shs_fl); //TODO: to decide
 
-    bliss_g->find_automorphisms(stats, &addBlissPermutation, stdout);
+    bliss_g->find_automorphisms(stats, &addBlissPermutation, (void*)this);
 
     std::swap(out_perms, perms);
 }
 
-Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
+Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses, Config* _conf) :
+    conf(_conf)
 {
     //TODO: Why are we making undirected graphs? Efficiency? In principle, a lot could be directed (e.g., only edge from clause to lit -> more in LP)
 
-    int n = 2 * nVars + clauses.size();
+    int n = 2 * conf->nVars + clauses.size();
 
     std::map<uint32_t, uint32_t> lit2color{};
 
     // Initialize colors:
-    for (uint32_t i = 0; i < 2 * nVars; ++i) {
+    for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
         lit2color[i] = 0;
     }
-    colorcount.push_back(2 * nVars);
+    colorcount.push_back(2 * conf->nVars);
 
-    for (int i = 2 * nVars; i < n; ++i) {
+    for (int i = 2 * conf->nVars; i < n; ++i) {
         lit2color[i] = 1;
     }
     colorcount.push_back(clauses.size());
@@ -127,7 +128,7 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
     // First construct for each node the list of neighbors
     vector<vector<uint32_t> > neighbours(n);
     // Literals have their negations as neighbors
-    for (uint32_t l = 1; l <= nVars; ++l) {
+    for (uint32_t l = 1; l <= conf->nVars; ++l) {
         uint32_t posID = encode(l);
         uint32_t negID = encode(-l);
         neighbours[posID].push_back(negID);
@@ -135,7 +136,7 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
         nbedges += 2;
     }
     // Clauses have as neighbors the literals occurring in them
-    uint32_t c = 2 * nVars;
+    uint32_t c = 2 * conf->nVars;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
             neighbours[lit].push_back(c);
@@ -157,16 +158,18 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
             usedLits.insert(neg(lit));
         }
     }
-    for (uint32_t i = 0; i < 2 * nVars; ++i) {
+    for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
         if (usedLits.count(i) == 0) {
             setUniqueColor(i);
         }
     }
 
-    // fix fixedLits
-    setUniqueColor(fixedLits);
+    // fix conf->fixedLits
+    setUniqueColor(conf->fixedLits);
 }
-Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
+
+Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules, Config* _conf) :
+    conf(_conf)
 {
     //We create this graph:
     // color0 for positive literals
@@ -209,19 +212,19 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
 
     //Number of nodes: 2 for each variable + two for each rule (head+body)
     //The three is to make sure that all colors are used (cfr colorcount documentation)
-    int n = 2 * nVars + 2 * rules.size() + 4 + nbextralits;
+    int n = 2 * conf->nVars + 2 * rules.size() + 4 + nbextralits;
 
     std::map<uint32_t, uint32_t> lit2color{};
     uint32_t current_node_index = 0;
-    for (; current_node_index < 2 * nVars; ++current_node_index) {
+    for (; current_node_index < 2 * conf->nVars; ++current_node_index) {
         //Positive lits are colored with color0
         lit2color[current_node_index] = 0;
         ++current_node_index;
         //Negative lits are colored with color0
         lit2color[current_node_index] = 1;
     }
-    colorcount.push_back(nVars);
-    colorcount.push_back(nVars);
+    colorcount.push_back(conf->nVars);
+    colorcount.push_back(conf->nVars);
 
     //initialise the 4 extra nodes
     for (auto i : {2, 3, 4, 5}) {
@@ -241,7 +244,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
     // First construct for each node the list of neighbors
     vector<vector<uint32_t> > neighbours(n);
     // Literals have their negations as neighbors
-    for (uint32_t l = 1; l <= nVars; ++l) {
+    for (uint32_t l = 1; l <= conf->nVars; ++l) {
         uint32_t posID = encode(l);
         uint32_t negID = encode(-l);
         neighbours[posID].push_back(negID);
@@ -317,14 +320,14 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
             usedLits.insert(neg(lit));
         }
     }
-    for (uint32_t i = 0; i < 2 * nVars; ++i) {
+    for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
         if (usedLits.count(i) == 0) {
             setUniqueColor(i);
         }
     }
 
-    // fix fixedLits
-    setUniqueColor(fixedLits);
+    // fix conf->fixedLits
+    setUniqueColor(conf->fixedLits);
 }
 
 Graph::~Graph()
@@ -376,7 +379,7 @@ void Graph::setUniqueColor(const vector<uint32_t>& lits)
 void Graph::getSymmetryGenerators(vector<sptr<Permutation> >& out_perms)
 {
     out_perms.clear();
-    if (verbosity > 1) {
+    if (conf->verbosity > 1) {
         cout << "Searching graph automorphisms" << endl;
     }
 

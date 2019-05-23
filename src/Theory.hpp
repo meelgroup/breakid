@@ -56,18 +56,8 @@ class Specification
 
 class CNF : public Specification
 {
-    friend class Breaker;
-
-   private:
-
-    ///must be an unordered_set, since we need to be able to test
-    ///whether a clause exists to detect symmetries
-    std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
-
-    void readCNF(std::string& filename);
-
-   public:
-    CNF(std::string& filename);
+public:
+    CNF(std::string& filename, Config* conf);
     CNF(vector<sptr<Clause> >& clss, sptr<Group> grp);
     ~CNF();
 
@@ -75,26 +65,35 @@ class CNF : public Specification
     uint32_t getSize();
     void setSubTheory(sptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
+    friend class Breaker;
+
+private:
+    ///must be an unordered_set, since we need to be able to test
+    ///whether a clause exists to detect symmetries
+    std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
+
+    void readCNF(std::string& filename);
+    Config* conf;
 };
 
 class LogicProgram : public Specification
 {
-    friend class Breaker;
-
-   private:
-
-    ///Must be an unordered_set, since we need to be able to test
-    ///whether a rule exists to detect symmetries
-    std::unordered_set<sptr<Rule>, UVecHash, UvecEqual> rules;
-
-   public:
-    LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp);
+public:
+    LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp, Config* conf);
     ~LogicProgram();
 
     void print(std::ostream& out);
     uint32_t getSize();
     void setSubTheory(sptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
+    friend class Breaker;
+
+private:
+
+    ///Must be an unordered_set, since we need to be able to test
+    ///whether a rule exists to detect symmetries
+    std::unordered_set<sptr<Rule>, UVecHash, UvecEqual> rules;
+    Config* conf;
 };
 
 #endif

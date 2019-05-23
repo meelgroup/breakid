@@ -30,25 +30,12 @@ class Breaker;
 
 class Permutation : public std::enable_shared_from_this<Permutation>
 {
-   private:
-    std::unordered_map<uint32_t, uint32_t> perm;
-    vector<uint32_t> cycleReprs; // smallest lit in each cycle
-    uint32_t maxCycleSize;
-    size_t hash;
+public:
+    Permutation(Config* conf);
+    Permutation(vector<std::pair<uint32_t, uint32_t> >& tuples, Config* conf);
 
-   public:
-    vector<uint32_t> domain;
-    vector<uint32_t> posDomain;
-    vector<uint32_t> image;
-
-    void addFromTo(uint32_t from, uint32_t to);
-    void addCycle(vector<uint32_t>& cyc);
-    void addPrimeSplitToVector(vector<sptr<Permutation> >& newPerms);
-
-    Permutation();
-    Permutation(vector<std::pair<uint32_t, uint32_t> >& tuples);
-    // Permutation constructed from swapping two rows.
-    Permutation(vector<uint32_t>& row1, vector<uint32_t>& row2);
+    ///Permutation constructed from swapping two rows.
+    Permutation(vector<uint32_t>& row1, vector<uint32_t>& row2, Config* conf);
 
     ~Permutation(){};
 
@@ -72,6 +59,20 @@ class Permutation : public std::enable_shared_from_this<Permutation>
     uint32_t getNbCycles();
 
     bool equals(sptr<Permutation> other);
+    vector<uint32_t> domain;
+    vector<uint32_t> posDomain;
+    vector<uint32_t> image;
+
+    void addFromTo(uint32_t from, uint32_t to);
+    void addCycle(vector<uint32_t>& cyc);
+    void addPrimeSplitToVector(vector<sptr<Permutation> >& newPerms);
+
+private:
+    std::unordered_map<uint32_t, uint32_t> perm;
+    vector<uint32_t> cycleReprs; // smallest lit in each cycle
+    uint32_t maxCycleSize;
+    size_t hash;
+    Config* conf;
 };
 
 class Matrix
@@ -81,9 +82,10 @@ class Matrix
         rows; // TODO: refactor this as 1 continuous vector
     std::unordered_map<uint32_t, uint32_t> rowco;
     std::unordered_map<uint32_t, uint32_t> colco;
+    Config* conf;
 
    public:
-    Matrix();
+    Matrix(Config* conf);
     ~Matrix();
     void print(std::ostream& out);
 
@@ -118,6 +120,8 @@ class Group
     // NOTE: if a group has a shared pointer to a theory, and a theory a shared pointer to a group, none of the memory pointed to by these pointers will ever be freed :(
     Specification* theory; // non-owning pointer
 
+    Group(Config* conf);
+
     void add(sptr<Permutation> p);
     void checkColumnInterchangeability(sptr<Matrix> m);
 
@@ -149,6 +153,7 @@ class Group
     void addBreakingClausesTo(Breaker& brkr);
 
     void maximallyExtend(sptr<Matrix> matrix, uint32_t indexOfFirstNewRow);
+    Config* conf;
 };
 
 #endif

@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include "Breaking.hpp"
 #include "Graph.hpp"
 
-//=========================CNF==================================================
-
 using std::cout;
 using std::endl;
 using std::set;
@@ -44,7 +42,7 @@ using std::stringstream;
 
 void CNF::readCNF(std::string& filename)
 {
-    if (verbosity > 0) {
+    if (conf->verbosity > 0) {
         cout << "*** Reading CNF: " << filename << endl;
     }
 
@@ -64,11 +62,11 @@ void CNF::readCNF(std::string& filename)
             iss >> nbVars;
             uint32_t nbClauses;
             iss >> nbClauses;
-            if (verbosity > 1) {
+            if (conf->verbosity > 1) {
                 cout << "CNF header stated " << nbVars << " vars and "
                           << nbClauses << " clauses" << endl;
             }
-            nVars = nbVars;
+            conf->nVars = nbVars;
             clauses.reserve(nbClauses);
         } else {
             //  parse the clauses, removing tautologies and double lits
@@ -92,8 +90,8 @@ void CNF::readCNF(std::string& filename)
                     }
                     inclause.clear();
                 } else {
-                    if ((uint32_t)abs(l) > nVars) {
-                        nVars = abs(l);
+                    if ((uint32_t)abs(l) > conf->nVars) {
+                        conf->nVars = abs(l);
                     }
                     inclause.insert(encode(l));
                 }
@@ -102,22 +100,23 @@ void CNF::readCNF(std::string& filename)
     }
 }
 
-CNF::CNF(std::string& filename)
+CNF::CNF(std::string& filename, Config* _conf) :
+    conf(_conf)
 {
     readCNF(filename);
-    if (verbosity > 0) {
+    if (conf->verbosity > 0) {
         cout << "*** Creating first graph..." << endl;
     }
-    graph = make_shared<Graph>(clauses);
-    if (verbosity > 1) {
+    graph = make_shared<Graph>(clauses, conf);
+    if (conf->verbosity > 1) {
         cout << "**** Number of nodes: " << graph->getNbNodes()
                   << endl;
         cout << "**** Number of edges: " << graph->getNbEdges()
                   << endl;
     }
 
-    group = make_shared<Group>();
-    if (verbosity > 0) {
+    group = make_shared<Group>(conf);
+    if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
     }
     vector<sptr<Permutation> > symgens;
@@ -130,9 +129,9 @@ CNF::CNF(std::string& filename)
 CNF::CNF(vector<sptr<Clause> >& clss, sptr<Group> grp)
 {
     clauses.insert(clss.cbegin(), clss.cend());
-    graph = make_shared<Graph>(clauses);
+    graph = make_shared<Graph>(clauses, conf);
     group = grp;
-    for (uint32_t l = 0; l < 2 * nVars; ++l) {
+    for (uint32_t l = 0; l < 2 * conf->nVars; ++l) {
         if (not grp->permutes(l)) {
             graph->setUniqueColor(l);
         }
@@ -224,19 +223,20 @@ void Specification::cleanUp()
  * LOGIC PROGRAM
  */
 
-void checkVarExists(int lit)
+void checkVarExists(int lit, Config* conf)
 {
-    if ((uint32_t)abs(lit) > nVars) {
-        nVars = abs(lit);
+    if ((uint32_t)abs(lit) > conf->nVars) {
+        conf->nVars = abs(lit);
     }
 }
 
-LogicProgram::LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp)
+LogicProgram::LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp, Config* _conf) :
+    conf(_conf)
 {
     rules.insert(rls.cbegin(), rls.cend());
-    graph = make_shared<Graph>(rules);
+    graph = make_shared<Graph>(rules, conf);
     group = grp;
-    for (uint32_t l = 0; l < 2 * nVars; ++l) {
+    for (uint32_t l = 0; l < 2 * conf->nVars; ++l) {
         if (not grp->permutes(l)) {
             graph->setUniqueColor(l);
         }
@@ -291,7 +291,7 @@ void LogicProgram::setSubTheory(sptr<Group> subgroup)
             }
         }
     }
-    subgroup->theory = new LogicProgram(subrules, subgroup);
+    subgroup->theory = new LogicProgram(subrules, subgroup, conf);
 }
 
 bool LogicProgram::isSymmetry(Permutation& prm)

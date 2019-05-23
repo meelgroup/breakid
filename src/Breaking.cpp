@@ -29,7 +29,9 @@ THE SOFTWARE.
 using std::cout;
 using std::endl;
 
-Breaker::Breaker(sptr<Specification> origTheo) : originalTheory(origTheo)
+Breaker::Breaker(sptr<Specification> origTheo, Config* _conf) :
+    originalTheory(origTheo)
+    , conf(_conf)
 {
 }
 
@@ -37,9 +39,9 @@ void Breaker::print(std::string& /*origfile*/)
 {
     cout << "c number of breaking clauses added: " << getAddedNbClauses()
               << "\n";
-    cout << "c max original variable: " << nVars << "\n";
+    cout << "c max original variable: " << conf->nVars << "\n";
     cout << "c auxiliary variables: " << getAuxiliaryNbVars() << "\n";
-    if (not onlyPrintBreakers) {
+    if (not conf->onlyPrintBreakers) {
         cout << "p cnf " << getTotalNbVars() << " " << getTotalNbClauses()
                   << "\n";
         originalTheory->print(cout);
@@ -90,7 +92,7 @@ void Breaker::addBinClause(uint32_t l1, uint32_t l2)
 void Breaker::addRegSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
 {
     uint32_t current = getTotalNbClauses();
-    if (useShatterTranslation) {
+    if (conf->useShatterTranslation) {
         addShatter(perm, order, true);
     } else {
         add(perm, order, true);
@@ -101,7 +103,7 @@ void Breaker::addRegSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
 void Breaker::addRowSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
 {
     uint32_t current = getTotalNbClauses();
-    if (useShatterTranslation) {
+    if (conf->useShatterTranslation) {
         addShatter(perm, order, false);
     } else {
         add(perm, order, false);
@@ -133,7 +135,7 @@ void Breaker::add(sptr<Permutation> perm, std::vector<uint32_t>& order,
     uint32_t prevSym = 0;
     uint32_t prevTst = 0; // previous tseitin
     for (auto l : order) {
-        if (limitExtraConstrs && nrExtraConstrs > symBreakingFormLength) {
+        if (limitExtraConstrs && nrExtraConstrs > conf->symBreakingFormLength) {
             break;
         }
         uint32_t sym = perm->getImage(l);
@@ -152,7 +154,7 @@ void Breaker::add(sptr<Permutation> perm, std::vector<uint32_t>& order,
                 addBinary(neg(prevLit), tst);
                 // ~tst | ~l | sym
                 addTernary(neg(tst), neg(l), sym);
-                if (useFullTranslation) {
+                if (conf->useFullTranslation) {
                     // adding clauses for tst => (prevSym => prevLit)
                     // ~tst | ~prevSym | prevLit
                     addTernary(neg(tst), neg(prevSym), prevLit);
@@ -166,7 +168,7 @@ void Breaker::add(sptr<Permutation> perm, std::vector<uint32_t>& order,
                 addTernary(neg(prevLit), neg(prevTst), tst);
                 // ~tst | ~l | sym
                 addTernary(neg(tst), neg(l), sym);
-                if (useFullTranslation) {
+                if (conf->useFullTranslation) {
                     // adding clauses for tst => prevTst and tst => (prevSym => prevLit)
                     // ~tst | prevTst
                     addBinary(neg(tst), prevTst);
@@ -210,7 +212,7 @@ void Breaker::addShatter(sptr<Permutation> perm, std::vector<uint32_t>& order,
     uint32_t prevSym = 0;
     uint32_t prevTst = 0; // previous tseitin
     for (auto l : order) {
-        if (limitExtraConstrs && nrExtraConstrs > symBreakingFormLength) {
+        if (limitExtraConstrs && nrExtraConstrs > conf->symBreakingFormLength) {
             break;
         }
         uint32_t sym = perm->getImage(l);
@@ -260,7 +262,7 @@ uint32_t Breaker::getAuxiliaryNbVars()
 
 uint32_t Breaker::getTotalNbVars()
 {
-    return nVars + nbExtraVars;
+    return conf->nVars + nbExtraVars;
 }
 
 uint32_t Breaker::getAddedNbClauses()
