@@ -433,8 +433,9 @@ sptr<Matrix> Group::getMatrix(uint32_t idx)
 
 void Group::addMatrices()
 {
-    sptr<Matrix> matrix =
-        getInitialMatrix(); // if possible, gives an initial matrix
+    ///if possible, gives an initial matrix
+    sptr<Matrix> matrix = getInitialMatrix();
+
     while (matrix != nullptr) {
         uint32_t oldNbRows = 0;
         while (oldNbRows < matrix->nbRows()) {
