@@ -564,7 +564,7 @@ void Group::getDisjointGenerators(vector<sptr<Group> >& subgroups)
         while ((int)current->getSize() > previoussize) {
             previoussize = current->getSize();
             for (int i = permutations.size() - 1; i >= 0; --i) {
-                if (not isDisjoint(
+                if (!isDisjoint(
                         current->support,
                         permutations[i]
                             ->posDomain)) { // it suffices to check that the positive literals occur in the group support
@@ -584,7 +584,7 @@ void Group::getDisjointGenerators(vector<sptr<Group> >& subgroups)
         while (current->getSize() > previoussize) {
             previoussize = current->getSize();
             for (int i = permutations.size() - 1; i >= 0; --i) {
-                if (not isDisjoint(
+                if (!isDisjoint(
                         current->support,
                         permutations[i]
                             ->posDomain)) { // it suffices to check that the positive literals occur in the group support

@@ -193,7 +193,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules, Config*
         if (r->ruleType == 2 || r->ruleType == 5) {
             auto bound = r->bound;
             auto& num = boundToColor[bound];
-            if (not num) {
+            if (!num) {
                 num = maxcolor;
                 maxcolor++;
             }
@@ -202,7 +202,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules, Config*
             nbextralits += r->weights.size();
             for (auto w : r->weights) {
                 auto& num = boundToColor[w];
-                if (not num) {
+                if (!num) {
                     num = maxcolor;
                     maxcolor++;
                 }

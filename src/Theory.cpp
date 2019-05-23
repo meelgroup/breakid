@@ -84,7 +84,7 @@ void CNF::readCNF(string& filename)
                             break;
                         }
                     }
-                    if (not isTautology) {
+                    if (!isTautology) {
                         sptr<Clause> cl(new Clause(inclause));
                         clauses.insert(cl);
                     }
@@ -132,7 +132,7 @@ CNF::CNF(vector<sptr<Clause> >& clss, sptr<Group> grp)
     graph = make_shared<Graph>(clauses, conf);
     group = grp;
     for (uint32_t l = 0; l < 2 * conf->nVars; ++l) {
-        if (not grp->permutes(l)) {
+        if (!grp->permutes(l)) {
             graph->setUniqueColor(l);
         }
     }
@@ -237,7 +237,7 @@ LogicProgram::LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp, Config* _c
     graph = make_shared<Graph>(rules, conf);
     group = grp;
     for (uint32_t l = 0; l < 2 * conf->nVars; ++l) {
-        if (not grp->permutes(l)) {
+        if (!grp->permutes(l)) {
             graph->setUniqueColor(l);
         }
     }

@@ -44,7 +44,6 @@ using std::endl;
 using std::vector;
 using std::string;
 
-// GLOBALS:
 struct Config {
     uint32_t nVars = 0;
     vector<uint32_t> fixedLits;
