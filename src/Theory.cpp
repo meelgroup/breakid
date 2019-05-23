@@ -162,7 +162,8 @@ uint32_t CNF::getSize()
 
 void CNF::setSubTheory(sptr<Group> subgroup)
 {
-    //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves? Is it simply made approximative on purpose or by accident?
+    //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves?
+    //TODO: Is it simply made approximative on purpose or by accident?
     vector<sptr<Clause> > subclauses;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {

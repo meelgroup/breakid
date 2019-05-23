@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
         theory->getGraph()->print();
     }
 
-    if (conf.verbosity > 0) {
+    if (conf.verbosity) {
         cout << "**** symmetry generators detected: "
                   << theory->getGroup()->getSize() << endl;
         if (conf.verbosity > 2) {
@@ -190,12 +190,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (conf.verbosity > 0) {
+    if (conf.verbosity) {
         cout << "*** Detecting subgroups..." << endl;
     }
     vector<sptr<Group> > subgroups;
     theory->getGroup()->getDisjointGenerators(subgroups);
-    if (conf.verbosity > 0) {
+    if (conf.verbosity) {
         cout << "**** subgroups detected: " << subgroups.size()
                   << endl;
     }
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
 
     if (conf.printGeneratorFile) {
         string symFile = filename_ + ".sym";
-        if (conf.verbosity > 0) {
+        if (conf.verbosity) {
             cout << "*** Printing generators to file " + symFile
                       << endl;
         }
