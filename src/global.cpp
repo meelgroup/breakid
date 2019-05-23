@@ -25,22 +25,6 @@ THE SOFTWARE.
 
 using namespace std;
 
-uint32_t nVars = 0;
-vector<uint32_t> fixedLits;
-string inputSymFile = "";
-time_t startTime;
-
-// OPTIONS:
-bool useMatrixDetection = true;
-bool useBinaryClauses = true;
-bool onlyPrintBreakers = false;
-bool printGeneratorFile = false;
-bool useShatterTranslation = false;
-bool useFullTranslation = false;
-int symBreakingFormLength = 50;
-uint32_t verbosity = 1;
-int timeLim = INT_MAX;
-
 size_t _getHash(const vector<uint32_t>& xs)
 {
     size_t seed = xs.size();
@@ -57,18 +41,6 @@ size_t _getHash(const vector<int>& xs)
         seed ^= x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
     return seed;
-}
-
-int timeLeft()
-{
-    time_t now;
-    time(&now);
-    return timeLim - difftime(now, startTime);
-}
-
-bool timeLimitPassed()
-{
-    return timeLeft() <= 0;
 }
 
 void gracefulError(string str)

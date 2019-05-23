@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <limits>
 
 using std::cout;
 using std::endl;
@@ -45,21 +46,21 @@ using std::string;
 
 // GLOBALS:
 struct Config {
-    uint32_t nVars;
+    uint32_t nVars = 0;
     vector<uint32_t> fixedLits;
     string inputSymFile;
     time_t startTime;
 
     // OPTIONS
-    int symBreakingFormLength;
-    bool useBinaryClauses;
-    bool onlyPrintBreakers;
-    bool printGeneratorFile;
-    bool useMatrixDetection;
-    bool useShatterTranslation;
-    bool useFullTranslation;
-    uint32_t verbosity;
-    int timeLim;
+    bool useMatrixDetection = true;
+    bool useBinaryClauses = true;
+    bool printGeneratorFile = false;
+    bool useShatterTranslation = false;
+    bool useFullTranslation = false;
+    int symBreakingFormLength = 50;
+    bool onlyPrintBreakers = false;
+    uint32_t verbosity = 1;
+    int64_t timeLim = std::numeric_limits<int64_t>::max();
 };
 
 size_t _getHash(const vector<uint32_t>& xs);

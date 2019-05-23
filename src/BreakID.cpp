@@ -100,8 +100,7 @@ void printUsage()
     << " introduced. <-1> means no symmetry breaking.\n"
 
     << options::timelim << " <default: " << conf.timeLim << ">\n"
-    << " Upper limit on time spent by Saucy detecting symmetry\n"
-    << " measured in seconds.\n"
+    << " Upper limit on computing steps spent, approximate measure for time.\n"
 
     << options::verbosity << " <default: " << conf.verbosity << ">\n"
     << " Verbosity of the output. <0> means no output other than the\n"
