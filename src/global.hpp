@@ -38,6 +38,9 @@ THE SOFTWARE.
 #include <unordered_set>
 #include <vector>
 
+using std::cout;
+using std::endl;
+
 // GLOBALS:
 extern uint32_t nVars;
 extern std::vector<uint32_t> fixedLits;
@@ -57,8 +60,6 @@ extern int timeLim;
 
 size_t _getHash(const std::vector<uint32_t>& xs);
 size_t _getHash(const std::vector<int>& xs);
-int timeLeft();
-bool timeLimitPassed();
 
 inline bool sign(uint32_t lit)
 {
@@ -141,7 +142,7 @@ class Clause
         for (auto decodedlit : posBodyLits) {
             ostr << decodedlit << " ";
         }
-        ostr << std::endl;
+        ostr << endl;
     }
 };
 
@@ -237,7 +238,7 @@ class Rule
      ostr << decodedlit << " ";
      }
      }
-     ostr << std::endl;*/
+     ostr << endl;*/
     }
 };
 

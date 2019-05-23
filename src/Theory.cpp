@@ -33,12 +33,19 @@ THE SOFTWARE.
 
 //=========================CNF==================================================
 
-using namespace std;
+using std::cout;
+using std::endl;
+using std::set;
+using std::ifstream;
+using std::string;
+using std::make_shared;
+using std::istringstream;
+using std::stringstream;
 
 void CNF::readCNF(std::string& filename)
 {
     if (verbosity > 0) {
-        std::clog << "*** Reading CNF: " << filename << std::endl;
+        cout << "*** Reading CNF: " << filename << endl;
     }
 
     ifstream file(filename);
@@ -58,8 +65,8 @@ void CNF::readCNF(std::string& filename)
             uint32_t nbClauses;
             iss >> nbClauses;
             if (verbosity > 1) {
-                std::clog << "CNF header stated " << nbVars << " vars and "
-                          << nbClauses << " clauses" << std::endl;
+                cout << "CNF header stated " << nbVars << " vars and "
+                          << nbClauses << " clauses" << endl;
             }
             nVars = nbVars;
             clauses.reserve(nbClauses);
@@ -99,19 +106,19 @@ CNF::CNF(std::string& filename)
 {
     readCNF(filename);
     if (verbosity > 0) {
-        std::clog << "*** Creating first graph..." << std::endl;
+        cout << "*** Creating first graph..." << endl;
     }
     graph = make_shared<Graph>(clauses);
     if (verbosity > 1) {
-        std::clog << "**** Number of nodes: " << graph->getNbNodes()
-                  << std::endl;
-        std::clog << "**** Number of edges: " << graph->getNbEdges()
-                  << std::endl;
+        cout << "**** Number of nodes: " << graph->getNbNodes()
+                  << endl;
+        cout << "**** Number of edges: " << graph->getNbEdges()
+                  << endl;
     }
 
     group = make_shared<Group>();
     if (verbosity > 0) {
-        std::clog << "*** Detecting symmetry group..." << std::endl;
+        cout << "*** Detecting symmetry group..." << endl;
     }
     std::vector<sptr<Permutation> > symgens;
     graph->getSymmetryGenerators(symgens);

@@ -207,7 +207,7 @@ void Permutation::print(std::ostream& out)
         }
         out << ") ";
     }
-    out << std::endl;
+    out << endl;
 }
 
 void Permutation::getCycle(uint32_t lit, std::vector<uint32_t>& orb)
@@ -353,10 +353,10 @@ void Group::addMatrix(sptr<Matrix> m)
     }
 
     if (verbosity > 1) {
-        std::clog << "Matrix with " << m->nbRows() << " rows and "
-                  << m->nbColumns() << " columns detected" << std::endl;
+        cout << "Matrix with " << m->nbRows() << " rows and "
+                  << m->nbColumns() << " columns detected" << endl;
     } else if (verbosity > 2) {
-        m->print(std::clog);
+        m->print(cout);
     }
 }
 
@@ -733,8 +733,8 @@ void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
 
     if (useBinaryClauses) {
         if (verbosity > 1) {
-            std::clog << "Adding binary symmetry breaking clauses for group..."
-                      << std::endl;
+            cout << "Adding binary symmetry breaking clauses for group..."
+                      << endl;
         }
         addBinaryClausesTo(brkr, out_order, matrixLits);
     }
@@ -781,11 +781,11 @@ void Group::addBreakingClausesTo(Breaker& brkr)
     getOrderAndAddBinaryClausesTo(brkr, order);
 
     if (verbosity > 1) {
-        std::clog << "order: ";
+        cout << "order: ";
         for (auto x : order) {
-            std::clog << decode(x) << " ";
+            cout << decode(x) << " ";
         }
-        std::clog << endl;
+        cout << endl;
     }
 
     // add clauses based on detected symmetries
@@ -818,12 +818,12 @@ Matrix::~Matrix()
 
 void Matrix::print(std::ostream& out)
 {
-    out << "rows " << nbRows() << " columns " << nbColumns() << std::endl;
+    out << "rows " << nbRows() << " columns " << nbColumns() << endl;
     for (auto row : rows) {
         for (auto lit : *row) {
             out << decode(lit) << " ";
         }
-        out << std::endl;
+        out << endl;
     }
 }
 

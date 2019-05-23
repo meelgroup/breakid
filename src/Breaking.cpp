@@ -26,23 +26,26 @@ THE SOFTWARE.
 #include "Theory.hpp"
 #include "global.hpp"
 
+using std::cout;
+using std::endl;
+
 Breaker::Breaker(sptr<Specification> origTheo) : originalTheory(origTheo)
 {
 }
 
 void Breaker::print(std::string& /*origfile*/)
 {
-    std::cout << "c number of breaking clauses added: " << getAddedNbClauses()
+    cout << "c number of breaking clauses added: " << getAddedNbClauses()
               << "\n";
-    std::cout << "c max original variable: " << nVars << "\n";
-    std::cout << "c auxiliary variables: " << getAuxiliaryNbVars() << "\n";
+    cout << "c max original variable: " << nVars << "\n";
+    cout << "c auxiliary variables: " << getAuxiliaryNbVars() << "\n";
     if (not onlyPrintBreakers) {
-        std::cout << "p cnf " << getTotalNbVars() << " " << getTotalNbClauses()
+        cout << "p cnf " << getTotalNbVars() << " " << getTotalNbClauses()
                   << "\n";
-        originalTheory->print(std::cout);
+        originalTheory->print(cout);
     }
     for (auto c : clauses) {
-        c->print(std::cout);
+        c->print(cout);
     }
 }
 

@@ -23,6 +23,9 @@ THE SOFTWARE.
 #include "Graph.hpp"
 #include "bliss/graph.hh"
 
+using std::cout;
+using std::endl;
+
 void Graph::initializeGraph(uint32_t nbNodes, uint32_t nbEdges,
                             std::map<uint32_t, uint32_t>& lit2color,
                             std::vector<std::vector<uint32_t> >& neighbours)
@@ -373,13 +376,8 @@ void Graph::setUniqueColor(const std::vector<uint32_t>& lits)
 void Graph::getSymmetryGenerators(std::vector<sptr<Permutation> >& out_perms)
 {
     out_perms.clear();
-    if (timeLimitPassed()) { // do not call saucy again when interrupted by time limit previously
-        return;
-    }
-
     if (verbosity > 1) {
-        std::clog << "Searching graph automorphisms with time limit: "
-                  << timeLeft() << std::endl;
+        cout << "Searching graph automorphisms" << endl;
     }
 
     getSymmetryGeneratorsInternal(out_perms);
