@@ -171,8 +171,6 @@ void parseOptions(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
-
-    time(&conf.startTime);
     string filename_ = argv[1];
 
     sptr<Specification> theory;

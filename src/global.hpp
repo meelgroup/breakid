@@ -48,7 +48,6 @@ struct Config {
     uint32_t nVars = 0;
     vector<uint32_t> fixedLits;
     string inputSymFile;
-    time_t startTime;
 
     // OPTIONS
     bool useMatrixDetection = true;
