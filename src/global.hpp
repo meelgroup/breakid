@@ -199,46 +199,6 @@ class Rule
     void print(std::ostream& /*ostr*/)
     {
         std::cerr << "Not implemented: printing rules\n";
-        /*std::cerr << "WARNING: printing rules is NOT in the right order for lparse format\n";
-     if (basicRule && headLits.size() == 0) {
-     //A constraint
-     assert(bodyLits.size() == 1);
-     auto origLit = decode(bodyLits.front());
-     if (origLit > 0) {
-     ostr << "B-\n" << origLit;
-     } else {
-     ostr << "B+\n" << origLit;
-     }
-     } else {
-     if (basicRule) {
-     assert(headLits.size() == 1);
-     ostr << "1 " << decode(headLits.front()) << " ";
-     } else {
-     ostr << "3 ";
-     ostr << headLits.size() << " ";
-     for (auto lit : headLits) {
-     ostr << decode(lit) << " ";
-     }
-     }
-     std::set<uint32_t> posBodyLits;
-     std::set<uint32_t> negBodyLits;
-     for (auto lit : bodyLits) {
-     auto decoded = decode(lit);
-     if (decoded > 0) {
-     posBodyLits.insert(decoded);
-     } else {
-     negBodyLits.insert(-decoded);
-     }
-     }
-     ostr << (posBodyLits.size() + negBodyLits.size()) << " " << negBodyLits.size() << " ";
-     for (auto decodedlit : negBodyLits) {
-     ostr << decodedlit << " ";
-     }
-     for (auto decodedlit : posBodyLits) {
-     ostr << decodedlit << " ";
-     }
-     }
-     ostr << endl;*/
     }
 };
 
