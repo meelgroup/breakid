@@ -54,7 +54,7 @@ namespace options {
     string norelaxed = "-no-relaxed";
     string onlybreakers = "-print-only-breakers";
     string generatorfile = "-with-generator-file";
-} // namespace options
+}
 
 Config conf;
 
@@ -169,7 +169,6 @@ void parseOptions(int argc, char *argv[])
     }
 }
 
-// ==== main
 int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);

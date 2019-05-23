@@ -41,7 +41,7 @@ void Breaker::print(std::string& /*origfile*/)
               << "\n";
     cout << "c max original variable: " << conf->nVars << "\n";
     cout << "c auxiliary variables: " << getAuxiliaryNbVars() << "\n";
-    if (not conf->onlyPrintBreakers) {
+    if (!conf->onlyPrintBreakers) {
         cout << "p cnf " << getTotalNbVars() << " " << getTotalNbClauses()
                   << "\n";
         originalTheory->print(cout);
