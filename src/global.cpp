@@ -27,7 +27,7 @@ using namespace std;
 
 uint32_t nVars = 0;
 vector<uint32_t> fixedLits;
-std::string inputSymFile = "";
+string inputSymFile = "";
 time_t startTime;
 
 // OPTIONS:

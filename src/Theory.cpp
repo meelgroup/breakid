@@ -40,7 +40,7 @@ using std::make_shared;
 using std::istringstream;
 using std::stringstream;
 
-void CNF::readCNF(std::string& filename)
+void CNF::readCNF(string& filename)
 {
     if (conf->verbosity > 0) {
         cout << "*** Reading CNF: " << filename << endl;
@@ -100,7 +100,7 @@ void CNF::readCNF(std::string& filename)
     }
 }
 
-CNF::CNF(std::string& filename, Config* _conf) :
+CNF::CNF(string& filename, Config* _conf) :
     conf(_conf)
 {
     readCNF(filename);

@@ -57,7 +57,7 @@ class Specification
 class CNF : public Specification
 {
 public:
-    CNF(std::string& filename, Config* conf);
+    CNF(string& filename, Config* conf);
     CNF(vector<sptr<Clause> >& clss, sptr<Group> grp);
     ~CNF();
 
@@ -72,7 +72,7 @@ private:
     ///whether a clause exists to detect symmetries
     std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
 
-    void readCNF(std::string& filename);
+    void readCNF(string& filename);
     Config* conf;
 };
 

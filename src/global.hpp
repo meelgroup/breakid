@@ -41,12 +41,13 @@ THE SOFTWARE.
 using std::cout;
 using std::endl;
 using std::vector;
+using std::string;
 
 // GLOBALS:
 struct Config {
     uint32_t nVars;
     vector<uint32_t> fixedLits;
-    std::string inputSymFile;
+    string inputSymFile;
     time_t startTime;
 
     // OPTIONS
@@ -84,7 +85,7 @@ inline int decode(uint32_t lit)
     return (sign(lit) ? -(lit / 2 + 1) : lit / 2 + 1);
 }
 
-void gracefulError(std::string str);
+void gracefulError(string str);
 
 class Clause
 {

@@ -35,7 +35,7 @@ public:
     ~Breaker(){};
 
     //Prints the current breaker. Gets the original file as input to recover information lost in the process
-    void print(std::string& origfile);
+    void print(string& origfile);
 
     void addBinClause(uint32_t l1, uint32_t l2);
     void addRegSym(sptr<Permutation> perm, vector<uint32_t>& order);
