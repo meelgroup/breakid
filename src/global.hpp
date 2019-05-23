@@ -40,10 +40,11 @@ THE SOFTWARE.
 
 using std::cout;
 using std::endl;
+using std::vector;
 
 // GLOBALS:
 extern uint32_t nVars;
-extern std::vector<uint32_t> fixedLits;
+extern vector<uint32_t> fixedLits;
 extern std::string inputSymFile;
 extern time_t startTime;
 
@@ -58,8 +59,8 @@ extern bool useFullTranslation;
 extern uint32_t verbosity;
 extern int timeLim;
 
-size_t _getHash(const std::vector<uint32_t>& xs);
-size_t _getHash(const std::vector<int>& xs);
+size_t _getHash(const vector<uint32_t>& xs);
+size_t _getHash(const vector<int>& xs);
 
 inline bool sign(uint32_t lit)
 {
@@ -89,7 +90,7 @@ class Clause
     size_t hashValue;
 
    public:
-    std::vector<uint32_t> lits;
+    vector<uint32_t> lits;
 
     Clause(const std::set<uint32_t>& inLits)
         : hashValue(0), lits(inLits.cbegin(), inLits.cend())
@@ -156,14 +157,14 @@ class Rule
     //Note: similarly, we use "disjunctive rules" as basic rules with multiple heads. (quite standard representation of those). Again: not nice  correspondence between our representation of rules and the lparse-smodels format
     //to respresent rules. As such, there is currently not yet a GOOD printing method for the rules.
     int ruleType;
-    std::vector<uint32_t> headLits;
-    std::vector<uint32_t> bodyLits;
+    vector<uint32_t> headLits;
+    vector<uint32_t> bodyLits;
     int bound; //Only relevant for rules of type 2 and 5
-    std::vector<int> weights;
+    vector<int> weights;
 
-    Rule(int inRuleType, const std::vector<uint32_t>& inHeads,
-         const std::vector<uint32_t>& bodies, int inBound,
-         std::vector<int>& inWeights)
+    Rule(int inRuleType, const vector<uint32_t>& inHeads,
+         const vector<uint32_t>& bodies, int inBound,
+         vector<int>& inWeights)
         : hashValue(0),
           ruleType(inRuleType),
           headLits(inHeads.cbegin(), inHeads.cend()),
@@ -203,7 +204,7 @@ class Rule
 };
 
 struct UVecHash {
-    size_t operator()(const sptr<std::vector<uint32_t> > first) const
+    size_t operator()(const sptr<vector<uint32_t> > first) const
     {
         return _getHash(*first);
     }
@@ -220,8 +221,8 @@ struct UVecHash {
 };
 
 struct UvecEqual {
-    bool equals(const std::vector<int>& first,
-                const std::vector<int>& second) const
+    bool equals(const vector<int>& first,
+                const vector<int>& second) const
     {
         if (first.size() != second.size()) {
             return false;
@@ -234,8 +235,8 @@ struct UvecEqual {
         return true;
     }
 
-    bool equals(const std::vector<uint32_t>& first,
-                const std::vector<uint32_t>& second) const
+    bool equals(const vector<uint32_t>& first,
+                const vector<uint32_t>& second) const
     {
         if (first.size() != second.size()) {
             return false;
@@ -248,8 +249,8 @@ struct UvecEqual {
         return true;
     }
 
-    bool operator()(const sptr<std::vector<uint32_t> > first,
-                    const sptr<std::vector<uint32_t> > second) const
+    bool operator()(const sptr<vector<uint32_t> > first,
+                    const sptr<vector<uint32_t> > second) const
     {
         return equals(*first, *second);
     }
@@ -270,7 +271,7 @@ struct UvecEqual {
 };
 
 template <class T>
-bool isDisjoint(std::unordered_set<T>& uset, std::vector<T>& vec)
+bool isDisjoint(std::unordered_set<T>& uset, vector<T>& vec)
 {
     for (T x : vec) {
         if (uset.count(x) > 0) {
@@ -281,7 +282,7 @@ bool isDisjoint(std::unordered_set<T>& uset, std::vector<T>& vec)
 }
 
 template <class T>
-void swapErase(std::vector<T>& vec, uint32_t index)
+void swapErase(vector<T>& vec, uint32_t index)
 {
     vec[index] = vec.back();
     vec.pop_back();

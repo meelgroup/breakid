@@ -68,7 +68,7 @@ class CNF : public Specification
 
    public:
     CNF(std::string& filename);
-    CNF(std::vector<sptr<Clause> >& clss, sptr<Group> grp);
+    CNF(vector<sptr<Clause> >& clss, sptr<Group> grp);
     ~CNF();
 
     void print(std::ostream& out);
@@ -88,7 +88,7 @@ class LogicProgram : public Specification
     std::unordered_set<sptr<Rule>, UVecHash, UvecEqual> rules;
 
    public:
-    LogicProgram(std::vector<sptr<Rule> >& rls, sptr<Group> grp);
+    LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp);
     ~LogicProgram();
 
     void print(std::ostream& out);

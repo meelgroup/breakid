@@ -42,9 +42,9 @@ class Breaker
     void addTernary(uint32_t l1, uint32_t l2, uint32_t l3);
     void addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4);
     void add(sptr<Clause> cl);
-    void add(sptr<Permutation> perm, std::vector<uint32_t>& order,
+    void add(sptr<Permutation> perm, vector<uint32_t>& order,
              bool limitExtraConstrs);
-    void addShatter(sptr<Permutation> perm, std::vector<uint32_t>& order,
+    void addShatter(sptr<Permutation> perm, vector<uint32_t>& order,
                     bool limitExtraConstrs);
 
    public:
@@ -56,8 +56,8 @@ class Breaker
     void print(std::string& origfile);
 
     void addBinClause(uint32_t l1, uint32_t l2);
-    void addRegSym(sptr<Permutation> perm, std::vector<uint32_t>& order);
-    void addRowSym(sptr<Permutation> perm, std::vector<uint32_t>& order);
+    void addRegSym(sptr<Permutation> perm, vector<uint32_t>& order);
+    void addRowSym(sptr<Permutation> perm, vector<uint32_t>& order);
 
     uint32_t getAuxiliaryNbVars();
     uint32_t getTotalNbVars();

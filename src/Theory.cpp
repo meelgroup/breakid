@@ -120,14 +120,14 @@ CNF::CNF(std::string& filename)
     if (verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
     }
-    std::vector<sptr<Permutation> > symgens;
+    vector<sptr<Permutation> > symgens;
     graph->getSymmetryGenerators(symgens);
     for (auto symgen : symgens) {
         group->add(symgen);
     }
 }
 
-CNF::CNF(std::vector<sptr<Clause> >& clss, sptr<Group> grp)
+CNF::CNF(vector<sptr<Clause> >& clss, sptr<Group> grp)
 {
     clauses.insert(clss.cbegin(), clss.cend());
     graph = make_shared<Graph>(clauses);
@@ -164,7 +164,7 @@ uint32_t CNF::getSize()
 void CNF::setSubTheory(sptr<Group> subgroup)
 {
     //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves? Is it simply made approximative on purpose or by accident?
-    std::vector<sptr<Clause> > subclauses;
+    vector<sptr<Clause> > subclauses;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
             if (subgroup->permutes(lit)) {
@@ -231,7 +231,7 @@ void checkVarExists(int lit)
     }
 }
 
-LogicProgram::LogicProgram(std::vector<sptr<Rule> >& rls, sptr<Group> grp)
+LogicProgram::LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp)
 {
     rules.insert(rls.cbegin(), rls.cend());
     graph = make_shared<Graph>(rules);
@@ -249,7 +249,7 @@ LogicProgram::LogicProgram(std::vector<sptr<Rule> >& rls, sptr<Group> grp)
     }
 }
 
-//CNF(std::vector<sptr<Clause> >& clss, sptr<Group> grp);
+//CNF(vector<sptr<Clause> >& clss, sptr<Group> grp);
 LogicProgram::~LogicProgram()
 {
 }
@@ -269,7 +269,7 @@ uint32_t LogicProgram::getSize()
 void LogicProgram::setSubTheory(sptr<Group> subgroup)
 {
     //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves? Is it simply made approximative on purpose or by accident?
-    std::vector<sptr<Rule> > subrules;
+    vector<sptr<Rule> > subrules;
     for (auto r : rules) {
         bool found = false;
         for (auto lit : r->headLits) {

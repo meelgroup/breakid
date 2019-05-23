@@ -47,9 +47,9 @@ void Permutation::addFromTo(uint32_t from, uint32_t to)
 }
 
 void Permutation::addPrimeSplitToVector(
-    std::vector<sptr<Permutation> >& newPerms)
+    vector<sptr<Permutation> >& newPerms)
 {
-    std::map<size_t, std::vector<std::vector<uint32_t> > > lengthToCycles;
+    std::map<size_t, vector<vector<uint32_t> > > lengthToCycles;
     std::map<size_t, std::set<size_t> > primeToPowers;
 
     //First, we split each cycle up in its relative prime components.
@@ -58,7 +58,7 @@ void Permutation::addPrimeSplitToVector(
     //The prime2powers then containss the information that for prime 2, power 3 occurs, for prime 3, power 1 etcetera.
 
     for (auto l : getCycleReprs()) {
-        std::vector<uint32_t> cycle;
+        vector<uint32_t> cycle;
         getCycle(l, cycle);
         auto cycleSize = cycle.size();
         for (size_t i = 2; i <= cycleSize; i++) {
@@ -79,7 +79,7 @@ void Permutation::addPrimeSplitToVector(
                 }
                 size_t nbNewCycles = cycle.size() / newCycleLength;
                 for (size_t j = 0; j < nbNewCycles; j++) {
-                    std::vector<uint32_t> newCycle;
+                    vector<uint32_t> newCycle;
                     for (size_t k = 0; k < newCycleLength; k++) {
                         newCycle.push_back(cycle[j + nbNewCycles * k]);
                     }
@@ -121,7 +121,7 @@ void Permutation::addPrimeSplitToVector(
                     size_t cycleLength = pow(prime, smallestPow);
                     size_t jump = c.size() / cycleLength;
                     for (int i = 0; i < jump; i++) {
-                        std::vector<uint32_t> newCycle;
+                        vector<uint32_t> newCycle;
                         for (int j = 0; j < cycleLength; j++) {
                             newCycle.push_back(c[i + j * jump]);
                         }
@@ -136,7 +136,7 @@ void Permutation::addPrimeSplitToVector(
     }
 }
 
-void Permutation::addCycle(std::vector<uint32_t>& cyc)
+void Permutation::addCycle(vector<uint32_t>& cyc)
 {
     uint32_t n = cyc.size();
     for (uint32_t i = 0; i < n; ++i) {
@@ -150,7 +150,7 @@ Permutation::Permutation()
     maxCycleSize = 1;
 }
 
-Permutation::Permutation(std::vector<std::pair<uint32_t, uint32_t> >& tuples)
+Permutation::Permutation(vector<std::pair<uint32_t, uint32_t> >& tuples)
 {
     for (auto tup : tuples) {
         addFromTo(tup.first, tup.second);
@@ -159,7 +159,7 @@ Permutation::Permutation(std::vector<std::pair<uint32_t, uint32_t> >& tuples)
     maxCycleSize = 1;
 }
 
-Permutation::Permutation(std::vector<uint32_t>& row1, std::vector<uint32_t>& row2)
+Permutation::Permutation(vector<uint32_t>& row1, vector<uint32_t>& row2)
 {
     for (uint32_t i = 0; i < row1.size() && i < row2.size(); ++i) {
         uint32_t from = row1[i];
@@ -181,7 +181,7 @@ uint32_t Permutation::getImage(uint32_t from)
     }
 }
 
-bool Permutation::getImage(std::vector<uint32_t>& orig, std::vector<uint32_t>& img)
+bool Permutation::getImage(vector<uint32_t>& orig, vector<uint32_t>& img)
 {
     img.clear();
     img.reserve(orig.size());
@@ -210,7 +210,7 @@ void Permutation::print(std::ostream& out)
     out << endl;
 }
 
-void Permutation::getCycle(uint32_t lit, std::vector<uint32_t>& orb)
+void Permutation::getCycle(uint32_t lit, vector<uint32_t>& orb)
 {
     orb.clear();
     orb.push_back(lit);
@@ -284,7 +284,7 @@ void Permutation::getSharedLiterals(sptr<Permutation> other,
     }
 }
 
-std::vector<uint32_t>& Permutation::getCycleReprs()
+vector<uint32_t>& Permutation::getCycleReprs()
 {
     if (cycleReprs.size() == 0 && supportSize() > 0) { // calculate cycles
         unordered_set<uint32_t> marked;
@@ -376,7 +376,7 @@ void Group::print(std::ostream& out)
 
 sptr<Matrix> Group::getInitialMatrix()
 {
-    std::map<uint32_t, std::vector<sptr<Permutation> > >
+    std::map<uint32_t, vector<sptr<Permutation> > >
         involutions; // indexed by size
     for (auto p : permutations) {
         if (p->isInvolution()) {
@@ -444,7 +444,7 @@ void Group::addMatrices()
                 theory->getGraph()->setUniqueColor(*matrix->getRow(i));
             }
             oldNbRows = matrix->nbRows();
-            std::vector<sptr<Permutation> > symgens;
+            vector<sptr<Permutation> > symgens;
             theory->getGraph()->getSymmetryGenerators(symgens);
             // now test stabilizer generators on the (former) last row
             for (auto p : symgens) {
@@ -466,7 +466,7 @@ void Group::addMatrices()
 void Group::checkColumnInterchangeability(sptr<Matrix> m)
 {
     // create first column
-    std::vector<uint32_t>* first = new std::vector<uint32_t>();
+    vector<uint32_t>* first = new vector<uint32_t>();
     uint32_t firstCol;
     for (firstCol = 0; firstCol < m->nbColumns(); ++firstCol) {
         if (!sign(m->getLit(
@@ -486,7 +486,7 @@ void Group::checkColumnInterchangeability(sptr<Matrix> m)
     for (uint32_t i = firstCol + 1; i < m->nbColumns(); ++i) {
         if (!sign(m->getLit(0,
                             i))) { // found other col starting with positive lit
-            std::vector<uint32_t>* other = new std::vector<uint32_t>();
+            vector<uint32_t>* other = new vector<uint32_t>();
             for (uint32_t j = 0; j < m->nbRows(); ++j) {
                 uint32_t l = m->getLit(j, i);
                 other->push_back(l);
@@ -541,7 +541,7 @@ uint32_t Group::getSize()
 // NOTE: only approximate support for groups with matrices as generators: all matrices are added to the first subgroup
 // NOTE: erases permutations for this group
 
-void Group::getDisjointGenerators(std::vector<sptr<Group> >& subgroups)
+void Group::getDisjointGenerators(vector<sptr<Group> >& subgroups)
 {
     // calculate maximal subsets of generators with pairwise disjoint supports
     subgroups.clear();
@@ -599,7 +599,7 @@ uint32_t Group::getSupportSize()
     return support.size();
 }
 
-void eliminateNonStabilizers(std::vector<sptr<Permutation> >& permutations,
+void eliminateNonStabilizers(vector<sptr<Permutation> >& permutations,
                              uint32_t lit)
 {
     for (uint32_t i = 0; i < permutations.size(); ++i) {
@@ -611,8 +611,8 @@ void eliminateNonStabilizers(std::vector<sptr<Permutation> >& permutations,
     }
 }
 
-void getOrbits2(const std::vector<sptr<Permutation> >& permutations,
-                std::vector<sptr<std::vector<uint32_t> > >& orbits)
+void getOrbits2(const vector<sptr<Permutation> >& permutations,
+                vector<sptr<vector<uint32_t> > >& orbits)
 {
     // find positively supported literals
     std::unordered_set<uint32_t> posSupport;
@@ -627,7 +627,7 @@ void getOrbits2(const std::vector<sptr<Permutation> >& permutations,
     for (auto l : posSupport) {
         if (visitedLits.insert(l)
                 .second) { // lit did not yet occur in visitedLits
-            sptr<std::vector<uint32_t> > newOrbit(new std::vector<uint32_t>());
+            sptr<vector<uint32_t> > newOrbit(new vector<uint32_t>());
             newOrbit->push_back(l);
             for (uint32_t i = 0; i < newOrbit->size(); ++i) {
                 for (auto p : permutations) {
@@ -643,7 +643,7 @@ void getOrbits2(const std::vector<sptr<Permutation> >& permutations,
 }
 
 void getPosLitOccurrenceCount(
-    const std::vector<sptr<Permutation> >& permutations,
+    const vector<sptr<Permutation> >& permutations,
     std::unordered_map<uint32_t, uint32_t>& lits2occ)
 {
     for (auto p : permutations) {
@@ -653,11 +653,11 @@ void getPosLitOccurrenceCount(
     }
 }
 
-void Group::addBinaryClausesTo(Breaker& brkr, std::vector<uint32_t>& out_order,
+void Group::addBinaryClausesTo(Breaker& brkr, vector<uint32_t>& out_order,
                                const std::unordered_set<uint32_t>& excludedLits)
 {
     // now, look for literals with large orbits (of a stabilizer group for smaller literals) as first elements of the order
-    std::vector<sptr<Permutation> > perms = permutations;
+    vector<sptr<Permutation> > perms = permutations;
     while (perms.size() > 0) {
         // as long as we have some permutations stabilizing everything in order so far, continue looking for other literals to add to the order
 
@@ -665,12 +665,12 @@ void Group::addBinaryClausesTo(Breaker& brkr, std::vector<uint32_t>& out_order,
         // 0) a non-excluded variable
         // 1) in _a_ largest orbit with non-excluded variables
         // 2) has the lowest occurrence of literals adhering to 0) and 1)
-        std::vector<sptr<std::vector<uint32_t> > > orbs;
+        vector<sptr<vector<uint32_t> > > orbs;
         getOrbits2(perms, orbs);
         std::unordered_map<uint32_t, uint32_t> lits2occ;
         getPosLitOccurrenceCount(perms, lits2occ);
 
-        sptr<std::vector<uint32_t> > finalOrb(new std::vector<uint32_t>());
+        sptr<vector<uint32_t> > finalOrb(new vector<uint32_t>());
         uint32_t finalLit = UINT_MAX;
         uint32_t finalOccurrence = UINT_MAX;
         for (auto o : orbs) {
@@ -719,7 +719,7 @@ void Group::addBinaryClausesTo(Breaker& brkr, std::vector<uint32_t>& out_order,
 // NOTE: the order is a list of literals, such that for each literal l, neg(l) is not in the order
 
 void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
-                                          std::vector<uint32_t>& out_order)
+                                          vector<uint32_t>& out_order)
 {
     // first, figure out which literals occur in the matrix, since their order is fixed.
     std::unordered_set<uint32_t> matrixLits;
@@ -777,7 +777,7 @@ void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
 
 void Group::addBreakingClausesTo(Breaker& brkr)
 {
-    std::vector<uint32_t> order;
+    vector<uint32_t> order;
     getOrderAndAddBinaryClausesTo(brkr, order);
 
     if (verbosity > 1) {
@@ -827,7 +827,7 @@ void Matrix::print(std::ostream& out)
     }
 }
 
-void Matrix::add(std::vector<uint32_t>* row)
+void Matrix::add(vector<uint32_t>* row)
 {
     for (uint32_t i = 0; i < row->size(); ++i) {
         rowco.insert({row->at(i), rows.size()});
@@ -850,7 +850,7 @@ uint32_t Matrix::nbColumns()
     }
 }
 
-std::vector<uint32_t>* Matrix::getRow(uint32_t rowindex)
+vector<uint32_t>* Matrix::getRow(uint32_t rowindex)
 {
     return rows[rowindex];
 }
@@ -859,7 +859,7 @@ void Matrix::tryToAddNewRow(sptr<Permutation> p, uint32_t rowIndex,
                             Specification* theory)
 {
     // checks whether the image of the current row can be used as a new row
-    std::vector<uint32_t>* image = new vector<uint32_t>();
+    vector<uint32_t>* image = new vector<uint32_t>();
     for (auto lit : *getRow(rowIndex)) {
         uint32_t sym = p->getImage(lit);
         if (permutes(sym)) {
@@ -944,7 +944,7 @@ sptr<Permutation> Matrix::getProductWithRowsWap(const sptr<Permutation> p,
         return result;
     }
 
-    std::vector<std::pair<uint32_t, uint32_t> > protoPerm;
+    vector<std::pair<uint32_t, uint32_t> > protoPerm;
 
     // add lit-image pairs permuted by rowswap but not by p
     for (uint32_t i = 0; i < nbColumns(); ++i) {

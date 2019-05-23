@@ -26,7 +26,7 @@ THE SOFTWARE.
 using namespace std;
 
 uint32_t nVars = 0;
-std::vector<uint32_t> fixedLits;
+vector<uint32_t> fixedLits;
 std::string inputSymFile = "";
 time_t startTime;
 
@@ -41,7 +41,7 @@ int symBreakingFormLength = 50;
 uint32_t verbosity = 1;
 int timeLim = INT_MAX;
 
-size_t _getHash(const std::vector<uint32_t>& xs)
+size_t _getHash(const vector<uint32_t>& xs)
 {
     size_t seed = xs.size();
     for (auto x : xs) {
@@ -50,7 +50,7 @@ size_t _getHash(const std::vector<uint32_t>& xs)
     return seed;
 }
 
-size_t _getHash(const std::vector<int>& xs)
+size_t _getHash(const vector<int>& xs)
 {
     size_t seed = xs.size();
     for (auto x : xs) {

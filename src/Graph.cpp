@@ -28,7 +28,7 @@ using std::endl;
 
 void Graph::initializeGraph(uint32_t nbNodes, uint32_t nbEdges,
                             std::map<uint32_t, uint32_t>& lit2color,
-                            std::vector<std::vector<uint32_t> >& neighbours)
+                            vector<vector<uint32_t> >& neighbours)
 {
     bliss_g = new bliss::Graph(nbNodes);
     for (size_t n = 0; n < nbNodes; n++) {
@@ -73,7 +73,7 @@ void Graph::setNodeToNewColor(uint32_t node)
 {
     bliss_g->change_color(node, colorcount.size());
 }
-std::vector<sptr<Permutation> > perms;
+vector<sptr<Permutation> > perms;
 
 // This method is given to BLISS as a polymorphic consumer of the detected generator permutations
 
@@ -92,7 +92,7 @@ static void addBlissPermutation(void* param, const unsigned int n,
 }
 
 void Graph::getSymmetryGeneratorsInternal(
-    std::vector<sptr<Permutation> >& out_perms)
+    vector<sptr<Permutation> >& out_perms)
 {
     bliss::Stats stats;
     //bliss_g->set_splitting_heuristic(bliss::Graph::SplittingHeuristic::shs_fl); //TODO: to decide
@@ -125,7 +125,7 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses)
 
     // Initialize edge lists
     // First construct for each node the list of neighbors
-    std::vector<std::vector<uint32_t> > neighbours(n);
+    vector<vector<uint32_t> > neighbours(n);
     // Literals have their negations as neighbors
     for (uint32_t l = 1; l <= nVars; ++l) {
         uint32_t posID = encode(l);
@@ -239,7 +239,7 @@ Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules)
     uint32_t nbedges = 0;
     // Initialize edge lists
     // First construct for each node the list of neighbors
-    std::vector<std::vector<uint32_t> > neighbours(n);
+    vector<vector<uint32_t> > neighbours(n);
     // Literals have their negations as neighbors
     for (uint32_t l = 1; l <= nVars; ++l) {
         uint32_t posID = encode(l);
@@ -366,14 +366,14 @@ void Graph::setUniqueColor(uint32_t lit)
     colorcount.push_back(1);
 }
 
-void Graph::setUniqueColor(const std::vector<uint32_t>& lits)
+void Graph::setUniqueColor(const vector<uint32_t>& lits)
 {
     for (auto lit : lits) {
         setUniqueColor(lit);
     }
 }
 
-void Graph::getSymmetryGenerators(std::vector<sptr<Permutation> >& out_perms)
+void Graph::getSymmetryGenerators(vector<sptr<Permutation> >& out_perms)
 {
     out_perms.clear();
     if (verbosity > 1) {
