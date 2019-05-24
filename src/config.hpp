@@ -37,11 +37,9 @@ struct Config {
     // OPTIONS
     bool useMatrixDetection = false;
     bool useBinaryClauses = true;
-    bool printGeneratorFile = false;
     bool useShatterTranslation = false;
     bool useFullTranslation = false;
     int symBreakingFormLength = 50;
-    bool onlyPrintBreakers = false;
     uint32_t verbosity = 1;
     int64_t timeLim = std::numeric_limits<int64_t>::max();
 };

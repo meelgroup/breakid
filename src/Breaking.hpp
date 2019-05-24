@@ -300,7 +300,7 @@ public:
     ~Breaker(){};
 
     //Prints the current breaker
-    void print();
+    void print(bool only_breakers);
 
     void addBinClause(uint32_t l1, uint32_t l2);
     void addRegSym(shared_ptr<Permutation> perm, vector<uint32_t>& order);

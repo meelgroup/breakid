@@ -30,6 +30,8 @@ using std::endl;
 #include "config.hpp"
 
 Config conf;
+bool printGeneratorFile = false;
+bool onlyPrintBreakers = false;
 
 namespace options {
     string nointch = "-no-row";
@@ -115,9 +117,9 @@ void parseOptions(int argc, char *argv[])
         } else if (0 == input.compare(options::nointch)) {
             conf.useMatrixDetection = false;
         } else if (0 == input.compare(options::onlybreakers)) {
-            conf.onlyPrintBreakers = true;
+            onlyPrintBreakers = true;
         } else if (0 == input.compare(options::generatorfile)) {
-            conf.printGeneratorFile = true;
+            printGeneratorFile = true;
         } else if (0 == input.compare(options::nosmall)) {
             conf.useShatterTranslation = true;
         } else if (0 == input.compare(options::norelaxed)) {
@@ -147,8 +149,8 @@ void parseOptions(int argc, char *argv[])
             << " "
             << (conf.useMatrixDetection ? "" : options::nointch) << " "
             << (conf.useBinaryClauses ? "" : options::nobinary) << " "
-            << (conf.onlyPrintBreakers ? options::onlybreakers : "") << " "
-            << (conf.printGeneratorFile ? options::generatorfile : "") << " "
+            << (onlyPrintBreakers ? options::onlybreakers : "") << " "
+            << (printGeneratorFile ? options::generatorfile : "") << " "
             << (conf.useShatterTranslation ? options::nosmall : "") << " "
             << (conf.useFullTranslation ? options::norelaxed : "") << " "
             << endl;
@@ -184,9 +186,9 @@ int main(int argc, char *argv[])
         breakid.print_symm();
     }
 
-    breakid.write_final_cnf();
+    breakid.write_final_cnf(onlyPrintBreakers);
 
-    if (conf.printGeneratorFile) {
+    if (printGeneratorFile) {
         breakid.print_generators(fname + ".sym");
     }
 

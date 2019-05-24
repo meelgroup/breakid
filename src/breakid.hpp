@@ -42,7 +42,7 @@ struct BreakID {
     void clean_theory();
     void break_symm();
     void print_symm();
-    void write_final_cnf();
+    void write_final_cnf(bool only_breakers);
     void print_generators(std::string symFile);
 
 

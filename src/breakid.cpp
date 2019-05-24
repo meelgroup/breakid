@@ -154,8 +154,8 @@ void BreakID::print_symm()
     << endl;
 }
 
-void BreakID::write_final_cnf() {
-    dat->brkr->print();
+void BreakID::write_final_cnf(bool only_breakers) {
+    dat->brkr->print(only_breakers);
 }
 
 void BreakID::print_generators(string symFile)

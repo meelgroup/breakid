@@ -34,13 +34,13 @@ Breaker::Breaker(shared_ptr<Specification> origTheo, Config* _conf) :
 {
 }
 
-void Breaker::print()
+void Breaker::print(bool only_breakers)
 {
     cout << "c number of breaking clauses added: " << getAddedNbClauses()
               << "\n";
     cout << "c max original variable: " << conf->nVars << "\n";
     cout << "c auxiliary variables: " << getAuxiliaryNbVars() << "\n";
-    if (!conf->onlyPrintBreakers) {
+    if (!only_breakers) {
         cout << "p cnf " << getTotalNbVars() << " " << getTotalNbClauses()
                   << "\n";
         originalTheory->print(cout);
