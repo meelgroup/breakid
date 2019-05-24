@@ -20,18 +20,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
+#include <cstdint>
 #include <string>
 #include <iostream>
+#include <limits>
+#include <string>
 
 using std::cout;
+using std::string;
 using std::endl;
 
 #include "breakid.hpp"
-#include "config.hpp"
 
-Config conf;
 bool printGeneratorFile = false;
 bool onlyPrintBreakers = false;
+
+//conf
+bool conf_useMatrixDetection = false;
+bool conf_useBinaryClauses = true;
+bool conf_useShatterTranslation = false;
+bool conf_useFullTranslation = false;
+int  conf_symBreakingFormLength = 50;
+uint32_t conf_verbosity = 1;
+int64_t conf_timeLim = std::numeric_limits<int64_t>::max();
 
 namespace options {
     string nointch = "-no-row";
@@ -48,7 +59,7 @@ namespace options {
 
 void printUsage()
 {
-    BreakID bid(NULL);
+    BreakID bid;
     cout << "BreakID version " << bid.get_sha1_version() << endl;
     cout << "Usage: ./BreakID <cnf-file> "
               << "[" << options::help << "] "
@@ -83,15 +94,15 @@ void printUsage()
     << " Disable relaxing constraints on auxiliary encoding\n"
     << " variables, use longer encoding instead.\n"
 
-    << options::formlength << " <default: " << conf.symBreakingFormLength << ">\n"
+    << options::formlength << " <default: " << conf_symBreakingFormLength << ">\n"
     << " Limit the size of the constructed symmetry breaking\n"
     << " formula's, measured as the number of auxiliary variables\n"
     << " introduced. <-1> means no symmetry breaking.\n"
 
-    << options::timelim << " <default: " << conf.timeLim << ">\n"
+    << options::timelim << " <default: " << conf_timeLim << ">\n"
     << " Upper limit on computing steps spent, approximate measure for time.\n"
 
-    << options::verbosity << " <default: " << conf.verbosity << ">\n"
+    << options::verbosity << " <default: " << conf_verbosity << ">\n"
     << " Verbosity of the output. <0> means no output other than the\n"
     << " CNF augmented with symmetry breaking clauses.\n"
 
@@ -113,46 +124,46 @@ void parseOptions(int argc, char *argv[])
     for (int i = 1; i < argc; ++i) {
         string input = argv[i];
         if (0 == input.compare(options::nobinary)) {
-            conf.useBinaryClauses = false;
+            conf_useBinaryClauses = false;
         } else if (0 == input.compare(options::nointch)) {
-            conf.useMatrixDetection = false;
+            conf_useMatrixDetection = false;
         } else if (0 == input.compare(options::onlybreakers)) {
             onlyPrintBreakers = true;
         } else if (0 == input.compare(options::generatorfile)) {
             printGeneratorFile = true;
         } else if (0 == input.compare(options::nosmall)) {
-            conf.useShatterTranslation = true;
+            conf_useShatterTranslation = true;
         } else if (0 == input.compare(options::norelaxed)) {
-            conf.useFullTranslation = true;
+            conf_useFullTranslation = true;
         } else if (0 == input.compare(options::formlength)) {
             ++i;
-            conf.symBreakingFormLength = std::stoi(argv[i]);
+            conf_symBreakingFormLength = std::stoi(argv[i]);
         } else if (0 == input.compare(options::timelim)) {
             ++i;
-            conf.timeLim = std::stoi(argv[i]);
+            conf_timeLim = std::stoi(argv[i]);
         } else if (0 == input.compare(options::verbosity)) {
             ++i;
-            conf.verbosity = std::stoi(argv[i]);
+            conf_verbosity = std::stoi(argv[i]);
         } else if (0 == input.compare(options::help)) {
             printUsage();
         }
     }
 
-    if (conf.verbosity > 1) {
+    if (conf_verbosity > 1) {
         cout << "Options used:"
-            << " " << options::formlength << " " << conf.symBreakingFormLength
+            << " " << options::formlength << " " << conf_symBreakingFormLength
 
-            << " " << options::timelim << " " << conf.timeLim
+            << " " << options::timelim << " " << conf_timeLim
 
-            << " " << options::verbosity << " " << conf.verbosity
+            << " " << options::verbosity << " " << conf_verbosity
 
             << " "
-            << (conf.useMatrixDetection ? "" : options::nointch) << " "
-            << (conf.useBinaryClauses ? "" : options::nobinary) << " "
+            << (conf_useMatrixDetection ? "" : options::nointch) << " "
+            << (conf_useBinaryClauses ? "" : options::nobinary) << " "
             << (onlyPrintBreakers ? options::onlybreakers : "") << " "
             << (printGeneratorFile ? options::generatorfile : "") << " "
-            << (conf.useShatterTranslation ? options::nosmall : "") << " "
-            << (conf.useFullTranslation ? options::norelaxed : "") << " "
+            << (conf_useShatterTranslation ? options::nosmall : "") << " "
+            << (conf_useFullTranslation ? options::norelaxed : "") << " "
             << endl;
     }
 }
@@ -160,29 +171,36 @@ void parseOptions(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
-    BreakID breakid(&conf);
+    BreakID breakid;
+    breakid.set_useMatrixDetection(conf_useMatrixDetection);
+    breakid.set_useBinaryClauses(conf_useBinaryClauses);
+    breakid.set_useShatterTranslation(conf_useShatterTranslation);
+    breakid.set_useFullTranslation(conf_useFullTranslation);
+    breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
+    breakid.set_verbosity(conf_verbosity);
+
 
     string fname = argv[1];
     breakid.read_cnf(fname);
 
-    if (conf.verbosity > 3) {
+    if (conf_verbosity > 3) {
         breakid.print_graph();
     }
 
-    if (conf.verbosity) {
+    if (conf_verbosity) {
         breakid.print_generators();
     }
 
     breakid.detect_subgroups();
 
-    if (conf.verbosity) {
+    if (conf_verbosity) {
         breakid.print_subgroups();
     }
 
     breakid.clean_theory();
     breakid.break_symm();
 
-    if (conf.verbosity) {
+    if (conf_verbosity) {
         breakid.print_symm();
     }
 

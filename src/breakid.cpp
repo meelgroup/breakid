@@ -53,15 +53,54 @@ struct PrivateData
 
 BreakID::~BreakID()
 {
+    delete conf;
     delete dat->brkr;
     delete dat;
 }
 
-BreakID::BreakID(Config* _conf) :
-    conf(_conf)
+BreakID::BreakID()
 {
+    conf = new Config;
     dat = new PrivateData;
 }
+
+
+void BreakID::set_useMatrixDetection(bool val)
+{
+    conf->useMatrixDetection = val;
+}
+
+void BreakID::set_useBinaryClauses(bool val)
+{
+    conf->useBinaryClauses = val;
+}
+
+void BreakID::set_useShatterTranslation(bool val)
+{
+    conf->useShatterTranslation = val;
+}
+
+void BreakID::set_useFullTranslation(bool val)
+{
+    conf->useFullTranslation = val;
+}
+
+void BreakID::set_symBreakingFormLength(int val)
+{
+    conf->symBreakingFormLength = val;
+}
+
+void BreakID::set_verbosity(uint32_t val)
+{
+    conf->verbosity = val;
+}
+
+void BreakID::conf_timeLim(int64_t val)
+{
+}
+
+
+
 
 void BreakID::read_cnf(string filename_) {
     dat->theory = make_shared<CNF>(filename_, conf);

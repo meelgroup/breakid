@@ -29,11 +29,21 @@ class Config;
 struct PrivateData;
 
 struct BreakID {
-    BreakID(Config* conf);
+    BreakID();
     ~BreakID();
 
     std::string get_sha1_version() const;
 
+    //configuration functions
+    void set_useMatrixDetection(bool val);
+    void set_useBinaryClauses(bool val);
+    void set_useShatterTranslation(bool val);
+    void set_useFullTranslation(bool val);
+    void set_symBreakingFormLength(int val);
+    void set_verbosity(uint32_t val);
+    void conf_timeLim(int64_t val);
+
+    //main functions
     void read_cnf(std::string fname);
     void print_graph();
     void print_generators();
@@ -48,7 +58,7 @@ struct BreakID {
 
 private:
     PrivateData* dat = NULL;
-    Config* conf;
+    Config* conf = NULL;
 };
 
 #endif
