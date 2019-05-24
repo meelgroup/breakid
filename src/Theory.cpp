@@ -191,6 +191,63 @@ bool CNF::isSymmetry(Permutation& prm)
     return true;
 }
 
+//// ONLINE
+
+/*OnlCNF::OnlCNF(uint32_t nVars, Config* _conf) :
+    conf(_conf)
+{
+    conf->nVars = nVars;
+    //graph = make_shared<Graph>(clauses, conf);
+}
+
+void OnlCNF::addClause(void* lits, uint32_t size)
+{
+}
+
+void OnlCNF::addBinClause(void* lit1, void* lit2)
+{
+}
+
+void OnlCNF::post_graph_run()
+{
+    group = make_shared<Group>(conf);
+    if (conf->verbosity > 0) {
+        cout << "*** Detecting symmetry group..." << endl;
+    }
+    vector<sptr<Permutation> > symgens;
+    graph->getSymmetryGenerators(symgens);
+    for (auto symgen : symgens) {
+        group->add(symgen);
+    }
+}
+
+void OnlCNF::print(std::ostream&)
+{
+    assert(false);
+}
+
+uint32_t OnlCNF::getSize()
+{
+    assert(false);
+    return 0;
+}
+
+void OnlCNF::setSubTheory(sptr<Group>)
+{
+    //this will ONLY kill matrix detection
+    //disabled matrix detection instead.
+    assert(false && "Not implemented");
+}
+
+bool OnlCNF::isSymmetry(Permutation&)
+{
+    //this will ONLY kill matrix detection
+    //disabled matrix detection instead.
+    assert(false && "Not implemented");
+    return true;
+}*/
+
+
 /******************
  * SPECIFICATION
  *

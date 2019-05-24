@@ -50,7 +50,7 @@ struct Config {
     string inputSymFile;
 
     // OPTIONS
-    bool useMatrixDetection = true;
+    bool useMatrixDetection = false;
     bool useBinaryClauses = true;
     bool printGeneratorFile = false;
     bool useShatterTranslation = false;

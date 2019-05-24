@@ -25,6 +25,7 @@ include_directories( ${ZLIB_INCLUDE_DIR}   )
 include_directories( ${Boost_INCLUDE_DIRS} )
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/solvertypesmini.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/breakid/solvertypesmini.hpp" @ONLY)
 
 include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
@@ -72,7 +73,8 @@ target_link_libraries(breakid-bin
     ${Boost_LIBRARIES}
 )
 
-# breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
+breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/Breaking.hpp )
+breakid_add_public_header(breakid ${CMAKE_CURRENT_BINARY_DIR}/breakid/solvertypesmini.hpp )
 
 # -----------------------------------------------------------------------------
 # Copy public headers into build directory include directory.

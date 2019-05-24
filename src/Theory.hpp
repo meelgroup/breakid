@@ -76,6 +76,26 @@ private:
     Config* conf;
 };
 
+/*class OnlCNF : public Specification
+{
+public:
+    OnlCNF(uint32_t nVars, Config* conf);
+    ~OnlCNF();
+
+    void post_graph_run();
+    void addClause(void* lits, uint32_t size);
+    void addBinClause(void* lit1, void* lit2);
+
+    void print(std::ostream& out);
+    uint32_t getSize();
+    void setSubTheory(sptr<Group> subgroup);
+    bool isSymmetry(Permutation& prm);
+    friend class Breaker;
+
+private:
+    Config* conf;
+};*/
+
 class LogicProgram : public Specification
 {
 public:

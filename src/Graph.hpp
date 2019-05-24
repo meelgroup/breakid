@@ -25,6 +25,7 @@ public:
     ///@INVAR: for all x: colorcount[x]>0
     vector<uint32_t> colorcount;
 
+    //Graph(uint32_t nVars, Config* conf); ///<for online CNF
     Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses, Config* conf);
     Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules, Config* conf);
     ~Graph();

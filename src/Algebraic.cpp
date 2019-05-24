@@ -35,8 +35,11 @@ using namespace std;
 
 void Permutation::addFromTo(uint32_t from, uint32_t to)
 {
-    if (from != to && from < 2 * conf->nVars &&
-        to < 2 * conf->nVars) { // only ID's < 2*conf->nVars represent literals
+    if (from != to
+        // only ID's < 2*conf->nVars represent literals
+        && from < 2 * conf->nVars
+        && to < 2 * conf->nVars
+    ) {
         perm[from] = to;
         domain.push_back(from);
         image.push_back(to);

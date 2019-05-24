@@ -215,6 +215,7 @@ int main(int argc, char *argv[])
 
     Breaker brkr(theory, &conf);
     for (auto grp : subgroups) {
+        cout << "NOTE: Matrix detection disabled as current code is too slow" << endl;
         if (grp->getSize() > 1 && conf.useMatrixDetection) {
             if (conf.verbosity > 1) {
                 cout << "*** Detecting row interchangeability..." << endl;
