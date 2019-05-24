@@ -191,6 +191,9 @@ int main(int argc, char *argv[])
         breakid.print_generators();
     }
 
+    if (conf_verbosity) {
+        cout << "*** Detecting subgroups..." << endl;
+    }
     breakid.detect_subgroups();
 
     if (conf_verbosity) {
@@ -201,13 +204,20 @@ int main(int argc, char *argv[])
     breakid.break_symm();
 
     if (conf_verbosity) {
-        breakid.print_symm();
+        breakid.print_symm_break_stats();
     }
 
     breakid.write_final_cnf(onlyPrintBreakers);
 
     if (printGeneratorFile) {
-        breakid.print_generators(fname + ".sym");
+        string symFile = fname + ".sym";
+        if (conf_verbosity) {
+            cout
+            << "*** Printing generators to file " + symFile
+            << endl;
+        }
+
+        breakid.print_generators(symFile);
     }
 
     return 0;

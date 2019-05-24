@@ -51,7 +51,7 @@ struct BreakID {
     void print_subgroups();
     void clean_theory();
     void break_symm();
-    void print_symm();
+    void print_symm_break_stats();
     void write_final_cnf(bool only_breakers);
     void print_generators(std::string symFile);
 

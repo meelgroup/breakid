@@ -112,28 +112,24 @@ void BreakID::print_generators() {
     << "**** symmetry generators detected: "
     << dat->theory->getGroup()->getSize() << endl;
 
-    if (conf->verbosity > 2) {
-        dat->theory->getGroup()->print(cout);
-    }
+    dat->theory->getGroup()->print(cout);
 }
 
 void BreakID::detect_subgroups() {
-    if (conf->verbosity) {
-        cout << "*** Detecting subgroups..." << endl;
-    }
     dat->theory->getGroup()->getDisjointGenerators(dat->subgroups);
 }
 
 void BreakID::print_subgroups() {
-    cout << "**** subgroups detected: " << dat->subgroups.size()
-                  << endl;
+    cout
+    << "**** subgroups detected: "
+    << dat->subgroups.size() << endl;
 
     for (auto grp : dat->subgroups) {
-        cout << "group size: " << grp->getSize()
-                  << " support: " << grp->getSupportSize() << endl;
-        if (conf->verbosity > 2) {
-            grp->print(cout);
-        }
+        cout
+        << "group size: " << grp->getSize()
+        << " support: " << grp->getSupportSize() << endl;
+
+        grp->print(cout);
     }
 }
 
@@ -166,7 +162,7 @@ void BreakID::break_symm()
     }
 }
 
-void BreakID::print_symm()
+void BreakID::print_symm_break_stats()
 {
     cout << "**** matrices detected: " << dat->totalNbMatrices << endl;
     cout << "**** row swaps detected: " << dat->totalNbRowSwaps << endl;
@@ -196,10 +192,6 @@ void BreakID::write_final_cnf(bool only_breakers) {
 
 void BreakID::print_generators(string symFile)
 {
-    if (conf->verbosity) {
-        cout << "*** Printing generators to file " + symFile
-                  << endl;
-    }
     ofstream fp_out;
     fp_out.open(symFile, std::ios::out);
     for (auto grp : dat->subgroups) {
