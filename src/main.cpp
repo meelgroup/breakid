@@ -28,7 +28,6 @@ using std::endl;
 
 #include "breakid.hpp"
 #include "config.hpp"
-#include "GitSHA1.h"
 
 Config conf;
 
@@ -47,7 +46,8 @@ namespace options {
 
 void printUsage()
 {
-    cout << "BreakID version " << BID::get_version_sha1() << endl;
+    BreakID bid(NULL);
+    cout << "BreakID version " << bid.get_sha1_version() << endl;
     cout << "Usage: ./BreakID <cnf-file> "
               << "[" << options::help << "] "
               << "[" << options::nointch << "] "

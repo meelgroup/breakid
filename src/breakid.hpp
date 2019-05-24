@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
+#ifndef BREAKID_H
+#define BREAKID_H
+
 #include <string>
 
 class Config;
@@ -28,6 +31,8 @@ struct PrivateData;
 struct BreakID {
     BreakID(Config* conf);
     ~BreakID();
+
+    std::string get_sha1_version() const;
 
     void read_cnf(std::string fname);
     void print_graph();
@@ -45,3 +50,5 @@ private:
     PrivateData* dat = NULL;
     Config* conf;
 };
+
+#endif

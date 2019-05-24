@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "Theory.hpp"
 #include "Graph.hpp"
 #include "config.hpp"
+#include "GitSHA1.h"
 
 #include <cstdlib>
 #include <fstream>
@@ -169,4 +170,9 @@ void BreakID::print_generators(string symFile)
         grp->print(fp_out);
     }
     fp_out.close();
+}
+
+std::string BreakID::get_sha1_version() const
+{
+    return BID::get_version_sha1();
 }
