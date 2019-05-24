@@ -64,7 +64,6 @@ BreakID::BreakID()
     dat = new PrivateData;
 }
 
-
 void BreakID::set_useMatrixDetection(bool val)
 {
     conf->useMatrixDetection = val;
@@ -97,10 +96,8 @@ void BreakID::set_verbosity(uint32_t val)
 
 void BreakID::conf_timeLim(int64_t val)
 {
+    conf->timeLim = val;
 }
-
-
-
 
 void BreakID::read_cnf(string filename_) {
     dat->theory = make_shared<CNF>(filename_, conf);
