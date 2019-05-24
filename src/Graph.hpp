@@ -4,8 +4,10 @@
 #ifndef BREAKID_GRAPH_H
 #define BREAKID_GRAPH_H
 
+#include <map>
+
 #include "Algebraic.hpp"
-#include "global.hpp"
+#include "Breaking.hpp"
 
 class Matrix;
 class Group;
@@ -19,15 +21,14 @@ class Graph : public std::enable_shared_from_this<Graph>
 public:
     bliss::Graph* bliss_g;
 
-
     ///keeps track of the number of times a color is used
     ///so that no color is never used (seems to give Saucy trouble)
     ///@INVAR: for all x: colorcount[x]>0
     vector<uint32_t> colorcount;
 
     //Graph(uint32_t nVars, Config* conf); ///<for online CNF
-    Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses, Config* conf);
-    Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules, Config* conf);
+    Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clauses, Config* conf);
+    Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, Config* conf);
     ~Graph();
 
     uint32_t getNbNodes();
@@ -35,10 +36,10 @@ public:
     void print();
     void setUniqueColor(uint32_t lit);
     void setUniqueColor(const vector<uint32_t>& lits);
-    void getSymmetryGenerators(vector<sptr<Permutation> >& out_perms);
+    void getSymmetryGenerators(vector<shared_ptr<Permutation> >& out_perms);
 
     //TODO should be private
-    vector<sptr<Permutation> > perms;
+    vector<shared_ptr<Permutation> > perms;
     Config* conf;
 
 private:
@@ -54,7 +55,7 @@ private:
     uint32_t getNeighbour(uint32_t node, uint32_t nbthNeighbour);
     void setNodeToNewColor(uint32_t node);
     void getSymmetryGeneratorsInternal(
-        vector<sptr<Permutation> >& out_perms);
+        vector<shared_ptr<Permutation> >& out_perms);
 };
 
 #endif

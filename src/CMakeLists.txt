@@ -32,9 +32,9 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 set(breakid_lib_files
     Algebraic.cpp
     Breaking.cpp
-    global.cpp
     Graph.cpp
     Theory.cpp
+    breakid.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp
     $<TARGET_OBJECTS:bliss>
 )
@@ -56,7 +56,7 @@ set_target_properties(breakid PROPERTIES
 ###############
 
 add_executable(breakid-bin
-    BreakID.cpp
+    main.cpp
 )
 set_target_properties(breakid-bin PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}

@@ -20,8 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
-#include "global.hpp"
-
 #include "Algebraic.hpp"
 #include "Breaking.hpp"
 #include "Graph.hpp"
@@ -50,7 +48,7 @@ void Permutation::addFromTo(uint32_t from, uint32_t to)
 }
 
 void Permutation::addPrimeSplitToVector(
-    vector<sptr<Permutation> >& newPerms)
+    vector<shared_ptr<Permutation> >& newPerms)
 {
     std::map<size_t, vector<vector<uint32_t> > > lengthToCycles;
     std::map<size_t, std::set<size_t> > primeToPowers;
@@ -249,7 +247,7 @@ bool Permutation::isIdentity()
 
 // TODO: expand this detection method with "non-binary involutions"
 
-bool Permutation::formsMatrixWith(sptr<Permutation> other)
+bool Permutation::formsMatrixWith(shared_ptr<Permutation> other)
 {
     if (supportSize() != other->supportSize() || !isInvolution() ||
         !other->isInvolution()) {
@@ -267,8 +265,8 @@ bool Permutation::formsMatrixWith(sptr<Permutation> other)
     return true;
 }
 
-pair<sptr<Permutation>, sptr<Permutation> > Permutation::getLargest(
-    sptr<Permutation> other)
+pair<shared_ptr<Permutation>, shared_ptr<Permutation> > Permutation::getLargest(
+    shared_ptr<Permutation> other)
 {
     if (other->supportSize() > supportSize()) {
         return {other, shared_from_this()};
@@ -277,11 +275,11 @@ pair<sptr<Permutation>, sptr<Permutation> > Permutation::getLargest(
     }
 }
 
-void Permutation::getSharedLiterals(sptr<Permutation> other,
+void Permutation::getSharedLiterals(shared_ptr<Permutation> other,
                                     vector<uint32_t>& shared)
 {
     shared.clear();
-    pair<sptr<Permutation>, sptr<Permutation> > ordered = getLargest(other);
+    pair<shared_ptr<Permutation>, shared_ptr<Permutation> > ordered = getLargest(other);
     for (auto lit : ordered.second->posDomain) {
         if (ordered.first->permutes(lit)) {
             shared.push_back(lit);
@@ -326,7 +324,7 @@ uint32_t Permutation::getNbCycles()
     return getCycleReprs().size();
 }
 
-bool Permutation::equals(sptr<Permutation> other)
+bool Permutation::equals(shared_ptr<Permutation> other)
 {
     if (supportSize() != other->supportSize() ||
         getMaxCycleSize() != other->getMaxCycleSize() ||
@@ -347,13 +345,13 @@ Group::Group(Config* _conf) :
     conf(_conf)
 {}
 
-void Group::add(sptr<Permutation> p)
+void Group::add(shared_ptr<Permutation> p)
 {
     permutations.push_back(p);
     support.insert(p->domain.cbegin(), p->domain.cend());
 }
 
-void Group::addMatrix(sptr<Matrix> m)
+void Group::addMatrix(shared_ptr<Matrix> m)
 {
     matrices.push_back(m);
     cleanPermutations(m);
@@ -384,9 +382,9 @@ void Group::print(std::ostream& out)
 // The first added row is the shared row.
 // The matrix is then maximally extended with new rows given the detected permutations for this group.
 
-sptr<Matrix> Group::getInitialMatrix()
+shared_ptr<Matrix> Group::getInitialMatrix()
 {
-    std::map<uint32_t, vector<sptr<Permutation> > >
+    std::map<uint32_t, vector<shared_ptr<Permutation> > >
         involutions; // indexed by size
     for (auto p : permutations) {
         if (p->isInvolution()) {
@@ -395,7 +393,7 @@ sptr<Matrix> Group::getInitialMatrix()
         }
     }
 
-    sptr<Matrix> result(new Matrix(conf));
+    shared_ptr<Matrix> result(new Matrix(conf));
     for (auto it = involutions.cbegin(); it != involutions.cend();
          ++it) { // looping over all involution sizes
         for (uint32_t i = 0; i < it->second.size(); ++i) {
@@ -436,7 +434,7 @@ uint32_t Group::getNbRowSwaps()
     return result;
 }
 
-sptr<Matrix> Group::getMatrix(uint32_t idx)
+shared_ptr<Matrix> Group::getMatrix(uint32_t idx)
 {
     return matrices.at(idx);
 }
@@ -444,7 +442,7 @@ sptr<Matrix> Group::getMatrix(uint32_t idx)
 void Group::addMatrices()
 {
     ///if possible, gives an initial matrix
-    sptr<Matrix> matrix = getInitialMatrix();
+    shared_ptr<Matrix> matrix = getInitialMatrix();
 
     while (matrix != nullptr) {
         uint32_t oldNbRows = 0;
@@ -455,7 +453,7 @@ void Group::addMatrices()
                 theory->getGraph()->setUniqueColor(*matrix->getRow(i));
             }
             oldNbRows = matrix->nbRows();
-            vector<sptr<Permutation> > symgens;
+            vector<shared_ptr<Permutation> > symgens;
             theory->getGraph()->getSymmetryGenerators(symgens);
             // now test stabilizer generators on the (former) last row
             for (auto p : symgens) {
@@ -474,7 +472,7 @@ void Group::addMatrices()
     }
 }
 
-void Group::checkColumnInterchangeability(sptr<Matrix> m)
+void Group::checkColumnInterchangeability(shared_ptr<Matrix> m)
 {
     // create first column
     vector<uint32_t>* first = new vector<uint32_t>();
@@ -490,7 +488,7 @@ void Group::checkColumnInterchangeability(sptr<Matrix> m)
             break;
         }
     }
-    sptr<Matrix> newM(new Matrix(conf));
+    shared_ptr<Matrix> newM(new Matrix(conf));
     newM->add(first);
 
     // test for all swaps of first column with another one
@@ -519,22 +517,22 @@ void Group::checkColumnInterchangeability(sptr<Matrix> m)
     }
 }
 
-void Group::cleanPermutations(sptr<Matrix> matrix)
+void Group::cleanPermutations(shared_ptr<Matrix> matrix)
 {
     // remove all permutations generated by the current set of matrices
     for (int i = permutations.size() - 1; i >= 0; --i) {
-        sptr<Permutation> p = permutations.at(i);
+        shared_ptr<Permutation> p = permutations.at(i);
         if (p->supportSize() % matrix->nbColumns() != 0) {
             continue; // can not be a row permutation
         }
-        sptr<Permutation> reduct = matrix->testMembership(p);
+        shared_ptr<Permutation> reduct = matrix->testMembership(p);
         if (reduct->isIdentity()) {
             swapErase(permutations, i);
         }
     }
 }
 
-void Group::maximallyExtend(sptr<Matrix> matrix, uint32_t indexOfFirstNewRow)
+void Group::maximallyExtend(shared_ptr<Matrix> matrix, uint32_t indexOfFirstNewRow)
 {
     for (uint32_t i = indexOfFirstNewRow; i < matrix->nbRows(); ++i) {
         // investigate for new rows
@@ -552,13 +550,13 @@ uint32_t Group::getSize()
 // NOTE: only approximate support for groups with matrices as generators: all matrices are added to the first subgroup
 // NOTE: erases permutations for this group
 
-void Group::getDisjointGenerators(vector<sptr<Group> >& subgroups)
+void Group::getDisjointGenerators(vector<shared_ptr<Group> >& subgroups)
 {
     // calculate maximal subsets of generators with pairwise disjoint supports
     subgroups.clear();
 
     if (matrices.size() > 0) {
-        sptr<Group> current(new Group(conf));
+        shared_ptr<Group> current(new Group(conf));
         for (auto m : matrices) {
             current->addMatrix(m);
         }
@@ -581,7 +579,7 @@ void Group::getDisjointGenerators(vector<sptr<Group> >& subgroups)
 
     while (permutations.size() > 0) {
         uint32_t previoussize = 0;
-        sptr<Group> current(new Group(conf));
+        shared_ptr<Group> current(new Group(conf));
         current->add(permutations.back());
         permutations.pop_back();
         while (current->getSize() > previoussize) {
@@ -610,7 +608,7 @@ uint32_t Group::getSupportSize()
     return support.size();
 }
 
-void eliminateNonStabilizers(vector<sptr<Permutation> >& permutations,
+void eliminateNonStabilizers(vector<shared_ptr<Permutation> >& permutations,
                              uint32_t lit)
 {
     for (uint32_t i = 0; i < permutations.size(); ++i) {
@@ -622,8 +620,8 @@ void eliminateNonStabilizers(vector<sptr<Permutation> >& permutations,
     }
 }
 
-void getOrbits2(const vector<sptr<Permutation> >& permutations,
-                vector<sptr<vector<uint32_t> > >& orbits)
+void getOrbits2(const vector<shared_ptr<Permutation> >& permutations,
+                vector<shared_ptr<vector<uint32_t> > >& orbits)
 {
     // find positively supported literals
     std::unordered_set<uint32_t> posSupport;
@@ -638,7 +636,7 @@ void getOrbits2(const vector<sptr<Permutation> >& permutations,
     for (auto l : posSupport) {
         if (visitedLits.insert(l)
                 .second) { // lit did not yet occur in visitedLits
-            sptr<vector<uint32_t> > newOrbit(new vector<uint32_t>());
+            shared_ptr<vector<uint32_t> > newOrbit(new vector<uint32_t>());
             newOrbit->push_back(l);
             for (uint32_t i = 0; i < newOrbit->size(); ++i) {
                 for (auto p : permutations) {
@@ -654,7 +652,7 @@ void getOrbits2(const vector<sptr<Permutation> >& permutations,
 }
 
 void getPosLitOccurrenceCount(
-    const vector<sptr<Permutation> >& permutations,
+    const vector<shared_ptr<Permutation> >& permutations,
     std::unordered_map<uint32_t, uint32_t>& lits2occ)
 {
     for (auto p : permutations) {
@@ -668,7 +666,7 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<uint32_t>& out_order,
                                const std::unordered_set<uint32_t>& excludedLits)
 {
     // now, look for literals with large orbits (of a stabilizer group for smaller literals) as first elements of the order
-    vector<sptr<Permutation> > perms = permutations;
+    vector<shared_ptr<Permutation> > perms = permutations;
     while (perms.size() > 0) {
         // as long as we have some permutations stabilizing everything in order so far, continue looking for other literals to add to the order
 
@@ -676,12 +674,12 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<uint32_t>& out_order,
         // 0) a non-excluded variable
         // 1) in _a_ largest orbit with non-excluded variables
         // 2) has the lowest occurrence of literals adhering to 0) and 1)
-        vector<sptr<vector<uint32_t> > > orbs;
+        vector<shared_ptr<vector<uint32_t> > > orbs;
         getOrbits2(perms, orbs);
         std::unordered_map<uint32_t, uint32_t> lits2occ;
         getPosLitOccurrenceCount(perms, lits2occ);
 
-        sptr<vector<uint32_t> > finalOrb(new vector<uint32_t>());
+        shared_ptr<vector<uint32_t> > finalOrb(new vector<uint32_t>());
         uint32_t finalLit = UINT_MAX;
         uint32_t finalOccurrence = UINT_MAX;
         for (auto o : orbs) {
@@ -807,7 +805,7 @@ void Group::addBreakingClausesTo(Breaker& brkr)
     // add clauses based on detected matrices
     for (auto m : matrices) {
         for (uint32_t idx = 0; idx < m->nbRows() - 1; ++idx) {
-            sptr<Permutation> rowswap(
+            shared_ptr<Permutation> rowswap(
                 new Permutation(*m->getRow(idx), *m->getRow(idx + 1), conf));
             brkr.addRowSym(rowswap, order);
         }
@@ -867,7 +865,7 @@ vector<uint32_t>* Matrix::getRow(uint32_t rowindex)
     return rows[rowindex];
 }
 
-void Matrix::tryToAddNewRow(sptr<Permutation> p, uint32_t rowIndex,
+void Matrix::tryToAddNewRow(shared_ptr<Permutation> p, uint32_t rowIndex,
                             Specification* theory)
 {
     // checks whether the image of the current row can be used as a new row
@@ -911,7 +909,7 @@ uint32_t Matrix::getColumnNb(uint32_t x)
     return colco.at(x);
 }
 
-sptr<Permutation> Matrix::testMembership(const sptr<Permutation> p)
+shared_ptr<Permutation> Matrix::testMembership(const shared_ptr<Permutation> p)
 {
     /**
    * NOTE: 
@@ -927,7 +925,7 @@ sptr<Permutation> Matrix::testMembership(const sptr<Permutation> p)
     for (uint32_t i = 0; i < nbRows(); ++i) {
         basic_orbit.insert(getLit(i, 0)); // creating Delta^0
     }
-    sptr<Permutation> g = p;
+    shared_ptr<Permutation> g = p;
     for (uint32_t l = 0; l < nbRows(); ++l) {
         uint32_t beta_l = getLit(l, 0);
         uint32_t beta_l_g = g->getImage(beta_l);
@@ -946,13 +944,13 @@ sptr<Permutation> Matrix::testMembership(const sptr<Permutation> p)
 
 // return p*swap(r1,r2)
 
-sptr<Permutation> Matrix::getProductWithRowsWap(const sptr<Permutation> p,
+shared_ptr<Permutation> Matrix::getProductWithRowsWap(const shared_ptr<Permutation> p,
                                                 uint32_t r1, uint32_t r2)
 {
     if (r1 == r2) {
         return p;
     } else if (p->isIdentity()) {
-        sptr<Permutation> result(new Permutation(*getRow(r1), *getRow(r2), conf));
+        shared_ptr<Permutation> result(new Permutation(*getRow(r1), *getRow(r2), conf));
         return result;
     }
 
@@ -987,6 +985,6 @@ sptr<Permutation> Matrix::getProductWithRowsWap(const sptr<Permutation> p,
         }
     }
 
-    sptr<Permutation> result(new Permutation(protoPerm, conf));
+    shared_ptr<Permutation> result(new Permutation(protoPerm, conf));
     return result;
 }

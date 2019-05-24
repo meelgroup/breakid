@@ -24,18 +24,17 @@ THE SOFTWARE.
 #include "Algebraic.hpp"
 #include "Breaking.hpp"
 #include "Theory.hpp"
-#include "global.hpp"
 
 using std::cout;
 using std::endl;
 
-Breaker::Breaker(sptr<Specification> origTheo, Config* _conf) :
+Breaker::Breaker(shared_ptr<Specification> origTheo, Config* _conf) :
     originalTheory(origTheo)
     , conf(_conf)
 {
 }
 
-void Breaker::print(std::string& /*origfile*/)
+void Breaker::print()
 {
     cout << "c number of breaking clauses added: " << getAddedNbClauses()
               << "\n";
@@ -51,14 +50,14 @@ void Breaker::print(std::string& /*origfile*/)
     }
 }
 
-void Breaker::add(sptr<Clause> cl)
+void Breaker::add(shared_ptr<Clause> cl)
 {
     clauses.insert(cl);
 }
 
 void Breaker::addBinary(uint32_t l1, uint32_t l2)
 {
-    sptr<Clause> toAdd(new Clause());
+    shared_ptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
     toAdd->lits.push_back(l2);
     add(toAdd);
@@ -66,7 +65,7 @@ void Breaker::addBinary(uint32_t l1, uint32_t l2)
 
 void Breaker::addTernary(uint32_t l1, uint32_t l2, uint32_t l3)
 {
-    sptr<Clause> toAdd(new Clause());
+    shared_ptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
     toAdd->lits.push_back(l2);
     toAdd->lits.push_back(l3);
@@ -75,7 +74,7 @@ void Breaker::addTernary(uint32_t l1, uint32_t l2, uint32_t l3)
 
 void Breaker::addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4)
 {
-    sptr<Clause> toAdd(new Clause());
+    shared_ptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
     toAdd->lits.push_back(l2);
     toAdd->lits.push_back(l3);
@@ -89,7 +88,7 @@ void Breaker::addBinClause(uint32_t l1, uint32_t l2)
     addBinary(l1, l2);
 }
 
-void Breaker::addRegSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
+void Breaker::addRegSym(shared_ptr<Permutation> perm, std::vector<uint32_t>& order)
 {
     uint32_t current = getTotalNbClauses();
     if (conf->useShatterTranslation) {
@@ -100,7 +99,7 @@ void Breaker::addRegSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
     nbRegClauses += getTotalNbClauses() - current;
 }
 
-void Breaker::addRowSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
+void Breaker::addRowSym(shared_ptr<Permutation> perm, std::vector<uint32_t>& order)
 {
     uint32_t current = getTotalNbClauses();
     if (conf->useShatterTranslation) {
@@ -111,7 +110,7 @@ void Breaker::addRowSym(sptr<Permutation> perm, std::vector<uint32_t>& order)
     nbRowClauses += getTotalNbClauses() - current;
 }
 
-void Breaker::add(sptr<Permutation> perm, std::vector<uint32_t>& order,
+void Breaker::add(shared_ptr<Permutation> perm, std::vector<uint32_t>& order,
                   bool limitExtraConstrs)
 {
     std::unordered_set<uint32_t>
@@ -188,7 +187,7 @@ void Breaker::add(sptr<Permutation> perm, std::vector<uint32_t>& order,
     }
 }
 
-void Breaker::addShatter(sptr<Permutation> perm, std::vector<uint32_t>& order,
+void Breaker::addShatter(shared_ptr<Permutation> perm, std::vector<uint32_t>& order,
                          bool limitExtraConstrs)
 {
     std::unordered_set<uint32_t>

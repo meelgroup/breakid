@@ -23,7 +23,8 @@ THE SOFTWARE.
 #ifndef THEORY_H
 #define THEORY_H
 
-#include "global.hpp"
+#include "config.hpp"
+#include "Breaking.hpp"
 
 class Graph;
 class Permutation;
@@ -36,8 +37,8 @@ class Specification
     friend class Breaker;
 
    protected:
-    sptr<Graph> graph;
-    sptr<Group> group;
+    shared_ptr<Graph> graph;
+    shared_ptr<Group> group;
 
    public:
     Specification();
@@ -46,11 +47,11 @@ class Specification
     virtual void print(std::ostream& out) = 0;
     virtual uint32_t getSize() = 0;
 
-    sptr<Graph> getGraph();
-    sptr<Group> getGroup();
+    shared_ptr<Graph> getGraph();
+    shared_ptr<Group> getGroup();
 
     virtual void cleanUp();
-    virtual void setSubTheory(sptr<Group> subgroup) = 0;
+    virtual void setSubTheory(shared_ptr<Group> subgroup) = 0;
     virtual bool isSymmetry(Permutation& prm) = 0;
 };
 
@@ -58,19 +59,19 @@ class CNF : public Specification
 {
 public:
     CNF(string& filename, Config* conf);
-    CNF(vector<sptr<Clause> >& clss, sptr<Group> grp);
+    CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp);
     ~CNF();
 
     void print(std::ostream& out);
     uint32_t getSize();
-    void setSubTheory(sptr<Group> subgroup);
+    void setSubTheory(shared_ptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
 
 private:
     ///must be an unordered_set, since we need to be able to test
     ///whether a clause exists to detect symmetries
-    std::unordered_set<sptr<Clause>, UVecHash, UvecEqual> clauses;
+    std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual> clauses;
 
     void readCNF(string& filename);
     Config* conf;
@@ -88,7 +89,7 @@ public:
 
     void print(std::ostream& out);
     uint32_t getSize();
-    void setSubTheory(sptr<Group> subgroup);
+    void setSubTheory(shared_ptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
 
@@ -99,12 +100,12 @@ private:
 class LogicProgram : public Specification
 {
 public:
-    LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp, Config* conf);
+    LogicProgram(vector<shared_ptr<Rule> >& rls, shared_ptr<Group> grp, Config* conf);
     ~LogicProgram();
 
     void print(std::ostream& out);
     uint32_t getSize();
-    void setSubTheory(sptr<Group> subgroup);
+    void setSubTheory(shared_ptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
 
@@ -112,7 +113,7 @@ private:
 
     ///Must be an unordered_set, since we need to be able to test
     ///whether a rule exists to detect symmetries
-    std::unordered_set<sptr<Rule>, UVecHash, UvecEqual> rules;
+    std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual> rules;
     Config* conf;
 };
 

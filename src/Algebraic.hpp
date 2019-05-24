@@ -23,7 +23,10 @@ THE SOFTWARE.
 #ifndef ALGEBRAIC_H
 #define ALGEBRAIC_H
 
-#include "global.hpp"
+#include <unordered_map>
+
+#include "config.hpp"
+#include "Breaking.hpp"
 
 class Specification;
 class Breaker;
@@ -50,22 +53,22 @@ public:
 
     void print(std::ostream& out);
 
-    bool formsMatrixWith(sptr<Permutation> other);
-    std::pair<sptr<Permutation>, sptr<Permutation> > getLargest(
-        sptr<Permutation> other);
-    void getSharedLiterals(sptr<Permutation> other, vector<uint32_t>& shared);
+    bool formsMatrixWith(shared_ptr<Permutation> other);
+    std::pair<shared_ptr<Permutation>, shared_ptr<Permutation> > getLargest(
+        shared_ptr<Permutation> other);
+    void getSharedLiterals(shared_ptr<Permutation> other, vector<uint32_t>& shared);
     vector<uint32_t>& getCycleReprs();
     uint32_t getMaxCycleSize();
     uint32_t getNbCycles();
 
-    bool equals(sptr<Permutation> other);
+    bool equals(shared_ptr<Permutation> other);
     vector<uint32_t> domain;
     vector<uint32_t> posDomain;
     vector<uint32_t> image;
 
     void addFromTo(uint32_t from, uint32_t to);
     void addCycle(vector<uint32_t>& cyc);
-    void addPrimeSplitToVector(vector<sptr<Permutation> >& newPerms);
+    void addPrimeSplitToVector(vector<shared_ptr<Permutation> >& newPerms);
 
 private:
     std::unordered_map<uint32_t, uint32_t> perm;
@@ -92,7 +95,7 @@ class Matrix
     void add(vector<uint32_t>* row);
     uint32_t nbColumns();
     uint32_t nbRows();
-    void tryToAddNewRow(sptr<Permutation> p, uint32_t rowIndex,
+    void tryToAddNewRow(shared_ptr<Permutation> p, uint32_t rowIndex,
                         Specification* theory);
     vector<uint32_t>* getRow(uint32_t rowindex);
     bool permutes(uint32_t x);
@@ -101,20 +104,20 @@ class Matrix
     uint32_t getRowNb(uint32_t x);
     uint32_t getColumnNb(uint32_t x);
 
-    sptr<Permutation> testMembership(const sptr<Permutation> p);
-    sptr<Permutation> getProductWithRowsWap(const sptr<Permutation> p, uint32_t r1,
+    shared_ptr<Permutation> testMembership(const shared_ptr<Permutation> p);
+    shared_ptr<Permutation> getProductWithRowsWap(const shared_ptr<Permutation> p, uint32_t r1,
                                             uint32_t r2); // return p*swap(r1,r2)
 };
 
 class Group
 {
    private:
-    vector<sptr<Permutation> > permutations;
-    vector<sptr<Matrix> > matrices;
+    vector<shared_ptr<Permutation> > permutations;
+    vector<shared_ptr<Matrix> > matrices;
     std::unordered_set<uint32_t> support;
 
     void cleanPermutations(
-        sptr<Matrix> matrix); // remove permutations implied by the matrix
+        shared_ptr<Matrix> matrix); // remove permutations implied by the matrix
 
    public:
     // NOTE: if a group has a shared pointer to a theory, and a theory a shared pointer to a group, none of the memory pointed to by these pointers will ever be freed :(
@@ -122,23 +125,23 @@ class Group
 
     Group(Config* conf);
 
-    void add(sptr<Permutation> p);
-    void checkColumnInterchangeability(sptr<Matrix> m);
+    void add(shared_ptr<Permutation> p);
+    void checkColumnInterchangeability(shared_ptr<Matrix> m);
 
     void print(std::ostream& out);
 
-    sptr<Matrix> getInitialMatrix();
+    shared_ptr<Matrix> getInitialMatrix();
 
     void addMatrices();
     void addMatrix(
-        sptr<Matrix>
+        shared_ptr<Matrix>
             m); // cnf-parameter, otherwise we have to store a pointer to the cnf here :(
     uint32_t getNbMatrices();
     uint32_t getNbRowSwaps();
 
-    sptr<Matrix> getMatrix(uint32_t idx);
+    shared_ptr<Matrix> getMatrix(uint32_t idx);
 
-    void getDisjointGenerators(vector<sptr<Group> >& subgroups);
+    void getDisjointGenerators(vector<shared_ptr<Group> >& subgroups);
     uint32_t getSize();
 
     bool permutes(uint32_t lit);
@@ -152,7 +155,7 @@ class Group
                             const std::unordered_set<uint32_t>& excludedLits);
     void addBreakingClausesTo(Breaker& brkr);
 
-    void maximallyExtend(sptr<Matrix> matrix, uint32_t indexOfFirstNewRow);
+    void maximallyExtend(shared_ptr<Matrix> matrix, uint32_t indexOfFirstNewRow);
     Config* conf;
 };
 

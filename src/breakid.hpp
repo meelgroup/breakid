@@ -1,5 +1,5 @@
 /******************************************
-Copyright (c) 2016, Mate Soos
+Copyright (c) 2019 Jo Devriendt - KU Leuven
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
-namespace BID {
+#include <string>
 
-const char* get_version_sha1();
-const char* get_version_tag();
-const char* get_compilation_env();
+class Config;
+struct PrivateData;
 
-}
+struct BreakID {
+    BreakID(Config* conf);
+    ~BreakID();
+
+    void read_cnf(std::string fname);
+    void print_graph();
+    void print_generators();
+    void detect_subgroups();
+    void print_subgroups();
+    void clean_theory();
+    void break_symm();
+    void print_symm();
+    void write_final_cnf();
+    void print_generators(std::string symFile);
+
+
+private:
+    PrivateData* dat = NULL;
+    Config* conf;
+};

@@ -19,32 +19,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
+#ifndef BREAKID_CONFIG
+#define BREAKID_CONFIG
 
-#include "global.hpp"
-#include "limits.h"
+#include <vector>
+#include <string>
+#include <limits>
 
-using namespace std;
+using std::vector;
+using std::string;
 
-size_t _getHash(const vector<uint32_t>& xs)
-{
-    size_t seed = xs.size();
-    for (auto x : xs) {
-        seed ^= x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    }
-    return seed;
-}
+struct Config {
+    uint32_t nVars = 0;
+    vector<uint32_t> fixedLits;
+    string inputSymFile;
 
-size_t _getHash(const vector<int>& xs)
-{
-    size_t seed = xs.size();
-    for (auto x : xs) {
-        seed ^= x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    }
-    return seed;
-}
+    // OPTIONS
+    bool useMatrixDetection = false;
+    bool useBinaryClauses = true;
+    bool printGeneratorFile = false;
+    bool useShatterTranslation = false;
+    bool useFullTranslation = false;
+    int symBreakingFormLength = 50;
+    bool onlyPrintBreakers = false;
+    uint32_t verbosity = 1;
+    int64_t timeLim = std::numeric_limits<int64_t>::max();
+};
 
-void gracefulError(string str)
-{
-    std::cerr << str << "\nExiting..." << endl;
-    exit(1);
-}
+#endif

@@ -48,7 +48,8 @@ void CNF::readCNF(string& filename)
 
     ifstream file(filename);
     if (!file) {
-        gracefulError("No CNF file found.");
+        std::cout << "ERROR: No CNF file found." << endl;
+        exit(-1);
     }
     string line;
     set<uint32_t> inclause = set<uint32_t>();
@@ -75,7 +76,8 @@ void CNF::readCNF(string& filename)
             while (iss >> l) {
                 if (l == 0) {
                     if (inclause.size() == 0) {
-                        gracefulError("Theory can not contain empty clause.");
+                        std::cout << "ERROR: Theory can not contain empty clause." << endl;
+                        exit(-1);
                     }
                     bool isTautology = false;
                     for (auto lit : inclause) {
@@ -85,7 +87,7 @@ void CNF::readCNF(string& filename)
                         }
                     }
                     if (!isTautology) {
-                        sptr<Clause> cl(new Clause(inclause));
+                        shared_ptr<Clause> cl(new Clause(inclause));
                         clauses.insert(cl);
                     }
                     inclause.clear();
@@ -119,14 +121,14 @@ CNF::CNF(string& filename, Config* _conf) :
     if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
     }
-    vector<sptr<Permutation> > symgens;
+    vector<shared_ptr<Permutation> > symgens;
     graph->getSymmetryGenerators(symgens);
     for (auto symgen : symgens) {
         group->add(symgen);
     }
 }
 
-CNF::CNF(vector<sptr<Clause> >& clss, sptr<Group> grp)
+CNF::CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp)
 {
     clauses.insert(clss.cbegin(), clss.cend());
     graph = make_shared<Graph>(clauses, conf);
@@ -160,11 +162,11 @@ uint32_t CNF::getSize()
     return clauses.size();
 }
 
-void CNF::setSubTheory(sptr<Group> subgroup)
+void CNF::setSubTheory(shared_ptr<Group> subgroup)
 {
     //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves?
     //TODO: Is it simply made approximative on purpose or by accident?
-    vector<sptr<Clause> > subclauses;
+    vector<shared_ptr<Clause> > subclauses;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
             if (subgroup->permutes(lit)) {
@@ -179,7 +181,7 @@ void CNF::setSubTheory(sptr<Group> subgroup)
 bool CNF::isSymmetry(Permutation& prm)
 {
     for (auto cl : clauses) {
-        sptr<Clause> symmetrical(new Clause());
+        shared_ptr<Clause> symmetrical(new Clause());
         if (!prm.getImage(cl->lits, symmetrical->lits)) {
             continue;
         }
@@ -214,7 +216,7 @@ void OnlCNF::post_graph_run()
     if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
     }
-    vector<sptr<Permutation> > symgens;
+    vector<shared_ptr<Permutation> > symgens;
     graph->getSymmetryGenerators(symgens);
     for (auto symgen : symgens) {
         group->add(symgen);
@@ -232,7 +234,7 @@ uint32_t OnlCNF::getSize()
     return 0;
 }
 
-void OnlCNF::setSubTheory(sptr<Group>)
+void OnlCNF::setSubTheory(shared_ptr<Group>)
 {
     //this will ONLY kill matrix detection
     //disabled matrix detection instead.
@@ -261,12 +263,12 @@ Specification::Specification()
 {
 }
 
-sptr<Graph> Specification::getGraph()
+shared_ptr<Graph> Specification::getGraph()
 {
     return graph;
 }
 
-sptr<Group> Specification::getGroup()
+shared_ptr<Group> Specification::getGroup()
 {
     return group;
 }
@@ -288,7 +290,7 @@ void checkVarExists(int lit, Config* conf)
     }
 }
 
-LogicProgram::LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp, Config* _conf) :
+LogicProgram::LogicProgram(vector<shared_ptr<Rule> >& rls, shared_ptr<Group> grp, Config* _conf) :
     conf(_conf)
 {
     rules.insert(rls.cbegin(), rls.cend());
@@ -307,7 +309,7 @@ LogicProgram::LogicProgram(vector<sptr<Rule> >& rls, sptr<Group> grp, Config* _c
     }
 }
 
-//CNF(vector<sptr<Clause> >& clss, sptr<Group> grp);
+//CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp);
 LogicProgram::~LogicProgram()
 {
 }
@@ -324,10 +326,10 @@ uint32_t LogicProgram::getSize()
     return rules.size();
 }
 
-void LogicProgram::setSubTheory(sptr<Group> subgroup)
+void LogicProgram::setSubTheory(shared_ptr<Group> subgroup)
 {
     //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves? Is it simply made approximative on purpose or by accident?
-    vector<sptr<Rule> > subrules;
+    vector<shared_ptr<Rule> > subrules;
     for (auto r : rules) {
         bool found = false;
         for (auto lit : r->headLits) {
@@ -355,7 +357,7 @@ void LogicProgram::setSubTheory(sptr<Group> subgroup)
 bool LogicProgram::isSymmetry(Permutation& prm)
 {
     for (auto r : rules) {
-        sptr<Rule> symmetrical(new Rule());
+        shared_ptr<Rule> symmetrical(new Rule());
         if (!(prm.getImage(r->headLits, symmetrical->headLits) |
               prm.getImage(r->bodyLits, symmetrical->bodyLits))) {
             continue;

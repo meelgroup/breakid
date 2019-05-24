@@ -82,7 +82,7 @@ static void addBlissPermutation(
 {
     Graph* g = (Graph*)param;
 
-    sptr<Permutation> permu = std::make_shared<Permutation>(g->conf);
+    shared_ptr<Permutation> permu = std::make_shared<Permutation>(g->conf);
     for (unsigned i = 0; i < n; ++i) {
         if (i != aut[i]) {
             permu->addFromTo(i, aut[i]);
@@ -92,7 +92,7 @@ static void addBlissPermutation(
 }
 
 void Graph::getSymmetryGeneratorsInternal(
-    vector<sptr<Permutation> >& out_perms)
+    vector<shared_ptr<Permutation> >& out_perms)
 {
     bliss::Stats stats;
     //bliss_g->set_splitting_heuristic(bliss::Graph::SplittingHeuristic::shs_fl); //TODO: to decide
@@ -102,7 +102,7 @@ void Graph::getSymmetryGeneratorsInternal(
     std::swap(out_perms, perms);
 }
 
-Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses, Config* _conf) :
+Graph::Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clauses, Config* _conf) :
     conf(_conf)
 {
     //TODO: Why are we making undirected graphs? Efficiency? In principle, a lot could be directed (e.g., only edge from clause to lit -> more in LP)
@@ -168,7 +168,7 @@ Graph::Graph(std::unordered_set<sptr<Clause>, UVecHash, UvecEqual>& clauses, Con
     setUniqueColor(conf->fixedLits);
 }
 
-Graph::Graph(std::unordered_set<sptr<Rule>, UVecHash, UvecEqual>& rules, Config* _conf) :
+Graph::Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, Config* _conf) :
     conf(_conf)
 {
     //We create this graph:
@@ -376,7 +376,7 @@ void Graph::setUniqueColor(const vector<uint32_t>& lits)
     }
 }
 
-void Graph::getSymmetryGenerators(vector<sptr<Permutation> >& out_perms)
+void Graph::getSymmetryGenerators(vector<shared_ptr<Permutation> >& out_perms)
 {
     out_perms.clear();
     if (conf->verbosity > 1) {

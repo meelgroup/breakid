@@ -20,30 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************/
 
-#include <cstdlib>
 #include <string>
-#include <fstream>
-#include <iterator>
-#include <sstream>
-
-#include "Algebraic.hpp"
-#include "Breaking.hpp"
-#include "GitSHA1.h"
-#include "Graph.hpp"
-#include "Theory.hpp"
-#include "global.hpp"
+#include <iostream>
 
 using std::cout;
 using std::endl;
-using std::string;
-using std::ofstream;
-using std::stringstream;
-using std::istringstream;
-using std::make_shared;
-using std::vector;
+
+#include "breakid.hpp"
+#include "config.hpp"
+#include "GitSHA1.h"
+
+Config conf;
 
 namespace options {
-    // option strings:
     string nointch = "-no-row";
     string nobinary = "-no-bin";
     string formlength = "-s";
@@ -56,11 +45,9 @@ namespace options {
     string generatorfile = "-with-generator-file";
 }
 
-Config conf;
-
 void printUsage()
 {
-    cout << "BreakID version " << BreakID::get_version_sha1() << endl;
+    cout << "BreakID version " << BID::get_version_sha1() << endl;
     cout << "Usage: ./BreakID <cnf-file> "
               << "[" << options::help << "] "
               << "[" << options::nointch << "] "
@@ -171,106 +158,36 @@ void parseOptions(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
-    string filename_ = argv[1];
+    BreakID breakid(&conf);
 
-    sptr<Specification> theory;
-    theory = make_shared<CNF>(filename_, &conf);
+    string fname = argv[1];
+    breakid.read_cnf(fname);
 
     if (conf.verbosity > 3) {
-        theory->getGraph()->print();
+        breakid.print_graph();
     }
 
     if (conf.verbosity) {
-        cout << "**** symmetry generators detected: "
-                  << theory->getGroup()->getSize() << endl;
-        if (conf.verbosity > 2) {
-            theory->getGroup()->print(cout);
-        }
+        breakid.print_generators();
     }
+
+    breakid.detect_subgroups();
 
     if (conf.verbosity) {
-        cout << "*** Detecting subgroups..." << endl;
-    }
-    vector<sptr<Group> > subgroups;
-    theory->getGroup()->getDisjointGenerators(subgroups);
-    if (conf.verbosity) {
-        cout << "**** subgroups detected: " << subgroups.size()
-                  << endl;
+        breakid.print_subgroups();
     }
 
-    if (conf.verbosity > 1) {
-        for (auto grp : subgroups) {
-            cout << "group size: " << grp->getSize()
-                      << " support: " << grp->getSupportSize() << endl;
-            if (conf.verbosity > 2) {
-                grp->print(cout);
-            }
-        }
-    }
-
-    theory->cleanUp(); // improve some memory overhead
-
-    uint32_t totalNbMatrices = 0;
-    uint32_t totalNbRowSwaps = 0;
-
-    Breaker brkr(theory, &conf);
-    for (auto grp : subgroups) {
-        cout << "NOTE: Matrix detection disabled as current code is too slow" << endl;
-        if (grp->getSize() > 1 && conf.useMatrixDetection) {
-            if (conf.verbosity > 1) {
-                cout << "*** Detecting row interchangeability..." << endl;
-            }
-            theory->setSubTheory(grp);
-            grp->addMatrices();
-            totalNbMatrices += grp->getNbMatrices();
-            totalNbRowSwaps += grp->getNbRowSwaps();
-        }
-        if (conf.symBreakingFormLength > -1) {
-            if (conf.verbosity > 1) {
-                cout << "*** Constructing symmetry breaking formula..." << endl;
-            }
-            grp->addBreakingClausesTo(brkr);
-        } // else no symmetry breaking formulas are needed :)
-        grp.reset();
-    }
+    breakid.clean_theory();
+    breakid.break_symm();
 
     if (conf.verbosity) {
-        cout << "**** matrices detected: " << totalNbMatrices << endl;
-        cout << "**** row swaps detected: " << totalNbRowSwaps << endl;
-
-        cout << "**** extra binary symmetry breaking clauses added: "
-                  << brkr.getNbBinClauses() << "\n";
-
-        cout << "**** regular symmetry breaking clauses added: "
-                  << brkr.getNbRegClauses() << "\n";
-
-        cout << "**** row interchangeability breaking clauses added: "
-                  << brkr.getNbRowClauses() << "\n";
-
-        cout << "**** total symmetry breaking clauses added: "
-                  << brkr.getAddedNbClauses() << "\n";
-
-        cout << "**** auxiliary variables introduced: "
-                  << brkr.getAuxiliaryNbVars() << "\n";
-
-        cout << "*** Printing resulting theory with symm breaking clauses..."
-        << endl;
+        breakid.print_symm();
     }
 
-    brkr.print(filename_);
+    breakid.write_final_cnf();
 
     if (conf.printGeneratorFile) {
-        string symFile = filename_ + ".sym";
-        if (conf.verbosity) {
-            cout << "*** Printing generators to file " + symFile
-                      << endl;
-        }
-        ofstream fp_out;
-        fp_out.open(symFile, std::ios::out);
-        for (auto grp : subgroups) {
-            grp->print(fp_out);
-        }
-        fp_out.close();
+        breakid.print_generators(fname + ".sym");
     }
 
     return 0;
