@@ -24,6 +24,7 @@ THE SOFTWARE.
 #define BREAKID_H
 
 #include <string>
+#include "breakid/solvertypesmini.hpp"
 
 class Config;
 struct PrivateData;
@@ -45,6 +46,11 @@ struct BreakID {
 
     //main functions
     void read_cnf(std::string fname);
+
+    void start_dynamic_cnf(uint32_t nVars, uint32_t num_cls);
+    void add_clause(BID::Lit* start, size_t num);
+    void add_bin_clause(BID::Lit lit1, BID::Lit lit2);
+
     void print_graph();
     void print_generators();
     void detect_subgroups();

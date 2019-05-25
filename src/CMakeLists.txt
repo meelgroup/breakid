@@ -73,6 +73,20 @@ target_link_libraries(breakid-bin
     ${Boost_LIBRARIES}
 )
 
+add_executable(mytest
+    test.cpp
+)
+set_target_properties(mytest PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+    OUTPUT_NAME mytest
+)
+target_link_libraries(mytest
+    breakid
+    ${Boost_LIBRARIES}
+)
+
+
 breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/Breaking.hpp )
 breakid_add_public_header(breakid ${CMAKE_CURRENT_BINARY_DIR}/breakid/solvertypesmini.hpp )
 

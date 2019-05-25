@@ -43,10 +43,7 @@ int main(int argc, char *argv[])
 
     bool conf_verbosity = 3;
     breakid.set_verbosity(conf_verbosity);
-
-
-    string fname = argv[1];
-    breakid.read_cnf(fname);
+    breakid.start_dynamic_cnf(10, 10);
 
     if (conf_verbosity > 3) {
         breakid.print_graph();
@@ -75,7 +72,7 @@ int main(int argc, char *argv[])
     breakid.write_final_cnf(true);
 
     if (true) {
-        string symFile = fname + ".sym";
+        string symFile = "test.sym";
         if (conf_verbosity) {
             cout
             << "*** Printing generators to file " + symFile

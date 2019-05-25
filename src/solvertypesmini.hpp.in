@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 using std::vector;
 
-namespace Bosph {
+namespace BID {
 
 typedef uint32_t Var;
 static const Var var_Undef(0xffffffffU >> 3);

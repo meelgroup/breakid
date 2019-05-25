@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 #include "config.hpp"
 #include "Breaking.hpp"
+#include "breakid/solvertypesmini.hpp"
 
 class Graph;
 class Permutation;
@@ -50,6 +51,10 @@ class Specification
     shared_ptr<Graph> getGraph();
     shared_ptr<Group> getGroup();
 
+    virtual void add_clause(BID::Lit* lits, uint32_t size)
+    {}
+    virtual void add_bin_clause(BID::Lit lit1, BID::Lit lit2)
+    {}
     virtual void cleanUp();
     virtual void setSubTheory(shared_ptr<Group> subgroup) = 0;
     virtual bool isSymmetry(Permutation& prm) = 0;
@@ -77,15 +82,15 @@ private:
     Config* conf;
 };
 
-/*class OnlCNF : public Specification
+class OnlCNF : public Specification
 {
 public:
-    OnlCNF(uint32_t nVars, Config* conf);
+    OnlCNF(uint32_t nVars, uint32_t num_cls, Config* conf);
     ~OnlCNF();
 
     void post_graph_run();
-    void addClause(void* lits, uint32_t size);
-    void addBinClause(void* lit1, void* lit2);
+    void add_clause(BID::Lit* lits, uint32_t size);
+    void add_bin_clause(BID::Lit lit1, BID::Lit lit2);
 
     void print(std::ostream& out);
     uint32_t getSize();
@@ -95,7 +100,8 @@ public:
 
 private:
     Config* conf;
-};*/
+    uint32_t num_cls;
+};
 
 class LogicProgram : public Specification
 {

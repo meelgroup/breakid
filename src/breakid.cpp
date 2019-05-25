@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "Theory.hpp"
 #include "Graph.hpp"
 #include "config.hpp"
+#include "breakid/solvertypesmini.hpp"
 #include "GitSHA1.h"
 
 #include <cstdlib>
@@ -101,6 +102,21 @@ void BreakID::conf_timeLim(int64_t val)
 
 void BreakID::read_cnf(string filename_) {
     dat->theory = make_shared<CNF>(filename_, conf);
+}
+
+void BreakID::start_dynamic_cnf(uint32_t nVars, uint32_t num_cls)
+{
+    dat->theory = make_shared<OnlCNF>(nVars, num_cls, conf);
+}
+
+void BreakID::add_clause(BID::Lit* start, size_t num)
+{
+    dat->theory->add_clause(start, num);
+}
+
+void BreakID::add_bin_clause(BID::Lit lit1, BID::Lit lit2)
+{
+    dat->theory->add_bin_clause(lit1, lit2);
 }
 
 void BreakID::print_graph() {

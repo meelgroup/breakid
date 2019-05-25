@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "Algebraic.hpp"
 #include "Breaking.hpp"
 #include "Graph.hpp"
+#include "breakid/solvertypesmini.hpp"
 
 using std::cout;
 using std::endl;
@@ -195,18 +196,23 @@ bool CNF::isSymmetry(Permutation& prm)
 
 //// ONLINE
 
-/*OnlCNF::OnlCNF(uint32_t nVars, Config* _conf) :
+OnlCNF::OnlCNF(uint32_t nVars, uint32_t _num_cls, Config* _conf) :
     conf(_conf)
 {
     conf->nVars = nVars;
+    num_cls = _num_cls;
     //graph = make_shared<Graph>(clauses, conf);
 }
 
-void OnlCNF::addClause(void* lits, uint32_t size)
+OnlCNF::~OnlCNF()
 {
 }
 
-void OnlCNF::addBinClause(void* lit1, void* lit2)
+void OnlCNF::add_clause(BID::Lit* lits, uint32_t size)
+{
+}
+
+void OnlCNF::add_bin_clause(BID::Lit lit1, BID::Lit lit2)
 {
 }
 
@@ -230,8 +236,7 @@ void OnlCNF::print(std::ostream&)
 
 uint32_t OnlCNF::getSize()
 {
-    assert(false);
-    return 0;
+    return num_cls;
 }
 
 void OnlCNF::setSubTheory(shared_ptr<Group>)
@@ -247,7 +252,7 @@ bool OnlCNF::isSymmetry(Permutation&)
     //disabled matrix detection instead.
     assert(false && "Not implemented");
     return true;
-}*/
+}
 
 
 /******************
