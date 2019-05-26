@@ -283,10 +283,10 @@ endif()
 find_package(ZLIB  REQUIRED)
 link_directories( ${ZLIB_LIBRARY} )
 
-find_package( Boost 1.46 COMPONENTS program_options REQUIRED)
-message(STATUS "Boost -- found at library: ${Boost_LIBRARIES}")
-message(STATUS "Boost -- adding '${Boost_LIBRARY_DIRS}' to link directories")
-link_directories(${Boost_LIBRARY_DIRS})
+# find_package( Boost 1.46 COMPONENTS program_options REQUIRED)
+# message(STATUS "Boost -- found at library: ${Boost_LIBRARIES}")
+# message(STATUS "Boost -- adding '${Boost_LIBRARY_DIRS}' to link directories")
+# link_directories(${Boost_LIBRARY_DIRS})
 
 # -----------------------------------------------------------------------------
 # Add GIT version
