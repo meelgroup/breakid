@@ -33,8 +33,8 @@ public:
 
     //Dynamic graph
     Graph(uint32_t nClauses, Config* conf); ///<for online CNF
-    void add_clause(BID::Lit lit1, BID::Lit lit2);
-    void add_clause(BID::Lit* start, uint32_t size);
+    void add_clause(BID::BLit lit1, BID::BLit lit2);
+    void add_clause(BID::BLit* start, uint32_t size);
     void end_dynamic_cnf();
 
     uint32_t getNbNodes();

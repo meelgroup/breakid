@@ -33,16 +33,13 @@ using std::vector;
 
 namespace BID {
 
-typedef uint32_t Var;
-static const Var var_Undef(0xffffffffU >> 3);
-
 class Lit
 {
     uint32_t x;
     explicit Lit(uint32_t i) : x(i) { }
 public:
-    Lit() : x(var_Undef<<1) {}   // (lit_Undef)
-    explicit Lit(Var var, bool is_inverted) :
+    Lit() : x((0xffffffffU >> 3)<<1) {}   // (lit_Undef)
+    explicit Lit(uint32_t var, bool is_inverted) :
         x((var<<1) | (uint32_t)is_inverted)
     {}
 
@@ -62,7 +59,7 @@ public:
     bool sign() const {
         return x & 1;
     }
-    Var  var() const {
+    uint32_t  var() const {
         return x >> 1;
     }
     Lit  unsign() const {
@@ -92,9 +89,6 @@ public:
     }
 };
 
-static const Lit lit_Undef(var_Undef, false);  // Useful special constants.
-static const Lit lit_Error(var_Undef, true );  //
-
 inline std::ostream& operator<<(std::ostream& os, const Lit lit)
 {
     if (lit == lit_Undef) {
@@ -102,125 +96,6 @@ inline std::ostream& operator<<(std::ostream& os, const Lit lit)
     } else {
         os << (lit.sign() ? "-" : "") << (lit.var() + 1);
     }
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& co, const std::vector<Lit>& lits)
-{
-    for (uint32_t i = 0; i < lits.size(); i++) {
-        co << lits[i];
-
-        if (i != lits.size()-1)
-            co << " ";
-    }
-
-    return co;
-}
-
-class lbool {
-    uint8_t value;
-
-public:
-    explicit lbool(uint8_t v) : value(v) { }
-
-    lbool()       : value(0) { }
-    explicit lbool(bool x) : value(!x) { }
-
-    bool  operator == (lbool b) const {
-        return ((b.value & 2) & (value & 2)) | (!(b.value & 2) & (value == b.value));
-    }
-    bool  operator != (lbool b) const {
-        return !(*this == b);
-    }
-    lbool operator ^  (bool  b) const {
-        return lbool((uint8_t)(value ^ (uint8_t)b));
-    }
-
-    lbool operator && (lbool b) const {
-        uint8_t sel = (this->value << 1) | (b.value << 3);
-        uint8_t v   = (0xF7F755F4 >> sel) & 3;
-        return lbool(v);
-    }
-
-    lbool operator || (lbool b) const {
-        uint8_t sel = (this->value << 1) | (b.value << 3);
-        uint8_t v   = (0xFCFCF400 >> sel) & 3;
-        return lbool(v);
-    }
-
-    friend int   toInt  (lbool l);
-    friend lbool toLbool(int   v);
-};
-
-const static lbool l_True = lbool((uint8_t)0);
-const static lbool l_False = lbool((uint8_t)1);
-const static lbool l_Undef = lbool((uint8_t)2);
-
-inline lbool boolToLBool(const bool b)
-{
-    if (b)
-        return l_True;
-    else
-        return l_False;
-}
-
-inline std::ostream& operator<<(std::ostream& cout, const lbool val)
-{
-    if (val == l_True) cout << "l_True";
-    if (val == l_False) cout << "l_False";
-    if (val == l_Undef) cout << "l_Undef";
-    return cout;
-}
-
-class Solution
-{
-public:
-    vector<lbool> sol;
-    lbool ret = l_Undef;
-};
-
-class Clause
-{
-   public:
-    Clause(const vector<Lit>& _lits) : lits(_lits)
-    {
-    }
-
-    const vector<Lit>& getLits() const
-    {
-        return lits;
-    }
-
-    size_t size() const
-    {
-        return lits.size();
-    }
-
-    bool empty() const
-    {
-        return lits.empty();
-    }
-
-    std::vector<Lit> getClause() const
-    {
-        assert(!lits.empty());
-        return lits;
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Clause& cl);
-
-   private:
-    vector<Lit> lits;
-};
-
-inline std::ostream& operator<<(std::ostream& os, const Clause& cl)
-{
-    for (vector<Lit>::const_iterator it = cl.lits.begin(), end = cl.lits.end();
-         it != end; it++) {
-        os << *it << " ";
-    }
-    os << "0";
-
     return os;
 }
 

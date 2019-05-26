@@ -59,20 +59,20 @@ Graph::Graph(uint32_t nClauses, Config* _conf) :
     cur_cl_num = 2 * conf->nVars;
 }
 
-void Graph::add_clause(BID::Lit* lits, uint32_t size)
+void Graph::add_clause(BID::BLit* lits, uint32_t size)
 {
     assert(size > 1 && "Fixed values are NOT permitted");
 
     // Clauses have as neighbors the literals occurring in them
     for(size_t i = 0; i < size; i++) {
-        BID::Lit l = lits[i];
+        BID::BLit l = lits[i];
         bliss_g->add_edge(cur_cl_num, encode(lit_to_weird(l)));
         used_lits[l.toInt()] = 1;
     }
     cur_cl_num++;
 }
 
-void Graph::add_clause(BID::Lit lit1, BID::Lit lit2)
+void Graph::add_clause(BID::BLit lit1, BID::BLit lit2)
 {
     // Clauses have as neighbors the literals occurring in them
     bliss_g->add_edge(cur_cl_num, encode( lit_to_weird(lit1) ));

@@ -111,12 +111,12 @@ void BreakID::start_dynamic_cnf(uint32_t nVars, uint32_t num_cls)
     dat->theory = make_shared<OnlCNF>(nVars, num_cls, dat->conf);
 }
 
-void BreakID::add_clause(BID::Lit* start, size_t num)
+void BreakID::add_clause(BID::BLit* start, size_t num)
 {
     dat->theory->add_clause(start, num);
 }
 
-void BreakID::add_bin_clause(BID::Lit lit1, BID::Lit lit2)
+void BreakID::add_bin_clause(BID::BLit lit1, BID::BLit lit2)
 {
     dat->theory->add_bin_clause(lit1, lit2);
 }
@@ -217,7 +217,7 @@ uint32_t BreakID::get_num_aux_vars()
     return dat->brkr->getAuxiliaryNbVars();
 }
 
-vector<vector<BID::Lit>> BreakID::get_brk_cls()
+vector<vector<BID::BLit>> BreakID::get_brk_cls()
 {
     return dat->brkr->get_brk_cls();
 }

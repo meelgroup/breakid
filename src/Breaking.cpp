@@ -50,16 +50,16 @@ void Breaker::print(bool only_breakers)
     }
 }
 
-vector<vector<BID::Lit>> Breaker::get_brk_cls()
+vector<vector<BID::BLit>> Breaker::get_brk_cls()
 {
-    vector<vector<BID::Lit>> cls;
+    vector<vector<BID::BLit>> cls;
 
-    vector<BID::Lit> tmp_cl;
+    vector<BID::BLit> tmp_cl;
     for (auto cl: clauses) {
         tmp_cl.clear();
         for(uint32_t lit: cl->lits) {
             int l = decode(lit);
-            BID::Lit l2(abs(l)-1, l < 0);
+            BID::BLit l2(abs(l)-1, l < 0);
             tmp_cl.push_back(l2);
         }
         cls.push_back(tmp_cl);

@@ -208,12 +208,12 @@ OnlCNF::~OnlCNF()
 {
 }
 
-void OnlCNF::add_clause(BID::Lit* lits, uint32_t size)
+void OnlCNF::add_clause(BID::BLit* lits, uint32_t size)
 {
     graph->add_clause(lits, size);
 }
 
-void OnlCNF::add_bin_clause(BID::Lit lit1, BID::Lit lit2)
+void OnlCNF::add_bin_clause(BID::BLit lit1, BID::BLit lit2)
 {
     graph->add_clause(lit1, lit2);
 }

@@ -51,9 +51,9 @@ class Specification
     shared_ptr<Graph> getGraph();
     shared_ptr<Group> getGroup();
 
-    virtual void add_clause(BID::Lit* /*lits*/, uint32_t /*size*/)
+    virtual void add_clause(BID::BLit* /*lits*/, uint32_t /*size*/)
     {}
-    virtual void add_bin_clause(BID::Lit /*lit1*/, BID::Lit /*lit2*/)
+    virtual void add_bin_clause(BID::BLit /*lit1*/, BID::BLit /*lit2*/)
     {}
     virtual void end_dynamic_cnf()
     {}
@@ -91,8 +91,8 @@ public:
     ~OnlCNF();
 
     void end_dynamic_cnf();
-    void add_clause(BID::Lit* lits, uint32_t size);
-    void add_bin_clause(BID::Lit lit1, BID::Lit lit2);
+    void add_clause(BID::BLit* lits, uint32_t size);
+    void add_bin_clause(BID::BLit lit1, BID::BLit lit2);
 
     void print(std::ostream& out);
     uint32_t getSize();

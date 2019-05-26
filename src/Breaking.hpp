@@ -90,7 +90,7 @@ inline uint32_t encode(int lit)
     return (lit > 0 ? 2 * (lit - 1) : 2 * (-lit - 1) + 1);
 }
 
-inline int lit_to_weird(BID::Lit l)
+inline int lit_to_weird(BID::BLit l)
 {
     int t = l.var()+1;
     if (l.sign()) {
@@ -315,7 +315,7 @@ public:
     void addBinClause(uint32_t l1, uint32_t l2);
     void addRegSym(shared_ptr<Permutation> perm, vector<uint32_t>& order);
     void addRowSym(shared_ptr<Permutation> perm, vector<uint32_t>& order);
-    vector<vector<BID::Lit>> get_brk_cls();
+    vector<vector<BID::BLit>> get_brk_cls();
 
     uint32_t getAuxiliaryNbVars();
     uint32_t getTotalNbVars();

@@ -30,7 +30,7 @@ THE SOFTWARE.
 using std::cout;
 using std::string;
 using std::endl;
-using BID::Lit;
+using BID::BLit;
 
 #include "breakid.hpp"
 
@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
     int conf_verbosity = 3;
     breakid.set_verbosity(conf_verbosity);
     breakid.start_dynamic_cnf(2, 2);
-    breakid.add_bin_clause(Lit(0, false), Lit(1, false));
-    breakid.add_bin_clause(Lit(0, true), Lit(1, true));
+    breakid.add_bin_clause(BLit(0, false), BLit(1, false));
+    breakid.add_bin_clause(BLit(0, true), BLit(1, true));
     breakid.end_dynamic_cnf();
 
     if (conf_verbosity > 3) {
