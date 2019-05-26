@@ -24,6 +24,7 @@ THE SOFTWARE.
 #define BREAKID_H
 
 #include <string>
+#include <vector>
 #include "breakid/solvertypesmini.hpp"
 
 namespace BID {
@@ -65,7 +66,7 @@ struct BreakID {
 
     uint32_t get_num_break_cls();
     uint32_t get_num_aux_vars();
-    vector<vector<BID::BLit>> get_brk_cls();
+    std::vector<std::vector<BID::BLit>> get_brk_cls();
 
 
     void write_final_cnf(bool only_breakers);

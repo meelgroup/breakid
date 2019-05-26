@@ -26,33 +26,29 @@ THE SOFTWARE.
 
 #include <cstdint>
 #include <iostream>
-#include <vector>
-#include <cassert>
-
-using std::vector;
 
 namespace BID {
 
-class Lit
+class BLit
 {
     uint32_t x;
-    explicit Lit(uint32_t i) : x(i) { }
+    explicit BLit(uint32_t i) : x(i) { }
 public:
-    Lit() : x((0xffffffffU >> 3)<<1) {}   // (lit_Undef)
-    explicit Lit(uint32_t var, bool is_inverted) :
+    BLit() : x((0xffffffffU >> 3)<<1) {}   // (lit_Undef)
+    explicit BLit(uint32_t var, bool is_inverted) :
         x((var<<1) | (uint32_t)is_inverted)
     {}
 
     const uint32_t& toInt() const { // Guarantees small, positive integers suitable for array indexing.
         return x;
     }
-    Lit  operator~() const {
-        return Lit(x ^ 1);
+    BLit  operator~() const {
+        return BLit(x ^ 1);
     }
-    Lit  operator^(const bool b) const {
-        return Lit(x ^ (uint32_t)b);
+    BLit  operator^(const bool b) const {
+        return BLit(x ^ (uint32_t)b);
     }
-    Lit& operator^=(const bool b) {
+    BLit& operator^=(const bool b) {
         x ^= (uint32_t)b;
         return *this;
     }
@@ -62,40 +58,37 @@ public:
     uint32_t  var() const {
         return x >> 1;
     }
-    Lit  unsign() const {
-        return Lit(x & ~1U);
+    BLit  unsign() const {
+        return BLit(x & ~1U);
     }
-    bool operator==(const Lit& p) const {
+    bool operator==(const BLit& p) const {
         return x == p.x;
     }
-    bool operator!= (const Lit& p) const {
+    bool operator!= (const BLit& p) const {
         return x != p.x;
     }
     /**
     @brief ONLY to be used for ordering such as: a, b, ~b, etc.
     */
-    bool operator <  (const Lit& p) const {
+    bool operator <  (const BLit& p) const {
         return x < p.x;     // '<' guarantees that p, ~p are adjacent in the ordering.
     }
-    bool operator >  (const Lit& p) const {
+    bool operator >  (const BLit& p) const {
         return x > p.x;
     }
-    bool operator >=  (const Lit& p) const {
+    bool operator >=  (const BLit& p) const {
         return x >= p.x;
     }
-    static Lit toLit(uint32_t data)
+    static BLit toBLit(uint32_t data)
     {
-        return Lit(data);
+        return BLit(data);
     }
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Lit lit)
+inline std::ostream& operator<<(std::ostream& os, const BLit lit)
 {
-    if (lit == lit_Undef) {
-        os << "lit_Undef";
-    } else {
-        os << (lit.sign() ? "-" : "") << (lit.var() + 1);
-    }
+
+    os << (lit.sign() ? "-" : "") << (lit.var() + 1);
     return os;
 }
 
