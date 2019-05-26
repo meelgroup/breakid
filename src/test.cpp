@@ -124,7 +124,6 @@ int main(int argc, char *argv[])
         cout << "Num generators: " << breakid.get_num_generators() << endl;
         breakid.print_generators();
     }
-    exit(0);
 
     if (conf_verbosity >= 2) {
         cout << "*** Detecting subgroups..." << endl;
