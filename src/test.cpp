@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include <fstream>
 #include <set>
 #include <sstream>
+
+#include "breakid.hpp"
 #include "breakid/solvertypesmini.hpp"
 
 using std::cout;
@@ -36,8 +38,6 @@ using std::endl;
 using BID::BLit;
 using std::vector;
 using std::istringstream;
-
-#include "breakid.hpp"
 
 uint32_t nVars;
 
@@ -109,12 +109,6 @@ int main(int argc, char *argv[])
         breakid.add_clause(cl.data(), cl.size());
     }
     breakid.end_dynamic_cnf();
-
-
-    /*breakid.start_dynamic_cnf(2, 2);
-    breakid.add_bin_clause(BLit(0, false), BLit(1, false));
-    breakid.add_bin_clause(BLit(0, true), BLit(1, true));
-    breakid.end_dynamic_cnf();*/
 
     if (conf_verbosity > 3) {
         breakid.print_graph();
