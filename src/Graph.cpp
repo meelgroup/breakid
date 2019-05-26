@@ -26,13 +26,86 @@ THE SOFTWARE.
 using std::cout;
 using std::endl;
 
+Graph::Graph(uint32_t nClauses, Config* _conf) :
+    conf(_conf)
+{
+    uint32_t n = 2 * conf->nVars + nClauses;
+    bliss_g = new bliss::Graph(n);
+    used_lits.resize(conf->nVars*2, 0);
+    color.resize(n);
+
+    // Initialize colors
+    for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
+        bliss_g->change_color(i, 0);
+        color[i] = 0;
+    }
+    colorcount.push_back(2 * conf->nVars);
+
+    for (uint32_t i = 2 * conf->nVars; i < n; ++i) {
+        bliss_g->change_color(i, 1);
+        color[i] = 1;
+    }
+    colorcount.push_back(nClauses);
+
+    // Initialize edge lists
+    // First construct for each node the list of neighbors
+    // Literals have their negations as neighbors
+    for (uint32_t l = 1; l <= conf->nVars; ++l) {
+        uint32_t posID = encode(l);
+        uint32_t negID = encode(-l);
+        bliss_g->add_edge(posID, negID);
+    }
+
+    cur_cl_num = 2 * conf->nVars;
+}
+
+void Graph::add_clause(BID::Lit* lits, uint32_t size)
+{
+    assert(size > 1 && "Fixed values are NOT permitted");
+
+    // Clauses have as neighbors the literals occurring in them
+    for(size_t i = 0; i < size; i++) {
+        BID::Lit l = lits[i];
+        bliss_g->add_edge(cur_cl_num, encode(lit_to_weird(l)));
+        used_lits[l.toInt()] = 1;
+    }
+    cur_cl_num++;
+}
+
+void Graph::add_clause(BID::Lit lit1, BID::Lit lit2)
+{
+    // Clauses have as neighbors the literals occurring in them
+    bliss_g->add_edge(cur_cl_num, encode( lit_to_weird(lit1) ));
+    bliss_g->add_edge(cur_cl_num, encode( lit_to_weird(lit2) ));
+
+    used_lits[lit1.toInt()] = 1;
+    used_lits[lit2.toInt()] = 1;
+    cur_cl_num++;
+}
+
+void Graph::end_dynamic_cnf()
+{
+    // look for unused lits, make their color unique so that no symmetries on them are found
+    // useful for subgroups
+    for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
+        if (used_lits[i] == 0) {
+            setUniqueColor(i);
+        }
+    }
+
+    // there must be NO fixed lits, this is ASSERTED
+}
+
 void Graph::initializeGraph(uint32_t nbNodes, uint32_t nbEdges,
                             std::map<uint32_t, uint32_t>& lit2color,
                             vector<vector<uint32_t> >& neighbours)
 {
     bliss_g = new bliss::Graph(nbNodes);
+    color.resize(nbNodes);
+
     for (size_t n = 0; n < nbNodes; n++) {
         bliss_g->change_color(n, lit2color[n]);
+        color[n] = lit2color[n];
     }
     for (size_t n = 0; n < nbNodes; n++) {
         for (auto other : neighbours[n]) {
@@ -56,9 +129,10 @@ uint32_t Graph::getNbEdgesFromGraph()
     return 0; //Not supported, not important
 }
 
-uint32_t Graph::getColorOf(uint32_t /*node*/)
+uint32_t Graph::getColorOf(uint32_t node)
 {
-    return 0; //Not supported, only used for printing
+    assert(node < color.size());
+    return color[node];
 }
 
 uint32_t Graph::nbNeighbours(uint32_t /*node*/)
@@ -68,10 +142,6 @@ uint32_t Graph::nbNeighbours(uint32_t /*node*/)
 uint32_t Graph::getNeighbour(uint32_t /*node*/, uint32_t /*nbthNeighbour*/)
 {
     return 0; //Not supported, only used for printing
-}
-void Graph::setNodeToNewColor(uint32_t node)
-{
-    bliss_g->change_color(node, colorcount.size());
 }
 
 // This method is given to BLISS as a polymorphic consumer of the detected generator permutations
@@ -359,13 +429,17 @@ uint32_t Graph::getNbEdges()
 
 void Graph::setUniqueColor(uint32_t lit)
 {
-    auto color = getColorOf(lit);
-    uint32_t currentcount = colorcount[getColorOf(lit)];
-    if (currentcount == 1) {
+    uint32_t mycolor = getColorOf(lit);
+    uint32_t mycount = colorcount[getColorOf(lit)];
+    assert(mycount > 0);
+    if (mycount == 1) {
         return; // color was already unique
     }
-    colorcount[color] = currentcount - 1;
-    setNodeToNewColor(lit);
+
+    colorcount[mycolor]--;
+    uint32_t new_color = colorcount.size();
+    bliss_g->change_color(lit, new_color);
+    color[lit] = new_color;
     colorcount.push_back(1);
 }
 

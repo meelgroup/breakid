@@ -119,6 +119,11 @@ void BreakID::add_bin_clause(BID::Lit lit1, BID::Lit lit2)
     dat->theory->add_bin_clause(lit1, lit2);
 }
 
+void BreakID::end_dynamic_cnf()
+{
+    dat->theory->end_dynamic_cnf();
+}
+
 void BreakID::print_graph() {
     dat->theory->getGraph()->print();
 }

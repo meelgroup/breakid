@@ -25,10 +25,12 @@ THE SOFTWARE.
 #include <iostream>
 #include <limits>
 #include <string>
+#include "breakid/solvertypesmini.hpp"
 
 using std::cout;
 using std::string;
 using std::endl;
+using BID::Lit;
 
 #include "breakid.hpp"
 
@@ -43,7 +45,10 @@ int main(int argc, char *argv[])
 
     bool conf_verbosity = 3;
     breakid.set_verbosity(conf_verbosity);
-    breakid.start_dynamic_cnf(10, 10);
+    breakid.start_dynamic_cnf(2, 2);
+    breakid.add_bin_clause(Lit(0, false), Lit(1, false));
+    breakid.add_bin_clause(Lit(0, true), Lit(1, true));
+    breakid.end_dynamic_cnf();
 
     if (conf_verbosity > 3) {
         breakid.print_graph();

@@ -8,6 +8,7 @@
 
 #include "Algebraic.hpp"
 #include "Breaking.hpp"
+#include "breakid/solvertypesmini.hpp"
 
 class Matrix;
 class Group;
@@ -19,17 +20,22 @@ class Graph;
 class Graph : public std::enable_shared_from_this<Graph>
 {
 public:
-    bliss::Graph* bliss_g;
+    bliss::Graph* bliss_g = NULL;
 
     ///keeps track of the number of times a color is used
     ///so that no color is never used (seems to give Saucy trouble)
     ///@INVAR: for all x: colorcount[x]>0
     vector<uint32_t> colorcount;
 
-    //Graph(uint32_t nVars, Config* conf); ///<for online CNF
     Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clauses, Config* conf);
     Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, Config* conf);
     ~Graph();
+
+    //Dynamic graph
+    Graph(uint32_t nClauses, Config* conf); ///<for online CNF
+    void add_clause(BID::Lit lit1, BID::Lit lit2);
+    void add_clause(BID::Lit* start, uint32_t size);
+    void end_dynamic_cnf();
 
     uint32_t getNbNodes();
     uint32_t getNbEdges();
@@ -40,7 +46,7 @@ public:
 
     //TODO should be private
     vector<shared_ptr<Permutation> > perms;
-    Config* conf;
+    Config* conf = NULL;
 
 private:
     //Interaction with saucy:
@@ -56,6 +62,12 @@ private:
     void setNodeToNewColor(uint32_t node);
     void getSymmetryGeneratorsInternal(
         vector<shared_ptr<Permutation> >& out_perms);
+
+    vector<uint32_t> color;
+
+    //dynamic CNF generation
+    uint32_t cur_cl_num = 0;
+    vector<char> used_lits;
 };
 
 #endif

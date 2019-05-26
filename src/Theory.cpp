@@ -201,7 +201,7 @@ OnlCNF::OnlCNF(uint32_t nVars, uint32_t _num_cls, Config* _conf) :
 {
     conf->nVars = nVars;
     num_cls = _num_cls;
-    //graph = make_shared<Graph>(clauses, conf);
+    graph = make_shared<Graph>(num_cls, conf);
 }
 
 OnlCNF::~OnlCNF()
@@ -210,14 +210,18 @@ OnlCNF::~OnlCNF()
 
 void OnlCNF::add_clause(BID::Lit* lits, uint32_t size)
 {
+    graph->add_clause(lits, size);
 }
 
 void OnlCNF::add_bin_clause(BID::Lit lit1, BID::Lit lit2)
 {
+    graph->add_clause(lit1, lit2);
 }
 
-void OnlCNF::post_graph_run()
+void OnlCNF::end_dynamic_cnf()
 {
+    graph->end_dynamic_cnf();
+
     group = make_shared<Group>(conf);
     if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;

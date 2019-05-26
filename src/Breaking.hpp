@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include <unordered_set>
 
 #include "config.hpp"
+#include "breakid/solvertypesmini.hpp"
 
 using std::vector;
 using std::set;
@@ -87,6 +88,15 @@ inline uint32_t neg(uint32_t lit)
 inline uint32_t encode(int lit)
 {
     return (lit > 0 ? 2 * (lit - 1) : 2 * (-lit - 1) + 1);
+}
+
+inline int lit_to_weird(BID::Lit l)
+{
+    int t = l.var()+1;
+    if (l.sign()) {
+        t *= -1;
+    }
+    return t;
 }
 
 inline int decode(uint32_t lit)

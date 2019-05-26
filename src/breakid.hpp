@@ -44,12 +44,14 @@ struct BreakID {
     void set_verbosity(uint32_t val);
     void conf_timeLim(int64_t val);
 
-    //main functions
+    //Static CNF
     void read_cnf(std::string fname);
 
+    //Dynamic CNF
     void start_dynamic_cnf(uint32_t nVars, uint32_t num_cls);
     void add_clause(BID::Lit* start, size_t num);
     void add_bin_clause(BID::Lit lit1, BID::Lit lit2);
+    void end_dynamic_cnf();
 
     void print_graph();
     void print_generators();

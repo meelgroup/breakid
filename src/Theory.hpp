@@ -51,9 +51,11 @@ class Specification
     shared_ptr<Graph> getGraph();
     shared_ptr<Group> getGroup();
 
-    virtual void add_clause(BID::Lit* lits, uint32_t size)
+    virtual void add_clause(BID::Lit* /*lits*/, uint32_t /*size*/)
     {}
-    virtual void add_bin_clause(BID::Lit lit1, BID::Lit lit2)
+    virtual void add_bin_clause(BID::Lit /*lit1*/, BID::Lit /*lit2*/)
+    {}
+    virtual void end_dynamic_cnf()
     {}
     virtual void cleanUp();
     virtual void setSubTheory(shared_ptr<Group> subgroup) = 0;
@@ -88,7 +90,7 @@ public:
     OnlCNF(uint32_t nVars, uint32_t num_cls, Config* conf);
     ~OnlCNF();
 
-    void post_graph_run();
+    void end_dynamic_cnf();
     void add_clause(BID::Lit* lits, uint32_t size);
     void add_bin_clause(BID::Lit lit1, BID::Lit lit2);
 

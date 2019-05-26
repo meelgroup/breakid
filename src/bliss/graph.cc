@@ -3539,7 +3539,7 @@ unsigned int Graph::add_vertex(const unsigned int color)
 
 void Graph::add_edge(const unsigned int vertex1, const unsigned int vertex2)
 {
-    //fprintf(stderr, "(%u,%u) ", vertex1, vertex2);
+    //fprintf(stdout, "GRAPH (%u,%u)\n", vertex1, vertex2);
     vertices[vertex1].add_edge(vertex2);
     vertices[vertex2].add_edge(vertex1);
 }
