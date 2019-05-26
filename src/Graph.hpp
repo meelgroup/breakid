@@ -49,9 +49,7 @@ public:
 
 private:
     //Interaction with saucy:
-    void initializeGraph(uint32_t nbNodes, uint32_t nbEdges,
-                         std::map<uint32_t, uint32_t>& lit2color,
-                         vector<vector<uint32_t> >& neighbours);
+    void initializeGraph(uint32_t nbNodes);
     void freeGraph();
     uint32_t getNbNodesFromGraph();
     uint32_t getNbEdgesFromGraph();
@@ -63,6 +61,10 @@ private:
         vector<shared_ptr<Permutation> >& out_perms);
 
     vector<uint32_t> color;
+
+    std::map<uint32_t, uint32_t> lit2color;
+    vector<vector<uint32_t> > neighbours;
+    uint32_t nbedges = 0;
 
     //dynamic CNF generation
     uint32_t cur_cl_num = 0;

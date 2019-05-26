@@ -33,16 +33,22 @@ Graph::Graph(uint32_t nClauses, Config* _conf) :
     bliss_g = new bliss::Graph(n);
     used_lits.resize(conf->nVars*2, 0);
     color.resize(n);
+    neighbours.clear();
+    //DEBUG neighbours.resize(n);
+    lit2color.clear();
+    nbedges = 0;
 
     // Initialize colors
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
         bliss_g->change_color(i, 0);
+        //DEBUG lit2color[i] = 0;
         color[i] = 0;
     }
     colorcount.push_back(2 * conf->nVars);
 
     for (uint32_t i = 2 * conf->nVars; i < n; ++i) {
         bliss_g->change_color(i, 1);
+        //DEBUG lit2color[i] = 1;
         color[i] = 1;
     }
     colorcount.push_back(nClauses);
@@ -54,7 +60,10 @@ Graph::Graph(uint32_t nClauses, Config* _conf) :
         uint32_t posID = encode(l);
         uint32_t negID = encode(-l);
         bliss_g->add_edge(posID, negID);
-        bliss_g->add_edge(negID, posID);
+
+        //DEBUG neighbours[posID].push_back(negID);
+        //DEBUG neighbours[negID].push_back(posID);
+        nbedges += 2;
     }
 
     cur_cl_num = 2 * conf->nVars;
@@ -62,18 +71,23 @@ Graph::Graph(uint32_t nClauses, Config* _conf) :
 
 void Graph::add_clause(BID::BLit* lits, uint32_t size)
 {
+    assert(size > 0 && "Must have clauses of size at least 1");
+
     if (size == 1) {
         BID::BLit lit = lits[0];
         setUniqueColor(encode(lit_to_weird(lit)));
-        return;
     }
 
     // Clauses have as neighbors the literals occurring in them
     for(size_t i = 0; i < size; i++) {
         BID::BLit l = lits[i];
         bliss_g->add_edge(cur_cl_num, encode(lit_to_weird(l)));
-        bliss_g->add_edge(encode(lit_to_weird(l)), cur_cl_num);
+
+        //DEBUG neighbours[cur_cl_num].push_back(encode(lit_to_weird(l)));
+        //DEBUG neighbours[encode(lit_to_weird(l))].push_back(cur_cl_num);
+
         used_lits[encode(lit_to_weird(l))] = 1;
+        nbedges+=2;
     }
     cur_cl_num++;
 }
@@ -88,13 +102,19 @@ void Graph::end_dynamic_cnf()
         }
     }
 
-    // there must be NO fixed lits, this is ASSERTED
+    /*
+    //DEBUG CODE
+    initializeGraph(cur_cl_num);
+    for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
+        if (used_lits[i] == 0) {
+            setUniqueColor(i);
+        }
+    }*/
 }
 
-void Graph::initializeGraph(uint32_t nbNodes, uint32_t nbEdges,
-                            std::map<uint32_t, uint32_t>& lit2color,
-                            vector<vector<uint32_t> >& neighbours)
+void Graph::initializeGraph(uint32_t nbNodes)
 {
+    delete bliss_g;
     bliss_g = new bliss::Graph(nbNodes);
     color.resize(nbNodes);
 
@@ -174,7 +194,7 @@ Graph::Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clause
 
     int n = 2 * conf->nVars + clauses.size();
 
-    std::map<uint32_t, uint32_t> lit2color{};
+    lit2color.clear();
 
     // Initialize colors:
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
@@ -187,11 +207,12 @@ Graph::Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clause
     }
     colorcount.push_back(clauses.size());
 
-    uint32_t nbedges = 0;
+    nbedges = 0;
 
     // Initialize edge lists
     // First construct for each node the list of neighbors
-    vector<vector<uint32_t> > neighbours(n);
+    neighbours.clear();
+    neighbours.resize(n);
     // Literals have their negations as neighbors
     for (uint32_t l = 1; l <= conf->nVars; ++l) {
         uint32_t posID = encode(l);
@@ -212,25 +233,23 @@ Graph::Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clause
     }
 
     //Now, initialize the internal graph
-    initializeGraph(n, nbedges, lit2color, neighbours);
+    initializeGraph(n);
 
     // look for unused lits, make their color unique so that no symmetries on them are found
     // useful for subgroups
-    std::unordered_set<uint32_t> usedLits;
+    used_lits.clear();
+    used_lits.resize(2*conf->nVars, 0);
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
-            usedLits.insert(lit);
-            usedLits.insert(neg(lit));
+            used_lits[lit] = 1;
+            used_lits[neg(lit)] = 1;
         }
     }
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
-        if (usedLits.count(i) == 0) {
+        if (used_lits[i] == 0) {
             setUniqueColor(i);
         }
     }
-
-    // fix conf->fixedLits
-    setUniqueColor(conf->fixedLits);
 }
 
 Graph::Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, Config* _conf) :
@@ -278,8 +297,8 @@ Graph::Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, C
     //Number of nodes: 2 for each variable + two for each rule (head+body)
     //The three is to make sure that all colors are used (cfr colorcount documentation)
     int n = 2 * conf->nVars + 2 * rules.size() + 4 + nbextralits;
+    lit2color.clear();
 
-    std::map<uint32_t, uint32_t> lit2color{};
     uint32_t current_node_index = 0;
     for (; current_node_index < 2 * conf->nVars; ++current_node_index) {
         //Positive lits are colored with color0
@@ -304,7 +323,7 @@ Graph::Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, C
         colorcount.push_back(0);
     }
 
-    uint32_t nbedges = 0;
+    nbedges = 0;
     // Initialize edge lists
     // First construct for each node the list of neighbors
     vector<vector<uint32_t> > neighbours(n);
@@ -370,29 +389,29 @@ Graph::Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, C
         }
     }
 
-    initializeGraph(n, nbedges, lit2color, neighbours);
+    initializeGraph(n);
 
     // look for unused lits, make their color unique so that no symmetries on them are found
     // useful for subgroups
-    std::unordered_set<uint32_t> usedLits;
+    used_lits.clear();
+    used_lits.resize(conf->nVars*2, 0);
     for (auto cl : rules) {
         for (auto lit : cl->headLits) {
-            usedLits.insert(lit);
-            usedLits.insert(neg(lit));
+            assert(lit < 2*conf->nVars);
+            assert(neg(lit) < 2*conf->nVars);
+            used_lits[lit] = 1;
+            used_lits[neg(lit)] = 1;
         }
         for (auto lit : cl->bodyLits) {
-            usedLits.insert(lit);
-            usedLits.insert(neg(lit));
+            used_lits[lit] = 1;
+            used_lits[neg(lit)] = 1;
         }
     }
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
-        if (usedLits.count(i) == 0) {
+        if (used_lits[i] == 0) {
             setUniqueColor(i);
         }
     }
-
-    // fix conf->fixedLits
-    setUniqueColor(conf->fixedLits);
 }
 
 Graph::~Graph()

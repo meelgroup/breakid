@@ -172,11 +172,11 @@ int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
     BID::BreakID breakid;
-    breakid.set_useMatrixDetection(conf_useMatrixDetection);
-    breakid.set_useBinaryClauses(conf_useBinaryClauses);
-    breakid.set_useShatterTranslation(conf_useShatterTranslation);
-    breakid.set_useFullTranslation(conf_useFullTranslation);
-    breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
+//     breakid.set_useMatrixDetection(conf_useMatrixDetection);
+//     breakid.set_useBinaryClauses(conf_useBinaryClauses);
+//     breakid.set_useShatterTranslation(conf_useShatterTranslation);
+//     breakid.set_useFullTranslation(conf_useFullTranslation);
+//     breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
     breakid.set_verbosity(conf_verbosity);
 
 

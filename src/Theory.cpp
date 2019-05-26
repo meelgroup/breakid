@@ -217,16 +217,19 @@ void OnlCNF::end_dynamic_cnf()
 {
     graph->end_dynamic_cnf();
 
+    if (conf->verbosity > 1) {
+        cout << "**** Number of nodes: " << graph->getNbNodes()
+                  << endl;
+        cout << "**** Number of edges: " << graph->getNbEdges()
+                  << endl;
+    }
+
     group = make_shared<Group>(conf);
     if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
     }
     vector<shared_ptr<Permutation> > symgens;
     graph->getSymmetryGenerators(symgens);
-
-    if (conf->verbosity > 0) {
-        cout << "Detected symmetry group." << endl;
-    }
     for (auto symgen : symgens) {
         group->add(symgen);
     }
