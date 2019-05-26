@@ -315,6 +315,7 @@ public:
     void addBinClause(uint32_t l1, uint32_t l2);
     void addRegSym(shared_ptr<Permutation> perm, vector<uint32_t>& order);
     void addRowSym(shared_ptr<Permutation> perm, vector<uint32_t>& order);
+    vector<vector<BID::Lit>> get_brk_cls();
 
     uint32_t getAuxiliaryNbVars();
     uint32_t getTotalNbVars();

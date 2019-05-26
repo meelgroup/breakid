@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 //     breakid.set_useFullTranslation(conf_useFullTranslation);
 //     breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
 
-    bool conf_verbosity = 3;
+    int conf_verbosity = 3;
     breakid.set_verbosity(conf_verbosity);
     breakid.start_dynamic_cnf(2, 2);
     breakid.add_bin_clause(Lit(0, false), Lit(1, false));
@@ -55,10 +55,11 @@ int main(int argc, char *argv[])
     }
 
     if (conf_verbosity) {
+        cout << "Num generators: " << breakid.get_num_generators() << endl;
         breakid.print_generators();
     }
 
-    if (conf_verbosity) {
+    if (conf_verbosity >= 2) {
         cout << "*** Detecting subgroups..." << endl;
     }
     breakid.detect_subgroups();
@@ -70,11 +71,21 @@ int main(int argc, char *argv[])
     breakid.clean_theory();
     breakid.break_symm();
 
-    if (conf_verbosity) {
+    if (false && conf_verbosity) {
         breakid.print_symm_break_stats();
+        breakid.write_final_cnf(true);
     }
 
-    breakid.write_final_cnf(true);
+    cout << "Num breaking clasues: "<< breakid.get_num_break_cls() << endl;
+    cout << "Num aux vars: "<< breakid.get_num_aux_vars() << endl;
+    auto brk = breakid.get_brk_cls();
+    for (auto cl: brk) {
+        cout << "Breaking clause: ";
+        for(auto lit: cl) {
+            cout << lit << " ";
+        }
+        cout << endl;
+    }
 
     if (true) {
         string symFile = "test.sym";

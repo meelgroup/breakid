@@ -128,11 +128,12 @@ void BreakID::print_graph() {
     dat->theory->getGraph()->print();
 }
 
-void BreakID::print_generators() {
-    cout
-    << "**** symmetry generators detected: "
-    << dat->theory->getGroup()->getSize() << endl;
+uint32_t BreakID::get_num_generators()
+{
+    return dat->theory->getGroup()->getSize();
+}
 
+void BreakID::print_generators() {
     dat->theory->getGroup()->print(cout);
 }
 
@@ -202,9 +203,21 @@ void BreakID::print_symm_break_stats()
 
     cout << "**** auxiliary variables introduced: "
               << dat->brkr->getAuxiliaryNbVars() << "\n";
+}
 
-    cout << "*** Printing resulting theory with symm breaking clauses..."
-    << endl;
+uint32_t BreakID::get_num_break_cls()
+{
+    return dat->brkr->getAddedNbClauses();
+}
+
+uint32_t BreakID::get_num_aux_vars()
+{
+    return dat->brkr->getAuxiliaryNbVars();
+}
+
+vector<vector<BID::Lit>> BreakID::get_brk_cls()
+{
+    return dat->brkr->get_brk_cls();
 }
 
 void BreakID::write_final_cnf(bool only_breakers) {

@@ -54,12 +54,19 @@ struct BreakID {
     void end_dynamic_cnf();
 
     void print_graph();
+    uint32_t get_num_generators();
     void print_generators();
     void detect_subgroups();
     void print_subgroups();
     void clean_theory();
     void break_symm();
     void print_symm_break_stats();
+
+    uint32_t get_num_break_cls();
+    uint32_t get_num_aux_vars();
+    vector<vector<BID::Lit>> get_brk_cls();
+
+
     void write_final_cnf(bool only_breakers);
     void print_generators(std::string symFile);
 
