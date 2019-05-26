@@ -22,33 +22,99 @@ THE SOFTWARE.
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <iostream>
 #include <limits>
-#include <string>
+#include <fstream>
+#include <set>
+#include <sstream>
 #include "breakid/solvertypesmini.hpp"
 
 using std::cout;
 using std::string;
 using std::endl;
 using BID::BLit;
+using std::vector;
+using std::istringstream;
 
 #include "breakid.hpp"
+
+uint32_t nVars;
+
+inline uint32_t encode(int lit)
+{
+    return (lit > 0 ? 2 * (lit - 1) : 2 * (-lit - 1) + 1);
+}
+
+vector<vector<BLit>> readCNF(const char* filename)
+{
+    vector<vector<BLit>> clauses;
+    //cout << "*** Reading CNF: " << filename << endl;
+
+    std::ifstream file(filename);
+    if (!file) {
+        std::cout << "ERROR: No CNF file found." << endl;
+        exit(-1);
+    }
+    string line;
+    vector<BLit> inclause;
+    while (getline(file, line)) {
+        if (line.size() == 0 || line.front() == 'c') {
+            // do nothing, this is a comment line
+        } else if (line.front() == 'p') {
+            string info = line.substr(6);
+            istringstream iss(info);
+            uint32_t nbVars;
+            iss >> nbVars;
+            uint32_t nbClauses;
+            iss >> nbClauses;
+            nVars = nbVars;
+            clauses.reserve(nbClauses);
+        } else {
+            //  parse the clauses, removing tautologies and double lits
+            istringstream iss(line);
+            int l;
+            while (iss >> l) {
+                if (l == 0) {
+                    if (inclause.size() == 0) {
+                        std::cout << "ERROR: Theory can not contain empty clause." << endl;
+                        exit(-1);
+                    }
+                    clauses.push_back(inclause);
+                    inclause.clear();
+                } else {
+                    if ((uint32_t)abs(l) > nVars) {
+                        nVars = abs(l);
+                    }
+                    inclause.push_back(BLit(abs(l)-1, l < 0));
+                }
+            }
+        }
+    }
+
+    return clauses;
+}
 
 int main(int argc, char *argv[])
 {
     BID::BreakID breakid;
-    breakid.set_useMatrixDetection(false);
-//     breakid.set_useBinaryClauses(conf_useBinaryClauses);
-//     breakid.set_useShatterTranslation(conf_useShatterTranslation);
-//     breakid.set_useFullTranslation(conf_useFullTranslation);
-//     breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
 
     int conf_verbosity = 3;
     breakid.set_verbosity(conf_verbosity);
-    breakid.start_dynamic_cnf(2, 2);
+    vector<vector<BLit>> cls = readCNF(argv[1]);
+    cout << "OK, read " << cls.size() << " clauses" << endl;
+
+    breakid.start_dynamic_cnf(nVars, cls.size());
+    for(auto cl: cls) {
+        breakid.add_clause(cl.data(), cl.size());
+    }
+    breakid.end_dynamic_cnf();
+
+
+    /*breakid.start_dynamic_cnf(2, 2);
     breakid.add_bin_clause(BLit(0, false), BLit(1, false));
     breakid.add_bin_clause(BLit(0, true), BLit(1, true));
-    breakid.end_dynamic_cnf();
+    breakid.end_dynamic_cnf();*/
 
     if (conf_verbosity > 3) {
         breakid.print_graph();
@@ -58,6 +124,7 @@ int main(int argc, char *argv[])
         cout << "Num generators: " << breakid.get_num_generators() << endl;
         breakid.print_generators();
     }
+    exit(0);
 
     if (conf_verbosity >= 2) {
         cout << "*** Detecting subgroups..." << endl;

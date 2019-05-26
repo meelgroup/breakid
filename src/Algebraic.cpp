@@ -370,9 +370,11 @@ void Group::addMatrix(shared_ptr<Matrix> m)
 
 void Group::print(std::ostream& out)
 {
+    cout << "-- Permutations:" << endl;
     for (auto p : permutations) {
         p->print(out);
     }
+    cout << "-- Matrices:" << endl;
     for (auto m : matrices) {
         m->print(out);
     }

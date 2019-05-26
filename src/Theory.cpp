@@ -213,11 +213,6 @@ void OnlCNF::add_clause(BID::BLit* lits, uint32_t size)
     graph->add_clause(lits, size);
 }
 
-void OnlCNF::add_bin_clause(BID::BLit lit1, BID::BLit lit2)
-{
-    graph->add_clause(lit1, lit2);
-}
-
 void OnlCNF::end_dynamic_cnf()
 {
     graph->end_dynamic_cnf();
@@ -228,6 +223,10 @@ void OnlCNF::end_dynamic_cnf()
     }
     vector<shared_ptr<Permutation> > symgens;
     graph->getSymmetryGenerators(symgens);
+
+    if (conf->verbosity > 0) {
+        cout << "Detected symmetry group." << endl;
+    }
     for (auto symgen : symgens) {
         group->add(symgen);
     }

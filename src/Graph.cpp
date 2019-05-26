@@ -54,6 +54,7 @@ Graph::Graph(uint32_t nClauses, Config* _conf) :
         uint32_t posID = encode(l);
         uint32_t negID = encode(-l);
         bliss_g->add_edge(posID, negID);
+        bliss_g->add_edge(negID, posID);
     }
 
     cur_cl_num = 2 * conf->nVars;
@@ -61,25 +62,19 @@ Graph::Graph(uint32_t nClauses, Config* _conf) :
 
 void Graph::add_clause(BID::BLit* lits, uint32_t size)
 {
-    assert(size > 1 && "Fixed values are NOT permitted");
+    if (size == 1) {
+        BID::BLit lit = lits[0];
+        setUniqueColor(encode(lit_to_weird(lit)));
+        return;
+    }
 
     // Clauses have as neighbors the literals occurring in them
     for(size_t i = 0; i < size; i++) {
         BID::BLit l = lits[i];
         bliss_g->add_edge(cur_cl_num, encode(lit_to_weird(l)));
-        used_lits[l.toInt()] = 1;
+        bliss_g->add_edge(encode(lit_to_weird(l)), cur_cl_num);
+        used_lits[encode(lit_to_weird(l))] = 1;
     }
-    cur_cl_num++;
-}
-
-void Graph::add_clause(BID::BLit lit1, BID::BLit lit2)
-{
-    // Clauses have as neighbors the literals occurring in them
-    bliss_g->add_edge(cur_cl_num, encode( lit_to_weird(lit1) ));
-    bliss_g->add_edge(cur_cl_num, encode( lit_to_weird(lit2) ));
-
-    used_lits[lit1.toInt()] = 1;
-    used_lits[lit2.toInt()] = 1;
     cur_cl_num++;
 }
 
@@ -453,9 +448,5 @@ void Graph::setUniqueColor(const vector<uint32_t>& lits)
 void Graph::getSymmetryGenerators(vector<shared_ptr<Permutation> >& out_perms)
 {
     out_perms.clear();
-    if (conf->verbosity > 1) {
-        cout << "Searching graph automorphisms" << endl;
-    }
-
     getSymmetryGeneratorsInternal(out_perms);
 }

@@ -116,11 +116,6 @@ void BreakID::add_clause(BID::BLit* start, size_t num)
     dat->theory->add_clause(start, num);
 }
 
-void BreakID::add_bin_clause(BID::BLit lit1, BID::BLit lit2)
-{
-    dat->theory->add_bin_clause(lit1, lit2);
-}
-
 void BreakID::end_dynamic_cnf()
 {
     dat->theory->end_dynamic_cnf();

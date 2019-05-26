@@ -53,8 +53,6 @@ class Specification
 
     virtual void add_clause(BID::BLit* /*lits*/, uint32_t /*size*/)
     {}
-    virtual void add_bin_clause(BID::BLit /*lit1*/, BID::BLit /*lit2*/)
-    {}
     virtual void end_dynamic_cnf()
     {}
     virtual void cleanUp();
@@ -92,7 +90,6 @@ public:
 
     void end_dynamic_cnf();
     void add_clause(BID::BLit* lits, uint32_t size);
-    void add_bin_clause(BID::BLit lit1, BID::BLit lit2);
 
     void print(std::ostream& out);
     uint32_t getSize();

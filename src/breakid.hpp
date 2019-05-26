@@ -52,7 +52,6 @@ struct BreakID {
     //Dynamic CNF
     void start_dynamic_cnf(uint32_t nVars, uint32_t num_cls);
     void add_clause(BID::BLit* start, size_t num);
-    void add_bin_clause(BID::BLit lit1, BID::BLit lit2);
     void end_dynamic_cnf();
 
     void print_graph();
