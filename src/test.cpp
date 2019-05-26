@@ -36,7 +36,7 @@ using BID::Lit;
 
 int main(int argc, char *argv[])
 {
-    BreakID breakid;
+    BID::BreakID breakid;
     breakid.set_useMatrixDetection(false);
 //     breakid.set_useBinaryClauses(conf_useBinaryClauses);
 //     breakid.set_useShatterTranslation(conf_useShatterTranslation);

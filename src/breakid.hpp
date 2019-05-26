@@ -26,7 +26,8 @@ THE SOFTWARE.
 #include <string>
 #include "breakid/solvertypesmini.hpp"
 
-class Config;
+namespace BID {
+
 struct PrivateData;
 
 struct BreakID {
@@ -73,7 +74,8 @@ struct BreakID {
 
 private:
     PrivateData* dat = NULL;
-    Config* conf = NULL;
 };
+
+}
 
 #endif

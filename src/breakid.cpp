@@ -42,71 +42,73 @@ using std::stringstream;
 using std::istringstream;
 using std::make_shared;
 using std::vector;
+using namespace BID;
 
-struct PrivateData
+struct BID::PrivateData
 {
     shared_ptr<Specification> theory;
     vector<shared_ptr<Group> > subgroups;
     uint32_t totalNbMatrices = 0;
     uint32_t totalNbRowSwaps = 0;
     Breaker* brkr = NULL;
+    Config* conf = NULL;
 };
 
 BreakID::~BreakID()
 {
-    delete conf;
+    delete dat->conf;
     delete dat->brkr;
     delete dat;
 }
 
 BreakID::BreakID()
 {
-    conf = new Config;
     dat = new PrivateData;
+    dat->conf = new Config;
 }
 
 void BreakID::set_useMatrixDetection(bool val)
 {
-    conf->useMatrixDetection = val;
+    dat->conf->useMatrixDetection = val;
 }
 
 void BreakID::set_useBinaryClauses(bool val)
 {
-    conf->useBinaryClauses = val;
+    dat->conf->useBinaryClauses = val;
 }
 
 void BreakID::set_useShatterTranslation(bool val)
 {
-    conf->useShatterTranslation = val;
+    dat->conf->useShatterTranslation = val;
 }
 
 void BreakID::set_useFullTranslation(bool val)
 {
-    conf->useFullTranslation = val;
+    dat->conf->useFullTranslation = val;
 }
 
 void BreakID::set_symBreakingFormLength(int val)
 {
-    conf->symBreakingFormLength = val;
+    dat->conf->symBreakingFormLength = val;
 }
 
 void BreakID::set_verbosity(uint32_t val)
 {
-    conf->verbosity = val;
+    dat->conf->verbosity = val;
 }
 
 void BreakID::conf_timeLim(int64_t val)
 {
-    conf->timeLim = val;
+    dat->conf->timeLim = val;
 }
 
 void BreakID::read_cnf(string filename_) {
-    dat->theory = make_shared<CNF>(filename_, conf);
+    dat->theory = make_shared<CNF>(filename_, dat->conf);
 }
 
 void BreakID::start_dynamic_cnf(uint32_t nVars, uint32_t num_cls)
 {
-    dat->theory = make_shared<OnlCNF>(nVars, num_cls, conf);
+    dat->theory = make_shared<OnlCNF>(nVars, num_cls, dat->conf);
 }
 
 void BreakID::add_clause(BID::Lit* start, size_t num)
@@ -162,11 +164,11 @@ void BreakID::clean_theory() {
 
 void BreakID::break_symm()
 {
-    dat->brkr = new Breaker(dat->theory, conf);
+    dat->brkr = new Breaker(dat->theory, dat->conf);
     for (auto grp : dat->subgroups) {
         cout << "NOTE: Matrix detection disabled as current code is too slow" << endl;
-        if (grp->getSize() > 1 && conf->useMatrixDetection) {
-            if (conf->verbosity > 1) {
+        if (grp->getSize() > 1 && dat->conf->useMatrixDetection) {
+            if (dat->conf->verbosity > 1) {
                 cout << "*** Detecting row interchangeability..." << endl;
             }
             dat->theory->setSubTheory(grp);
@@ -174,8 +176,8 @@ void BreakID::break_symm()
             dat->totalNbMatrices += grp->getNbMatrices();
             dat->totalNbRowSwaps += grp->getNbRowSwaps();
         }
-        if (conf->symBreakingFormLength > -1) {
-            if (conf->verbosity > 1) {
+        if (dat->conf->symBreakingFormLength > -1) {
+            if (dat->conf->verbosity > 1) {
                 cout << "*** Constructing symmetry breaking formula..." << endl;
             }
             grp->addBreakingClausesTo(*dat->brkr);

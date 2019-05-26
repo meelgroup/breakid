@@ -59,7 +59,7 @@ namespace options {
 
 void printUsage()
 {
-    BreakID bid;
+    BID::BreakID bid;
     cout << "BreakID version " << bid.get_sha1_version() << endl;
     cout << "Usage: ./BreakID <cnf-file> "
               << "[" << options::help << "] "
@@ -171,7 +171,7 @@ void parseOptions(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
-    BreakID breakid;
+    BID::BreakID breakid;
     breakid.set_useMatrixDetection(conf_useMatrixDetection);
     breakid.set_useBinaryClauses(conf_useBinaryClauses);
     breakid.set_useShatterTranslation(conf_useShatterTranslation);

@@ -87,7 +87,7 @@ target_link_libraries(mytest
 )
 
 
-breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/Breaking.hpp )
+breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
 breakid_add_public_header(breakid ${CMAKE_CURRENT_BINARY_DIR}/breakid/solvertypesmini.hpp )
 
 # -----------------------------------------------------------------------------
