@@ -52,7 +52,7 @@ public:
     ~Graph();
 
     //Dynamic graph
-    Graph(uint32_t nClauses, Config* conf); ///<for online CNF
+    Graph(Config* conf); ///<for online CNF
     void add_clause(BID::BLit* start, uint32_t size);
     void end_dynamic_cnf();
 
@@ -87,7 +87,6 @@ private:
     uint32_t nbedges = 0;
 
     //dynamic CNF generation
-    uint32_t cur_cl_num = 0;
     vector<char> used_lits;
 };
 

@@ -106,9 +106,9 @@ void BreakID::read_cnf(string filename_) {
     dat->theory = make_shared<CNF>(filename_, dat->conf);
 }
 
-void BreakID::start_dynamic_cnf(uint32_t nVars, uint32_t num_cls)
+void BreakID::start_dynamic_cnf(uint32_t nVars)
 {
-    dat->theory = make_shared<OnlCNF>(nVars, num_cls, dat->conf);
+    dat->theory = make_shared<OnlCNF>(nVars, dat->conf);
 }
 
 void BreakID::add_clause(BID::BLit* start, size_t num)

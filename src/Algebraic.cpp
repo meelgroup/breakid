@@ -791,7 +791,7 @@ void Group::addBreakingClausesTo(Breaker& brkr)
     vector<uint32_t> order;
     getOrderAndAddBinaryClausesTo(brkr, order);
 
-    if (conf->verbosity > 1) {
+    if (conf->verbosity > 3) {
         cout << "order: ";
         for (auto x : order) {
             cout << decode(x) << " ";

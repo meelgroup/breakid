@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     vector<vector<BLit>> cls = readCNF(argv[1]);
     cout << "OK, read " << cls.size() << " clauses" << endl;
 
-    breakid.start_dynamic_cnf(nVars, cls.size());
+    breakid.start_dynamic_cnf(nVars);
     for(auto cl: cls) {
         breakid.add_clause(cl.data(), cl.size());
     }

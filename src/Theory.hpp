@@ -85,7 +85,7 @@ private:
 class OnlCNF : public Specification
 {
 public:
-    OnlCNF(uint32_t nVars, uint32_t num_cls, Config* conf);
+    OnlCNF(uint32_t num_cls, Config* conf);
     ~OnlCNF();
 
     void end_dynamic_cnf();

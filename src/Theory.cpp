@@ -196,12 +196,11 @@ bool CNF::isSymmetry(Permutation& prm)
 
 //// ONLINE
 
-OnlCNF::OnlCNF(uint32_t nVars, uint32_t _num_cls, Config* _conf) :
+OnlCNF::OnlCNF(uint32_t nVars, Config* _conf) :
     conf(_conf)
 {
     conf->nVars = nVars;
-    num_cls = _num_cls;
-    graph = make_shared<Graph>(num_cls, conf);
+    graph = make_shared<Graph>(conf);
 }
 
 OnlCNF::~OnlCNF()

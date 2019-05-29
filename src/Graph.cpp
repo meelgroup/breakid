@@ -27,32 +27,24 @@ THE SOFTWARE.
 using std::cout;
 using std::endl;
 
-Graph::Graph(uint32_t nClauses, Config* _conf) :
+Graph::Graph(Config* _conf) :
     conf(_conf)
 {
-    uint32_t n = 2 * conf->nVars + nClauses;
+    uint32_t n = 2 * conf->nVars;
     bliss_g = new bliss::Graph(n);
     used_lits.resize(conf->nVars*2, 0);
-    color.resize(n);
     neighbours.clear();
-    //DEBUG neighbours.resize(n);
     lit2color.clear();
     nbedges = 0;
+    color.clear();
 
     // Initialize colors
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
         bliss_g->change_color(i, 0);
-        //DEBUG lit2color[i] = 0;
-        color[i] = 0;
+        color.push_back(0);
     }
     colorcount.push_back(2 * conf->nVars);
-
-    for (uint32_t i = 2 * conf->nVars; i < n; ++i) {
-        bliss_g->change_color(i, 1);
-        //DEBUG lit2color[i] = 1;
-        color[i] = 1;
-    }
-    colorcount.push_back(nClauses);
+    colorcount.push_back(100); //we expect there to be many clauses;
 
     // Initialize edge lists
     // First construct for each node the list of neighbors
@@ -61,13 +53,10 @@ Graph::Graph(uint32_t nClauses, Config* _conf) :
         uint32_t posID = encode(l);
         uint32_t negID = encode(-l);
         bliss_g->add_edge(posID, negID);
-
-        //DEBUG neighbours[posID].push_back(negID);
-        //DEBUG neighbours[negID].push_back(posID);
-        nbedges += 2;
+        nbedges += 1;
     }
-
-    cur_cl_num = 2 * conf->nVars;
+    assert(color.size() == n);
+    assert(bliss_g->get_nof_vertices() == n);
 }
 
 void Graph::add_clause(BID::BLit* lits, uint32_t size)
@@ -80,21 +69,21 @@ void Graph::add_clause(BID::BLit* lits, uint32_t size)
     }
 
     // Clauses have as neighbors the literals occurring in them
+    uint32_t v = bliss_g->add_vertex(1);
     for(size_t i = 0; i < size; i++) {
         BID::BLit l = lits[i];
-        bliss_g->add_edge(cur_cl_num, encode(lit_to_weird(l)));
-
-        //DEBUG neighbours[cur_cl_num].push_back(encode(lit_to_weird(l)));
-        //DEBUG neighbours[encode(lit_to_weird(l))].push_back(cur_cl_num);
-
+        bliss_g->add_edge(v, encode(lit_to_weird(l)));
         used_lits[encode(lit_to_weird(l))] = 1;
-        nbedges+=2;
+        nbedges+=1;
     }
-    cur_cl_num++;
+    assert(color.size() == v);
+    color.push_back(1);
 }
 
 void Graph::end_dynamic_cnf()
 {
+    colorcount[1] = bliss_g->get_nof_vertices() - conf->nVars*2;
+
     // look for unused lits, make their color unique so that no symmetries on them are found
     // useful for subgroups
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
@@ -102,15 +91,6 @@ void Graph::end_dynamic_cnf()
             setUniqueColor(i);
         }
     }
-
-    /*
-    //DEBUG CODE
-    initializeGraph(cur_cl_num);
-    for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
-        if (used_lits[i] == 0) {
-            setUniqueColor(i);
-        }
-    }*/
 }
 
 void Graph::initializeGraph(uint32_t nbNodes)
