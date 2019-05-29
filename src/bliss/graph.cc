@@ -3532,7 +3532,7 @@ Graph::~Graph()
 unsigned int Graph::add_vertex(const unsigned int color)
 {
     const unsigned int vertex_num = vertices.size();
-    vertices.resize(vertex_num + 1);
+    vertices.push_back(Vertex());
     vertices.back().color = color;
     return vertex_num;
 }
