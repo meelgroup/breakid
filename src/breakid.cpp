@@ -161,7 +161,7 @@ void BreakID::break_symm()
 {
     dat->brkr = new Breaker(dat->theory, dat->conf);
     for (auto grp : dat->subgroups) {
-        cout << "NOTE: Matrix detection disabled as current code is too slow" << endl;
+        //cout << "NOTE: Matrix detection disabled as current code is too slow" << endl;
         if (grp->getSize() > 1 && dat->conf->useMatrixDetection) {
             if (dat->conf->verbosity > 1) {
                 cout << "*** Detecting row interchangeability..." << endl;
