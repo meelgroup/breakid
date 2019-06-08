@@ -45,7 +45,7 @@ uint32_t conf_verbosity = 1;
 int64_t conf_timeLim = std::numeric_limits<int64_t>::max();
 
 namespace options {
-    string nointch = "-no-row";
+    string intch_symm = "-row";
     string nobinary = "-no-bin";
     string formlength = "-s";
     string verbosity = "-v";
@@ -63,7 +63,7 @@ void printUsage()
     cout << "BreakID version " << bid.get_sha1_version() << endl;
     cout << "Usage: ./BreakID <cnf-file> "
               << "[" << options::help << "] "
-              << "[" << options::nointch << "] "
+              << "[" << options::intch_symm << "] "
               << "[" << options::nobinary << "] "
               << "[" << options::nosmall << "] "
               << "[" << options::norelaxed << "] "
@@ -79,8 +79,8 @@ void printUsage()
     << options::help << "\n"
     << " Display this help message instead of running BreakID.\n"
 
-    << options::nointch << "\n"
-    << " Disable detection and breaking of row interchangeability.\n"
+    << options::intch_symm << "\n"
+    << " ENABLE detection and breaking of row interchangeability.\n"
 
     << options::nobinary << "\n"
     << " Disable construction of additional binary symmetry breaking\n"
@@ -125,8 +125,8 @@ void parseOptions(int argc, char *argv[])
         string input = argv[i];
         if (0 == input.compare(options::nobinary)) {
             conf_useBinaryClauses = false;
-        } else if (0 == input.compare(options::nointch)) {
-            conf_useMatrixDetection = false;
+        } else if (0 == input.compare(options::intch_symm)) {
+            conf_useMatrixDetection = true;
         } else if (0 == input.compare(options::onlybreakers)) {
             onlyPrintBreakers = true;
         } else if (0 == input.compare(options::generatorfile)) {
@@ -158,7 +158,7 @@ void parseOptions(int argc, char *argv[])
             << " " << options::verbosity << " " << conf_verbosity
 
             << " "
-            << (conf_useMatrixDetection ? "" : options::nointch) << " "
+            << (conf_useMatrixDetection ? "" : options::intch_symm) << " "
             << (conf_useBinaryClauses ? "" : options::nobinary) << " "
             << (onlyPrintBreakers ? options::onlybreakers : "") << " "
             << (printGeneratorFile ? options::generatorfile : "") << " "
@@ -172,11 +172,11 @@ int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
     BID::BreakID breakid;
-//     breakid.set_useMatrixDetection(conf_useMatrixDetection);
-//     breakid.set_useBinaryClauses(conf_useBinaryClauses);
-//     breakid.set_useShatterTranslation(conf_useShatterTranslation);
-//     breakid.set_useFullTranslation(conf_useFullTranslation);
-//     breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
+    breakid.set_useMatrixDetection(conf_useMatrixDetection);
+    breakid.set_useBinaryClauses(conf_useBinaryClauses);
+    breakid.set_useShatterTranslation(conf_useShatterTranslation);
+    breakid.set_useFullTranslation(conf_useFullTranslation);
+    breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
     breakid.set_verbosity(conf_verbosity);
 
 
