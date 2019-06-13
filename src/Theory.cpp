@@ -286,10 +286,3 @@ shared_ptr<Group> Specification::getGroup()
 {
     return group;
 }
-
-void Specification::cleanUp()
-{
-    delete graph;
-    graph = NULL;
-    group.reset();
-}

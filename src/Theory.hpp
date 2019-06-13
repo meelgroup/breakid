@@ -55,7 +55,6 @@ class Specification
     {}
     virtual void end_dynamic_cnf()
     {}
-    virtual void cleanUp();
     virtual void setSubTheory(shared_ptr<Group> subgroup) = 0;
     virtual bool isSymmetry(Permutation& prm) = 0;
 };
