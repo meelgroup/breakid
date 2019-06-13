@@ -31,18 +31,11 @@ using std::string;
 using std::endl;
 
 #include "breakid.hpp"
+#include "config.hpp"
 
 bool printGeneratorFile = false;
 bool onlyPrintBreakers = false;
-
-//conf
-bool conf_useMatrixDetection = false;
-bool conf_useBinaryClauses = true;
-bool conf_useShatterTranslation = false;
-bool conf_useFullTranslation = false;
-int  conf_symBreakingFormLength = 50;
-uint32_t conf_verbosity = 1;
-int64_t conf_timeLim = std::numeric_limits<int64_t>::max();
+Config conf;
 
 namespace options {
     string intch_symm = "-row";
@@ -94,15 +87,15 @@ void printUsage()
     << " Disable relaxing constraints on auxiliary encoding\n"
     << " variables, use longer encoding instead.\n"
 
-    << options::formlength << " <default: " << conf_symBreakingFormLength << ">\n"
+    << options::formlength << " <default: " << conf.symBreakingFormLength << ">\n"
     << " Limit the size of the constructed symmetry breaking\n"
     << " formula's, measured as the number of auxiliary variables\n"
     << " introduced. <-1> means no symmetry breaking.\n"
 
-    << options::timelim << " <default: " << conf_timeLim << ">\n"
+    << options::timelim << " <default: " << conf.timeLim << ">\n"
     << " Upper limit on computing steps spent, approximate measure for time.\n"
 
-    << options::verbosity << " <default: " << conf_verbosity << ">\n"
+    << options::verbosity << " <default: " << conf.verbosity << ">\n"
     << " Verbosity of the output. <0> means no output other than the\n"
     << " CNF augmented with symmetry breaking clauses.\n"
 
@@ -124,46 +117,46 @@ void parseOptions(int argc, char *argv[])
     for (int i = 1; i < argc; ++i) {
         string input = argv[i];
         if (0 == input.compare(options::nobinary)) {
-            conf_useBinaryClauses = false;
+            conf.useBinaryClauses = false;
         } else if (0 == input.compare(options::intch_symm)) {
-            conf_useMatrixDetection = true;
+            conf.useMatrixDetection = true;
         } else if (0 == input.compare(options::onlybreakers)) {
             onlyPrintBreakers = true;
         } else if (0 == input.compare(options::generatorfile)) {
             printGeneratorFile = true;
         } else if (0 == input.compare(options::nosmall)) {
-            conf_useShatterTranslation = true;
+            conf.useShatterTranslation = true;
         } else if (0 == input.compare(options::norelaxed)) {
-            conf_useFullTranslation = true;
+            conf.useFullTranslation = true;
         } else if (0 == input.compare(options::formlength)) {
             ++i;
-            conf_symBreakingFormLength = std::stoi(argv[i]);
+            conf.symBreakingFormLength = std::stoi(argv[i]);
         } else if (0 == input.compare(options::timelim)) {
             ++i;
-            conf_timeLim = std::stoi(argv[i]);
+            conf.timeLim = std::stoi(argv[i]);
         } else if (0 == input.compare(options::verbosity)) {
             ++i;
-            conf_verbosity = std::stoi(argv[i]);
+            conf.verbosity = std::stoi(argv[i]);
         } else if (0 == input.compare(options::help)) {
             printUsage();
         }
     }
 
-    if (conf_verbosity > 1) {
+    if (conf.verbosity > 1) {
         cout << "Options used:"
-            << " " << options::formlength << " " << conf_symBreakingFormLength
+            << " " << options::formlength << " " << conf.symBreakingFormLength
 
-            << " " << options::timelim << " " << conf_timeLim
+            << " " << options::timelim << " " << conf.timeLim
 
-            << " " << options::verbosity << " " << conf_verbosity
+            << " " << options::verbosity << " " << conf.verbosity
 
             << " "
-            << (conf_useMatrixDetection ? "" : options::intch_symm) << " "
-            << (conf_useBinaryClauses ? "" : options::nobinary) << " "
+            << (conf.useMatrixDetection ? "" : options::intch_symm) << " "
+            << (conf.useBinaryClauses ? "" : options::nobinary) << " "
             << (onlyPrintBreakers ? options::onlybreakers : "") << " "
             << (printGeneratorFile ? options::generatorfile : "") << " "
-            << (conf_useShatterTranslation ? options::nosmall : "") << " "
-            << (conf_useFullTranslation ? options::norelaxed : "") << " "
+            << (conf.useShatterTranslation ? options::nosmall : "") << " "
+            << (conf.useFullTranslation ? options::norelaxed : "") << " "
             << endl;
     }
 }
@@ -172,36 +165,36 @@ int main(int argc, char *argv[])
 {
     parseOptions(argc, argv);
     BID::BreakID breakid;
-    breakid.set_useMatrixDetection(conf_useMatrixDetection);
-    breakid.set_useBinaryClauses(conf_useBinaryClauses);
-    breakid.set_useShatterTranslation(conf_useShatterTranslation);
-    breakid.set_useFullTranslation(conf_useFullTranslation);
-    breakid.set_symBreakingFormLength(conf_symBreakingFormLength);
-    breakid.set_verbosity(conf_verbosity);
+    breakid.set_useMatrixDetection(conf.useMatrixDetection);
+    breakid.set_useBinaryClauses(conf.useBinaryClauses);
+    breakid.set_useShatterTranslation(conf.useShatterTranslation);
+    breakid.set_useFullTranslation(conf.useFullTranslation);
+    breakid.set_symBreakingFormLength(conf.symBreakingFormLength);
+    breakid.set_verbosity(conf.verbosity);
 
 
     string fname = argv[1];
     breakid.read_cnf(fname);
 
-    if (conf_verbosity > 3) {
+    if (conf.verbosity > 3) {
         breakid.print_graph();
     }
 
-    if (conf_verbosity) {
+    if (conf.verbosity) {
         breakid.print_generators();
     }
 
-    if (conf_verbosity) {
+    if (conf.verbosity) {
         cout << "*** Detecting subgroups..." << endl;
     }
     breakid.detect_subgroups();
 
-    if (conf_verbosity) {
+    if (conf.verbosity) {
         breakid.print_subgroups();
     }
     breakid.break_symm();
 
-    if (conf_verbosity) {
+    if (conf.verbosity) {
         breakid.print_symm_break_stats();
     }
 
@@ -209,7 +202,7 @@ int main(int argc, char *argv[])
 
     if (printGeneratorFile) {
         string symFile = fname + ".sym";
-        if (conf_verbosity) {
+        if (conf.verbosity) {
             cout
             << "*** Printing generators to file " + symFile
             << endl;
