@@ -121,9 +121,9 @@ void Permutation::addPrimeSplitToVector(
                 for (auto c : lengthToCycles[pow(prime, power)]) {
                     size_t cycleLength = pow(prime, smallestPow);
                     size_t jump = c.size() / cycleLength;
-                    for (int i = 0; i < jump; i++) {
+                    for (size_t i = 0; i < jump; i++) {
                         vector<uint32_t> newCycle;
-                        for (int j = 0; j < cycleLength; j++) {
+                        for (size_t j = 0; j < cycleLength; j++) {
                             newCycle.push_back(c[i + j * jump]);
                         }
                         equalCycleGen->addCycle(newCycle);
