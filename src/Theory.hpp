@@ -63,7 +63,7 @@ class CNF : public Specification
 {
 public:
     CNF(string& filename, Config* conf);
-    CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp);
+    CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp, Config* conf);
     ~CNF();
 
     void print(std::ostream& out) const;

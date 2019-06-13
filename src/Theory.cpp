@@ -130,7 +130,8 @@ CNF::CNF(string& filename, Config* _conf) :
     }
 }
 
-CNF::CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp)
+CNF::CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp, Config* _conf) :
+    conf(_conf)
 {
     clauses.insert(clss.cbegin(), clss.cend());
     assert(graph == NULL);
@@ -178,7 +179,7 @@ void CNF::setSubTheory(shared_ptr<Group> subgroup)
             }
         }
     }
-    subgroup->theory = new CNF(subclauses, subgroup);
+    subgroup->theory = new CNF(subclauses, subgroup, conf);
 }
 
 bool CNF::isSymmetry(Permutation& prm)
