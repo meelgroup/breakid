@@ -59,7 +59,6 @@ struct BreakID {
     void print_generators();
     void detect_subgroups();
     void print_subgroups();
-    void clean_theory();
     void break_symm();
     void print_symm_break_stats();
 

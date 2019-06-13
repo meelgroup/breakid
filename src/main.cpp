@@ -199,8 +199,6 @@ int main(int argc, char *argv[])
     if (conf_verbosity) {
         breakid.print_subgroups();
     }
-
-    breakid.clean_theory();
     breakid.break_symm();
 
     if (conf_verbosity) {

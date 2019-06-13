@@ -160,12 +160,6 @@ void BreakID::print_subgroups() {
     }
 }
 
-void BreakID::clean_theory() {
-    // improve some memory overhead
-    delete dat->theory;
-    dat->theory = NULL;
-}
-
 void BreakID::break_symm()
 {
     dat->brkr = new Breaker(dat->theory, dat->conf);

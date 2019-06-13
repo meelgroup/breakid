@@ -128,7 +128,6 @@ int main(int argc, char *argv[])
         breakid.print_subgroups();
     }
 
-    breakid.clean_theory();
     breakid.break_symm();
 
     if (false && conf_verbosity) {
