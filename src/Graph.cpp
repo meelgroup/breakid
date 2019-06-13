@@ -140,8 +140,8 @@ uint32_t Graph::getNeighbour(uint32_t /*node*/, uint32_t /*nbthNeighbour*/)
     return 0; //Not supported, only used for printing
 }
 
-// This method is given to BLISS as a polymorphic consumer of the detected generator permutations
-
+///This method is given to BLISS as a polymorphic consumer
+///of the detected generator permutations
 static void addBlissPermutation(
     void* param, const unsigned int n,
     const unsigned int* aut)
