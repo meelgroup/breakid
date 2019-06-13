@@ -38,16 +38,16 @@ bool onlyPrintBreakers = false;
 Config conf;
 
 namespace options {
-    string intch_symm = "-row";
-    string nobinary = "-no-bin";
+    string intch_symm = "--row";
+    string nobinary =   "--no-bin";
     string formlength = "-s";
     string verbosity = "-v";
     string timelim = "-t";
     string help = "-h";
-    string nosmall = "-no-small";
-    string norelaxed = "-no-relaxed";
-    string onlybreakers = "-print-only-breakers";
-    string generatorfile = "-with-generator-file";
+    string nosmall = "--no-small";
+    string norelaxed = "--no-relaxed";
+    string onlybreakers = "--only-brk";
+    string generatorfile = "--with-gen-fil";
 }
 
 void printUsage()
@@ -70,41 +70,41 @@ void printUsage()
     cout
     << "\nOptions:\n"
     << options::help << "\n"
-    << " Display this help message instead of running BreakID.\n"
+    << "    Display this help message instead of running BreakID.\n\n"
 
     << options::intch_symm << "\n"
-    << " ENABLE detection and breaking of row interchangeability.\n"
+    << "    ENABLE detection and breaking of row interchangeability.\n\n"
 
     << options::nobinary << "\n"
-    << " Disable construction of additional binary symmetry breaking\n"
-    << " clauses based on stabilizer subgroups.\n"
+    << "    Disable construction of additional binary symmetry breaking\n\n"
+    << "    clauses based on stabilizer subgroups.\n"
 
     << options::nosmall << "\n"
-    << " Disable compact symmetry breaking encoding, use Shatter's\n"
-    << " encoding instead.\n"
+    << "    Disable compact symmetry breaking encoding, use Shatter's\n\n"
+    << "    encoding instead.\n"
 
     << options::norelaxed << "\n"
-    << " Disable relaxing constraints on auxiliary encoding\n"
-    << " variables, use longer encoding instead.\n"
+    << "    Disable relaxing constraints on auxiliary encoding\n"
+    << "    variables, use longer encoding instead.\n\n"
 
     << options::formlength << " <default: " << conf.symBreakingFormLength << ">\n"
-    << " Limit the size of the constructed symmetry breaking\n"
-    << " formula's, measured as the number of auxiliary variables\n"
-    << " introduced. <-1> means no symmetry breaking.\n"
+    << "    Limit the size of the constructed symmetry breaking\n"
+    << "    formula's, measured as the number of auxiliary variables\n"
+    << "    introduced. <-1> means no symmetry breaking.\n\n"
 
     << options::timelim << " <default: " << conf.timeLim << ">\n"
-    << " Upper limit on computing steps spent, approximate measure for time.\n"
+    << "    Upper limit on computing steps spent, approximate measure for time.\n\n"
 
     << options::verbosity << " <default: " << conf.verbosity << ">\n"
-    << " Verbosity of the output. <0> means no output other than the\n"
-    << " CNF augmented with symmetry breaking clauses.\n"
+    << "    Verbosity of the output. <0> means no output other than the\n"
+    << "    CNF augmented with symmetry breaking clauses.\n\n"
 
     << options::onlybreakers << "\n"
-    << " Do not print original theory, only the symmetry breaking"
-    << " clauses.\n"
+    << "    Do not print original theory, only the symmetry breaking\n"
+    << "    clauses.\n\n"
 
     << options::generatorfile << "\n"
-    << " Return the generator symmetries as a <path-to-cnf>.sym file.\n"
+    << "    Return the generator symmetries as a <path-to-cnf>.sym file.\n\n"
     ;
 }
 
