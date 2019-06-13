@@ -293,14 +293,3 @@ void Specification::cleanUp()
     graph = NULL;
     group.reset();
 }
-
-/******************
- * LOGIC PROGRAM
- */
-
-void checkVarExists(int lit, Config* conf)
-{
-    if ((uint32_t)abs(lit) > conf->nVars) {
-        conf->nVars = abs(lit);
-    }
-}
