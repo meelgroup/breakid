@@ -97,12 +97,12 @@ vector<vector<BLit>> readCNF(const char* filename)
 
 int main(int argc, char *argv[])
 {
-    BID::BreakID breakid;
     if (argc != 2)  {
         cout << "You must give the CNF as a single parameter" << endl;
         exit(-1);
     }
 
+    BID::BreakID breakid;
     int conf_verbosity = 3;
     breakid.set_verbosity(conf_verbosity);
     vector<vector<BLit>> cls = readCNF(argv[1]);
