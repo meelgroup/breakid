@@ -549,9 +549,9 @@ uint32_t Group::getSize()
     return permutations.size();
 }
 
-// NOTE: only approximate support for groups with matrices as generators: all matrices are added to the first subgroup
-// NOTE: erases permutations for this group
-
+// Only approximate support for groups with matrices as generators:
+//       all matrices are added to the first subgroup
+// Erases permutations for this group
 void Group::getDisjointGenerators(vector<shared_ptr<Group> >& subgroups)
 {
     // calculate maximal subsets of generators with pairwise disjoint supports
@@ -566,11 +566,13 @@ void Group::getDisjointGenerators(vector<shared_ptr<Group> >& subgroups)
         int previoussize = -1;
         while ((int)current->getSize() > previoussize) {
             previoussize = current->getSize();
-            for (int i = permutations.size() - 1; i >= 0; --i) {
+            for (int i = (int)permutations.size() - 1; i >= 0; --i) {
+
+                // it suffices to check that the positive literals occur in the group support
                 if (!isDisjoint(
                         current->support,
-                        permutations[i]
-                            ->posDomain)) { // it suffices to check that the positive literals occur in the group support
+                        permutations[i]->posDomain)
+                ) {
                     current->add(permutations[i]);
                     swapErase(permutations, i);
                 }
@@ -586,11 +588,13 @@ void Group::getDisjointGenerators(vector<shared_ptr<Group> >& subgroups)
         permutations.pop_back();
         while (current->getSize() > previoussize) {
             previoussize = current->getSize();
-            for (int i = permutations.size() - 1; i >= 0; --i) {
+            for (int i = (int)permutations.size() - 1; i >= 0; --i) {
+
+                // it suffices to check that the positive literals occur in the group support
                 if (!isDisjoint(
                         current->support,
-                        permutations[i]
-                            ->posDomain)) { // it suffices to check that the positive literals occur in the group support
+                        permutations[i]->posDomain)
+                ) {
                     current->add(permutations[i]);
                     swapErase(permutations, i);
                 }
