@@ -306,7 +306,7 @@ struct UvecEqual {
 class Breaker
 {
 public:
-    Breaker(shared_ptr<Specification> origTheo, Config* conf);
+    Breaker(Specification const* origTheo, Config* conf);
     ~Breaker(){};
 
     //Prints the current breaker
@@ -329,7 +329,7 @@ public:
 
 private:
     unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual> clauses;
-    shared_ptr<Specification> originalTheory;
+    Specification const* originalTheory;
     uint32_t nbExtraVars = 0;
     uint32_t nbBinClauses = 0;
     uint32_t nbRowClauses = 0;

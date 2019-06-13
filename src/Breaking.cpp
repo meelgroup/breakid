@@ -28,7 +28,7 @@ THE SOFTWARE.
 using std::cout;
 using std::endl;
 
-Breaker::Breaker(shared_ptr<Specification> origTheo, Config* _conf) :
+Breaker::Breaker(Specification const* origTheo, Config* _conf) :
     originalTheory(origTheo)
     , conf(_conf)
 {

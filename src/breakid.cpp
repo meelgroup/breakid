@@ -46,18 +46,24 @@ using namespace BID;
 
 struct BID::PrivateData
 {
-    shared_ptr<Specification> theory;
     vector<shared_ptr<Group> > subgroups;
     uint32_t totalNbMatrices = 0;
     uint32_t totalNbRowSwaps = 0;
+
+    Specification* theory = NULL;
     Breaker* brkr = NULL;
     Config* conf = NULL;
+
+    ~PrivateData()
+    {
+        delete theory;
+        delete conf;
+        delete brkr;
+    }
 };
 
 BreakID::~BreakID()
 {
-    delete dat->conf;
-    delete dat->brkr;
     delete dat;
 }
 
@@ -103,12 +109,14 @@ void BreakID::conf_timeLim(int64_t val)
 }
 
 void BreakID::read_cnf(string filename_) {
-    dat->theory = make_shared<CNF>(filename_, dat->conf);
+    assert(dat->theory == NULL);
+    dat->theory = new CNF(filename_, dat->conf);
 }
 
 void BreakID::start_dynamic_cnf(uint32_t nVars)
 {
-    dat->theory = make_shared<OnlCNF>(nVars, dat->conf);
+    assert(dat->theory == NULL);
+    dat->theory = new OnlCNF(nVars, dat->conf);
 }
 
 void BreakID::add_clause(BID::BLit* start, size_t num)
@@ -154,7 +162,8 @@ void BreakID::print_subgroups() {
 
 void BreakID::clean_theory() {
     // improve some memory overhead
-    dat->theory->cleanUp();
+    delete dat->theory;
+    dat->theory = NULL;
 }
 
 void BreakID::break_symm()

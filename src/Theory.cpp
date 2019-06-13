@@ -110,7 +110,8 @@ CNF::CNF(string& filename, Config* _conf) :
     if (conf->verbosity > 0) {
         cout << "*** Creating first graph..." << endl;
     }
-    graph = make_shared<Graph>(clauses, conf);
+    assert(graph == NULL);
+    graph = new Graph(clauses, conf);
     if (conf->verbosity > 1) {
         cout << "**** Number of nodes: " << graph->getNbNodes()
                   << endl;
@@ -132,7 +133,8 @@ CNF::CNF(string& filename, Config* _conf) :
 CNF::CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp)
 {
     clauses.insert(clss.cbegin(), clss.cend());
-    graph = make_shared<Graph>(clauses, conf);
+    assert(graph == NULL);
+    graph = new Graph(clauses, conf);
     group = grp;
     for (uint32_t l = 0; l < 2 * conf->nVars; ++l) {
         if (!grp->permutes(l)) {
@@ -151,14 +153,14 @@ CNF::~CNF()
 {
 }
 
-void CNF::print(std::ostream& out)
+void CNF::print(std::ostream& out) const
 {
     for (auto clause : clauses) {
         clause->print(out);
     }
 }
 
-uint32_t CNF::getSize()
+uint32_t CNF::getSize() const
 {
     return clauses.size();
 }
@@ -200,7 +202,7 @@ OnlCNF::OnlCNF(uint32_t nVars, Config* _conf) :
     conf(_conf)
 {
     conf->nVars = nVars;
-    graph = make_shared<Graph>(conf);
+    graph =new Graph(conf);
 }
 
 OnlCNF::~OnlCNF()
@@ -234,12 +236,12 @@ void OnlCNF::end_dynamic_cnf()
     }
 }
 
-void OnlCNF::print(std::ostream&)
+void OnlCNF::print(std::ostream&) const
 {
     assert(false);
 }
 
-uint32_t OnlCNF::getSize()
+uint32_t OnlCNF::getSize() const
 {
     return num_cls;
 }
@@ -267,13 +269,15 @@ bool OnlCNF::isSymmetry(Permutation&)
 
 Specification::~Specification()
 {
+    delete graph;
+    graph = NULL;
 }
 
 Specification::Specification()
 {
 }
 
-shared_ptr<Graph> Specification::getGraph()
+Graph* Specification::getGraph()
 {
     return graph;
 }
@@ -285,7 +289,8 @@ shared_ptr<Group> Specification::getGroup()
 
 void Specification::cleanUp()
 {
-    graph.reset();
+    delete graph;
+    graph = NULL;
     group.reset();
 }
 
@@ -304,7 +309,8 @@ LogicProgram::LogicProgram(vector<shared_ptr<Rule> >& rls, shared_ptr<Group> grp
     conf(_conf)
 {
     rules.insert(rls.cbegin(), rls.cend());
-    graph = make_shared<Graph>(rules, conf);
+    assert(graph == NULL);
+    graph = new Graph(rules, conf);
     group = grp;
     for (uint32_t l = 0; l < 2 * conf->nVars; ++l) {
         if (!grp->permutes(l)) {
@@ -324,14 +330,14 @@ LogicProgram::~LogicProgram()
 {
 }
 
-void LogicProgram::print(std::ostream& out)
+void LogicProgram::print(std::ostream& out) const
 {
     for (auto rule : rules) {
         rule->print(out);
     }
 }
 
-uint32_t LogicProgram::getSize()
+uint32_t LogicProgram::getSize() const
 {
     return rules.size();
 }

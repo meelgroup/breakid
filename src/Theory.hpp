@@ -38,17 +38,17 @@ class Specification
     friend class Breaker;
 
    protected:
-    shared_ptr<Graph> graph;
+    Graph* graph = NULL;
     shared_ptr<Group> group;
 
    public:
     Specification();
     virtual ~Specification();
 
-    virtual void print(std::ostream& out) = 0;
-    virtual uint32_t getSize() = 0;
+    virtual void print(std::ostream& out) const = 0;
+    virtual uint32_t getSize() const = 0;
 
-    shared_ptr<Graph> getGraph();
+    Graph* getGraph();
     shared_ptr<Group> getGroup();
 
     virtual void add_clause(BID::BLit* /*lits*/, uint32_t /*size*/)
@@ -67,8 +67,8 @@ public:
     CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp);
     ~CNF();
 
-    void print(std::ostream& out);
-    uint32_t getSize();
+    void print(std::ostream& out) const;
+    uint32_t getSize() const;
     void setSubTheory(shared_ptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
@@ -91,8 +91,8 @@ public:
     void end_dynamic_cnf();
     void add_clause(BID::BLit* lits, uint32_t size);
 
-    void print(std::ostream& out);
-    uint32_t getSize();
+    void print(std::ostream& out) const;
+    uint32_t getSize() const;
     void setSubTheory(shared_ptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
@@ -108,8 +108,8 @@ public:
     LogicProgram(vector<shared_ptr<Rule> >& rls, shared_ptr<Group> grp, Config* conf);
     ~LogicProgram();
 
-    void print(std::ostream& out);
-    uint32_t getSize();
+    void print(std::ostream& out) const;
+    uint32_t getSize() const;
     void setSubTheory(shared_ptr<Group> subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
