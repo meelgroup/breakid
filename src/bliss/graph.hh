@@ -764,6 +764,9 @@ class Graph : public AbstractGraph
     {
         sh = shs;
     }
+
+    std::vector<Partition::Cell*> comp_tmp_first_first;
+    std::vector<Partition::Cell*> neighbours_tmp_first_first;
 };
 
 /**

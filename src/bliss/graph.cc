@@ -4735,9 +4735,14 @@ bool Graph::nucr_find_first_component(const unsigned int level,
         return false;
     }
 
-    std::vector<Partition::Cell*> comp;
-    KStack<Partition::Cell*> neighbours;
-    neighbours.init(get_nof_vertices());
+    //std::vector<Partition::Cell*> comp;
+    //KStack<Partition::Cell*> neighbours;
+    //neighbours.init(get_nof_vertices());
+
+    std::vector<Partition::Cell*>& comp = comp_tmp_first_first;
+    assert(comp.empty());
+    std::vector<Partition::Cell*>& neighbours = neighbours_tmp_first_first;
+    assert(neighbours.empty());
 
     first_cell->max_ival = 1;
     comp.push_back(first_cell);
@@ -4759,13 +4764,20 @@ bool Graph::nucr_find_first_component(const unsigned int level,
             //if(p.cr_get_level(neighbour_cell->first) != level)
             //  continue;
             if (neighbour_cell->max_ival_count == 0)
-                neighbours.push(neighbour_cell);
+                //neighbours.push(neighbour_cell);
+                neighbours.push_back(neighbour_cell);
+
             neighbour_cell->max_ival_count++;
         }
         unsigned int nuconn = 1;
-        while (!neighbours.is_empty()) {
+        /*while (!neighbours.is_empty()) {
             Partition::Cell* const neighbour_cell = neighbours.pop();
             //neighbours.pop_back();
+        */
+        while (!neighbours.empty()) {
+            Partition::Cell* const neighbour_cell = neighbours.back();
+            neighbours.resize(neighbours.size()-1);
+
 
             /* Skip saturated neighbour cells */
             if (neighbour_cell->max_ival_count == neighbour_cell->length) {
@@ -4852,6 +4864,9 @@ bool Graph::nucr_find_first_component(const unsigned int level,
                 (long unsigned)component.size(), component_elements);
         fflush(verbstr);
     }
+    comp.clear();
+    neighbours.clear();
+
 
     return true;
 }
