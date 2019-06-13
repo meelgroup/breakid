@@ -102,24 +102,4 @@ private:
     uint32_t num_cls;
 };
 
-class LogicProgram : public Specification
-{
-public:
-    LogicProgram(vector<shared_ptr<Rule> >& rls, shared_ptr<Group> grp, Config* conf);
-    ~LogicProgram();
-
-    void print(std::ostream& out) const;
-    uint32_t getSize() const;
-    void setSubTheory(shared_ptr<Group> subgroup);
-    bool isSymmetry(Permutation& prm);
-    friend class Breaker;
-
-private:
-
-    ///Must be an unordered_set, since we need to be able to test
-    ///whether a rule exists to detect symmetries
-    std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual> rules;
-    Config* conf;
-};
-
 #endif
