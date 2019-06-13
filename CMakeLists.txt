@@ -268,9 +268,6 @@ if ((${CMAKE_SYSTEM_NAME} MATCHES "Linux") OR (${CMAKE_SYSTEM_NAME} MATCHES "Dar
     endif()
 endif()
 
-find_package(ZLIB  REQUIRED)
-link_directories( ${ZLIB_LIBRARY} )
-
 # find_package( Boost 1.46 COMPONENTS program_options REQUIRED)
 # message(STATUS "Boost -- found at library: ${Boost_LIBRARIES}")
 # message(STATUS "Boost -- adding '${Boost_LIBRARY_DIRS}' to link directories")

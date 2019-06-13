@@ -21,8 +21,6 @@
 add_subdirectory(bliss)
 
 include_directories( ${PROJECT_SOURCE_DIR} )
-include_directories( ${ZLIB_INCLUDE_DIR}   )
-# include_directories( ${Boost_INCLUDE_DIRS} )
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/solvertypesmini.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/breakid/solvertypesmini.hpp" @ONLY)
