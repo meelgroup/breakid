@@ -48,7 +48,6 @@ public:
     vector<uint32_t> colorcount;
 
     Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clauses, Config* conf);
-    Graph(std::unordered_set<shared_ptr<Rule>, UVecHash, UvecEqual>& rules, Config* conf);
     ~Graph();
 
     //Dynamic graph
