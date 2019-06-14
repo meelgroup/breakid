@@ -164,22 +164,32 @@ void BreakID::break_symm()
 {
     dat->brkr = new Breaker(dat->theory, dat->conf);
     for (auto grp : dat->subgroups) {
-        //cout << "NOTE: Matrix detection disabled as current code is too slow" << endl;
+
+        //Try to find matrix row interch. symmetries
         if (grp->getSize() > 1 && dat->conf->useMatrixDetection) {
             if (dat->conf->verbosity > 1) {
                 cout << "*** Detecting row interchangeability..." << endl;
             }
+
+            // Find set of clauses group permutates
+            // add the subgroup to "grp->theory"
             dat->theory->setSubTheory(grp);
+
+            // Upate group with matrix symmetries: matrixes, permutations
             grp->addMatrices();
+
+            //Update stats
             dat->totalNbMatrices += grp->getNbMatrices();
             dat->totalNbRowSwaps += grp->getNbRowSwaps();
         }
+
+        //Symmetry
         if (dat->conf->symBreakingFormLength > -1) {
             if (dat->conf->verbosity > 1) {
                 cout << "*** Constructing symmetry breaking formula..." << endl;
             }
             grp->addBreakingClausesTo(*dat->brkr);
-        } // else no symmetry breaking formulas are needed :)
+        }
         grp.reset();
     }
 }

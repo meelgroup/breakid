@@ -116,12 +116,16 @@ class Group
     vector<shared_ptr<Matrix> > matrices;
     std::unordered_set<uint32_t> support;
 
+
+    ///remove permutations implied by the matrix
     void cleanPermutations(
-        shared_ptr<Matrix> matrix); // remove permutations implied by the matrix
+        shared_ptr<Matrix> matrix);
 
    public:
-    // NOTE: if a group has a shared pointer to a theory, and a theory a shared pointer to a group, none of the memory pointed to by these pointers will ever be freed :(
-    Specification* theory; // non-owning pointer
+    /// BUG: if a group has a shared pointer to a theory
+    ///      and a theory a shared pointer to a group
+    ///      none of the memory pointed to by these pointers will ever be freed!!
+    Specification* theory;
 
     Group(Config* conf);
 

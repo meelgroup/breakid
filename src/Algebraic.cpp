@@ -383,7 +383,6 @@ void Group::print(std::ostream& out)
 // Adds to matrix 3 rows if an initialmatrix is found.
 // The first added row is the shared row.
 // The matrix is then maximally extended with new rows given the detected permutations for this group.
-
 shared_ptr<Matrix> Group::getInitialMatrix()
 {
     std::map<uint32_t, vector<shared_ptr<Permutation> > >
@@ -441,6 +440,8 @@ shared_ptr<Matrix> Group::getMatrix(uint32_t idx)
     return matrices.at(idx);
 }
 
+
+///Update group with matrix row interchangeability symmetries
 void Group::addMatrices()
 {
     ///if possible, gives an initial matrix
@@ -455,6 +456,7 @@ void Group::addMatrices()
                 theory->getGraph()->setUniqueColor(*matrix->getRow(i));
             }
             oldNbRows = matrix->nbRows();
+
             vector<shared_ptr<Permutation> > symgens;
             theory->getGraph()->getSymmetryGenerators(symgens);
             // now test stabilizer generators on the (former) last row
@@ -462,6 +464,7 @@ void Group::addMatrices()
                 matrix->tryToAddNewRow(p, oldNbRows - 1, theory);
                 add(p);
             }
+
             // for all new rows, test all permutations for this group if they generate a new row
             maximallyExtend(matrix, oldNbRows);
         }
@@ -470,6 +473,8 @@ void Group::addMatrices()
         // fix lits of last row as well
         theory->getGraph()->setUniqueColor(
             *matrix->getRow(matrix->nbRows() - 1));
+
+        //Get new matrix to evaluate
         matrix = getInitialMatrix();
     }
 }
@@ -480,8 +485,9 @@ void Group::checkColumnInterchangeability(shared_ptr<Matrix> m)
     vector<uint32_t>* first = new vector<uint32_t>();
     uint32_t firstCol;
     for (firstCol = 0; firstCol < m->nbColumns(); ++firstCol) {
-        if (!sign(m->getLit(
-                0, firstCol))) { // found first col starting with positive lit
+
+        // found first col starting with positive lit
+        if (!sign(m->getLit(0, firstCol))) {
             for (uint32_t j = 0; j < m->nbRows(); ++j) {
                 uint32_t l = m->getLit(j, firstCol);
                 first->push_back(l);
@@ -513,8 +519,8 @@ void Group::checkColumnInterchangeability(shared_ptr<Matrix> m)
         }
     }
 
-    if (newM->nbRows() >
-        2) { // at least 3 rows needed to be of use for symmetry breaking
+    // at least 3 rows needed to be of use for symmetry breaking
+    if (newM->nbRows() > 2) {
         addMatrix(newM);
     }
 }
@@ -790,6 +796,8 @@ void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
     }
 }
 
+///Standard symmetry breaking
+///i.e. it's the non-matrix row interchangeability symmetry
 void Group::addBreakingClausesTo(Breaker& brkr)
 {
     vector<uint32_t> order;

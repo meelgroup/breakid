@@ -55,6 +55,8 @@ class Specification
     {}
     virtual void end_dynamic_cnf()
     {}
+
+    ///Only used in matrix row interchangeability symmetry
     virtual void setSubTheory(shared_ptr<Group> subgroup) = 0;
     virtual bool isSymmetry(Permutation& prm) = 0;
 };

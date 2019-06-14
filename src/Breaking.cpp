@@ -130,15 +130,16 @@ void Breaker::addRowSym(shared_ptr<Permutation> perm, std::vector<uint32_t>& ord
 void Breaker::add(shared_ptr<Permutation> perm, std::vector<uint32_t>& order,
                   bool limitExtraConstrs)
 {
-    std::unordered_set<uint32_t>
-        allowedLits; // which are not the last lit in their cycle, unless they map to their negation
+    /// which are not the last lit in their cycle, unless they map to their negation
+    std::unordered_set<uint32_t> allowedLits;
+
     for (uint32_t i = order.size(); i > 0; --i) {
         uint32_t lit = order.at(i - 1);
         if (allowedLits.count(lit) == 0) { // we have a last lit of a cycle
             uint32_t sym = perm->getImage(lit);
-            while (
-                sym !=
-                lit) { // add the other lits of the cycle and the negated cycle
+
+            // add the other lits of the cycle and the negated cycle
+            while (sym != lit) {
                 allowedLits.insert(sym);
                 allowedLits.insert(neg(sym));
                 sym = perm->getImage(sym);

@@ -166,6 +166,7 @@ uint32_t CNF::getSize() const
     return clauses.size();
 }
 
+///Find set of clauses that subgroup permutates
 void CNF::setSubTheory(shared_ptr<Group> subgroup)
 {
     //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves?
