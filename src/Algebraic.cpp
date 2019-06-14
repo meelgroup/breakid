@@ -813,7 +813,7 @@ void Group::addBreakingClausesTo(Breaker& brkr)
 
     // add clauses based on detected symmetries
     for (auto p : permutations) {
-        brkr.addRegSym(p, order);
+        brkr.addSym(p, order, true);
     }
 
     // add clauses based on detected matrices
@@ -821,7 +821,7 @@ void Group::addBreakingClausesTo(Breaker& brkr)
         for (uint32_t idx = 0; idx < m->nbRows() - 1; ++idx) {
             shared_ptr<Permutation> rowswap(
                 new Permutation(*m->getRow(idx), *m->getRow(idx + 1), conf));
-            brkr.addRowSym(rowswap, order);
+            brkr.addSym(rowswap, order, false);
         }
     }
 }

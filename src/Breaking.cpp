@@ -105,26 +105,18 @@ void Breaker::addBinClause(uint32_t l1, uint32_t l2)
     addBinary(l1, l2);
 }
 
-void Breaker::addRegSym(shared_ptr<Permutation> perm, std::vector<uint32_t>& order)
-{
+void Breaker::addSym(
+    shared_ptr<Permutation> perm
+    , std::vector<uint32_t>& order
+    , bool limitExtraConstrs
+) {
     uint32_t current = getTotalNbClauses();
     if (conf->useShatterTranslation) {
-        addShatter(perm, order, true);
+        addShatter(perm, order, limitExtraConstrs);
     } else {
-        add(perm, order, true);
+        add(perm, order, limitExtraConstrs);
     }
     nbRegClauses += getTotalNbClauses() - current;
-}
-
-void Breaker::addRowSym(shared_ptr<Permutation> perm, std::vector<uint32_t>& order)
-{
-    uint32_t current = getTotalNbClauses();
-    if (conf->useShatterTranslation) {
-        addShatter(perm, order, false);
-    } else {
-        add(perm, order, false);
-    }
-    nbRowClauses += getTotalNbClauses() - current;
 }
 
 void Breaker::add(shared_ptr<Permutation> perm, std::vector<uint32_t>& order,
