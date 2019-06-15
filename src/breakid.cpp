@@ -233,14 +233,11 @@ void BreakID::write_final_cnf(bool only_breakers) {
     dat->brkr->print(only_breakers);
 }
 
-void BreakID::print_generators(string symFile)
+void BreakID::print_generators(std::ostream& out)
 {
-    ofstream fp_out;
-    fp_out.open(symFile, std::ios::out);
     for (auto grp : dat->subgroups) {
-        grp->print(fp_out);
+        grp->print(out);
     }
-    fp_out.close();
 }
 
 std::string BreakID::get_sha1_version() const

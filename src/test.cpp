@@ -151,14 +151,7 @@ int main(int argc, char *argv[])
     }
 
     if (true) {
-        string symFile = "test.sym";
-        if (conf_verbosity) {
-            cout
-            << "*** Printing generators to file " + symFile
-            << endl;
-        }
-
-        breakid.print_generators(symFile);
+        breakid.print_generators(std::cout);
     }
 
     return 0;

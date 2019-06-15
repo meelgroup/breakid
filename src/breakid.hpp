@@ -68,7 +68,7 @@ struct BreakID {
 
 
     void write_final_cnf(bool only_breakers);
-    void print_generators(std::string symFile);
+    void print_generators(std::ostream& out);
 
 
 private:

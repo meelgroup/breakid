@@ -24,7 +24,7 @@ THE SOFTWARE.
 #include <string>
 #include <iostream>
 #include <limits>
-#include <string>
+#include <fstream>
 
 using std::cout;
 using std::string;
@@ -207,8 +207,10 @@ int main(int argc, char *argv[])
             << "*** Printing generators to file " + symFile
             << endl;
         }
-
-        breakid.print_generators(symFile);
+        std::ofstream fp_out;
+        fp_out.open(symFile, std::ios::out);
+        breakid.print_generators(fp_out);
+        fp_out.close();
     }
 
     return 0;
