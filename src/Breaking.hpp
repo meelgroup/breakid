@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "config.hpp"
 #include "breakid/solvertypesmini.hpp"
 
+using namespace BID;
 using std::vector;
 using std::set;
 using std::endl;
@@ -57,51 +58,13 @@ void swapErase(vector<T>& vec, uint32_t index)
     vec.pop_back();
 }
 
-inline size_t _getHash(const vector<uint32_t>& xs)
+inline size_t _getHash(const vector<BLit>& xs)
 {
     size_t seed = xs.size();
     for (auto x : xs) {
-        seed ^= x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= x.toInt() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
     return seed;
-}
-
-inline size_t _getHash(const vector<int>& xs)
-{
-    size_t seed = xs.size();
-    for (auto x : xs) {
-        seed ^= x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    }
-    return seed;
-}
-
-inline bool sign(uint32_t lit)
-{
-    return lit & 1;
-}
-
-inline uint32_t neg(uint32_t lit)
-{
-    return lit ^ 1;
-}
-
-inline uint32_t encode(int lit)
-{
-    return (lit > 0 ? 2 * (lit - 1) : 2 * (-lit - 1) + 1);
-}
-
-inline int lit_to_weird(BID::BLit l)
-{
-    int t = l.var()+1;
-    if (l.sign()) {
-        t *= -1;
-    }
-    return t;
-}
-
-inline int decode(uint32_t lit)
-{
-    return (sign(lit) ? -(lit / 2 + 1) : lit / 2 + 1);
 }
 
 class Clause
@@ -110,9 +73,9 @@ class Clause
     size_t hashValue;
 
    public:
-    vector<uint32_t> lits;
+    vector<BLit> lits;
 
-    Clause(const std::set<uint32_t>& inLits)
+    Clause(const std::set<BLit>& inLits)
         : hashValue(0), lits(inLits.cbegin(), inLits.cend())
     {
     }
@@ -136,34 +99,9 @@ class Clause
     void print(std::ostream& ostr)
     {
         for (auto lit : lits) {
-            ostr << decode(lit) << " ";
+            ostr << lit << " ";
         }
         ostr << "0\n";
-    }
-    //Prints a clause c a rule falsevar <- (not c)
-    //afterwards, falsevar (a new variable) will be added to the "false" constraints.
-    void printAsRule(std::ostream& ostr, uint32_t falsevar)
-    {
-        ostr << "1 " << falsevar << " ";
-        std::set<uint32_t> posBodyLits;
-        std::set<uint32_t> negBodyLits;
-        for (auto lit : lits) {
-            auto decoded = decode(lit);
-            if (decoded > 0) {
-                posBodyLits.insert(decoded);
-            } else {
-                negBodyLits.insert(-decoded);
-            }
-        }
-        ostr << (posBodyLits.size() + negBodyLits.size()) << " "
-             << negBodyLits.size() << " ";
-        for (auto decodedlit : negBodyLits) {
-            ostr << decodedlit << " ";
-        }
-        for (auto decodedlit : posBodyLits) {
-            ostr << decodedlit << " ";
-        }
-        ostr << endl;
     }
 };
 
@@ -177,21 +115,31 @@ class Rule
     //Note: similarly, we use "disjunctive rules" as basic rules with multiple heads. (quite standard representation of those). Again: not nice  correspondence between our representation of rules and the lparse-smodels format
     //to respresent rules. As such, there is currently not yet a GOOD printing method for the rules.
     int ruleType;
-    vector<uint32_t> headLits;
-    vector<uint32_t> bodyLits;
+    vector<BLit> headLits;
+    vector<BLit> bodyLits;
     int bound; //Only relevant for rules of type 2 and 5
-    vector<int> weights;
+    vector<BLit> weights;
 
     Rule(int inRuleType, const vector<uint32_t>& inHeads,
          const vector<uint32_t>& bodies, int inBound,
-         vector<int>& inWeights)
-        : hashValue(0),
-          ruleType(inRuleType),
-          headLits(inHeads.cbegin(), inHeads.cend()),
-          bodyLits(bodies.cbegin(), bodies.cend()),
-          bound(inBound),
-          weights(inWeights.cbegin(), inWeights.cend())
+         vector<BLit>& inWeights) :
+
+    hashValue(0),
+    ruleType(inRuleType),
+    bound(inBound)
     {
+        for(const auto& x: inWeights) {
+            weights.push_back(x);
+        }
+        for(const auto& x: inHeads) {
+            headLits.push_back(BLit::toBLit(x));
+        }
+
+        for(const auto& x: bodies) {
+            bodyLits.push_back(BLit::toBLit(x));
+        }
+
+
         std::sort(headLits.begin(), headLits.end());
         if (ruleType != 5 && ruleType != 6) {
             std::sort(bodyLits.begin(), bodyLits.end());
@@ -237,7 +185,7 @@ bool isDisjoint(std::unordered_set<T>& uset, vector<T>& vec)
 }
 
 struct UVecHash {
-    size_t operator()(const std::shared_ptr<vector<uint32_t> > first) const
+    size_t operator()(const std::shared_ptr<vector<BLit> > first) const
     {
         return _getHash(*first);
     }
@@ -268,8 +216,8 @@ struct UvecEqual {
         return true;
     }
 
-    bool equals(const vector<uint32_t>& first,
-                const vector<uint32_t>& second) const
+    bool equals(const vector<BLit>& first,
+                const vector<BLit>& second) const
     {
         if (first.size() != second.size()) {
             return false;
@@ -282,8 +230,8 @@ struct UvecEqual {
         return true;
     }
 
-    bool operator()(const std::shared_ptr<vector<uint32_t> > first,
-                    const std::shared_ptr<vector<uint32_t> > second) const
+    bool operator()(const std::shared_ptr<vector<BLit> > first,
+                    const std::shared_ptr<vector<BLit> > second) const
     {
         return equals(*first, *second);
     }
@@ -312,13 +260,13 @@ public:
     //Prints the current breaker
     void print(bool only_breakers);
 
-    void addBinClause(uint32_t l1, uint32_t l2);
+    void addBinClause(BLit l1, BLit l2);
     void addSym(
         shared_ptr<Permutation> perm
-        , vector<uint32_t>& order
+        , vector<BLit>& order
         , bool limitExtraConstrs
     );
-    vector<vector<BID::BLit>> get_brk_cls();
+    vector<vector<BLit>> get_brk_cls();
 
     uint32_t getAuxiliaryNbVars();
     uint32_t getTotalNbVars();
@@ -328,7 +276,7 @@ public:
     uint32_t getNbBinClauses();
     uint32_t getNbRowClauses();
     uint32_t getNbRegClauses();
-    uint32_t getTseitinVar();
+    BLit getTseitinVar();
 
 private:
     unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual> clauses;
@@ -338,13 +286,13 @@ private:
     uint32_t nbRowClauses = 0;
     uint32_t nbRegClauses = 0;
 
-    void addBinary(uint32_t l1, uint32_t l2);
-    void addTernary(uint32_t l1, uint32_t l2, uint32_t l3);
-    void addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4);
+    void addBinary(BLit l1, BLit l2);
+    void addTernary(BLit l1, BLit l2, BLit l3);
+    void addQuaternary(BLit l1, BLit l2, BLit l3, BLit l4);
     void add(shared_ptr<Clause> cl);
-    void add(shared_ptr<Permutation> perm, vector<uint32_t>& order,
+    void add(shared_ptr<Permutation> perm, vector<BLit>& order,
              bool limitExtraConstrs);
-    void addShatter(shared_ptr<Permutation> perm, vector<uint32_t>& order,
+    void addShatter(shared_ptr<Permutation> perm, vector<BLit>& order,
                     bool limitExtraConstrs);
 
     Config* conf;

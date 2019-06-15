@@ -138,10 +138,6 @@ uint32_t BreakID::get_num_generators()
     return dat->theory->getGroup()->getSize();
 }
 
-void BreakID::print_generators() {
-    dat->theory->getGroup()->print(cout);
-}
-
 void BreakID::detect_subgroups() {
     dat->theory->getGroup()->getDisjointGenerators(dat->subgroups);
 }
@@ -233,18 +229,22 @@ void BreakID::write_final_cnf(bool only_breakers) {
     dat->brkr->print(only_breakers);
 }
 
-void BreakID::print_generators(std::ostream& out)
+void BreakID::print_perms_and_matrices(std::ostream& out)
 {
     for (auto grp : dat->subgroups) {
         grp->print(out);
     }
 }
 
-void BreakID::get_permutations(vector<std::unordered_map<uint32_t, uint32_t> >& out)
+void BreakID::print_generators(std::ostream& out) {
+    dat->theory->getGroup()->print(cout);
+}
+
+void BreakID::get_perms(vector<std::unordered_map<BLit, BLit> >& out)
 {
     assert(out.empty());
     for (auto grp : dat->subgroups) {
-        grp->add_perms(out);
+        grp->get_perms_to(out);
     }
 }
 

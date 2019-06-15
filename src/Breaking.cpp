@@ -53,16 +53,8 @@ void Breaker::print(bool only_breakers)
 vector<vector<BID::BLit>> Breaker::get_brk_cls()
 {
     vector<vector<BID::BLit>> cls;
-
-    vector<BID::BLit> tmp_cl;
-    for (auto cl: clauses) {
-        tmp_cl.clear();
-        for(uint32_t lit: cl->lits) {
-            int l = decode(lit);
-            BID::BLit l2(abs(l)-1, l < 0);
-            tmp_cl.push_back(l2);
-        }
-        cls.push_back(tmp_cl);
+    for (const auto& cl: clauses) {
+        cls.push_back(cl->lits);
     }
     return cls;
 }
@@ -72,7 +64,7 @@ void Breaker::add(shared_ptr<Clause> cl)
     clauses.insert(cl);
 }
 
-void Breaker::addBinary(uint32_t l1, uint32_t l2)
+void Breaker::addBinary(BLit l1, BLit l2)
 {
     shared_ptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
@@ -80,7 +72,7 @@ void Breaker::addBinary(uint32_t l1, uint32_t l2)
     add(toAdd);
 }
 
-void Breaker::addTernary(uint32_t l1, uint32_t l2, uint32_t l3)
+void Breaker::addTernary(BLit l1, BLit l2, BLit l3)
 {
     shared_ptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
@@ -89,7 +81,7 @@ void Breaker::addTernary(uint32_t l1, uint32_t l2, uint32_t l3)
     add(toAdd);
 }
 
-void Breaker::addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4)
+void Breaker::addQuaternary(BLit l1, BLit l2, BLit l3, BLit l4)
 {
     shared_ptr<Clause> toAdd(new Clause());
     toAdd->lits.push_back(l1);
@@ -99,7 +91,7 @@ void Breaker::addQuaternary(uint32_t l1, uint32_t l2, uint32_t l3, uint32_t l4)
     add(toAdd);
 }
 
-void Breaker::addBinClause(uint32_t l1, uint32_t l2)
+void Breaker::addBinClause(BLit l1, BLit l2)
 {
     ++nbBinClauses;
     addBinary(l1, l2);
@@ -107,11 +99,12 @@ void Breaker::addBinClause(uint32_t l1, uint32_t l2)
 
 void Breaker::addSym(
     shared_ptr<Permutation> perm
-    , std::vector<uint32_t>& order
+    , std::vector<BLit>& order
     , bool limitExtraConstrs
 ) {
     uint32_t current = getTotalNbClauses();
     if (conf->useShatterTranslation) {
+        assert(false);
         addShatter(perm, order, limitExtraConstrs);
     } else {
         add(perm, order, limitExtraConstrs);
@@ -119,74 +112,74 @@ void Breaker::addSym(
     nbRegClauses += getTotalNbClauses() - current;
 }
 
-void Breaker::add(shared_ptr<Permutation> perm, std::vector<uint32_t>& order,
+void Breaker::add(shared_ptr<Permutation> perm, std::vector<BLit>& order,
                   bool limitExtraConstrs)
 {
     /// which are not the last lit in their cycle, unless they map to their negation
-    std::unordered_set<uint32_t> allowedLits;
+    std::unordered_set<BLit> allowedLits;
 
     for (uint32_t i = order.size(); i > 0; --i) {
-        uint32_t lit = order.at(i - 1);
+        BLit lit = order.at(i - 1);
         if (allowedLits.count(lit) == 0) { // we have a last lit of a cycle
-            uint32_t sym = perm->getImage(lit);
+            BLit sym = perm->getImage(lit);
 
             // add the other lits of the cycle and the negated cycle
             while (sym != lit) {
                 allowedLits.insert(sym);
-                allowedLits.insert(neg(sym));
+                allowedLits.insert(~sym);
                 sym = perm->getImage(sym);
             }
         }
     }
 
     int nrExtraConstrs = 0;
-    uint32_t prevLit = 0;
-    uint32_t prevSym = 0;
-    uint32_t prevTst = 0; // previous tseitin
+    BLit prevLit = BLit_Undef;
+    BLit prevSym = BLit_Undef;
+    BLit prevTst = BLit_Undef; // previous tseitin
     for (auto l : order) {
         if (limitExtraConstrs && nrExtraConstrs > conf->symBreakingFormLength) {
             break;
         }
-        uint32_t sym = perm->getImage(l);
+        BLit sym = perm->getImage(l);
         if (sym != l && allowedLits.count(l)) {
-            uint32_t tst = 0;
+            BLit tst = BLit_Undef;
             if (nrExtraConstrs == 0) {
                 // adding clause for l => sym :
                 // ~l | sym
-                addBinary(neg(l), sym);
+                addBinary(~l, sym);
             } else if (nrExtraConstrs == 1) {
                 // adding clauses for (prevSym => prevLit) => tst and tst => (l => sym)
                 tst = getTseitinVar();
                 // prevSym | tst
                 addBinary(prevSym, tst);
                 // ~prevLit | tst
-                addBinary(neg(prevLit), tst);
+                addBinary(~prevLit, tst);
                 // ~tst | ~l | sym
-                addTernary(neg(tst), neg(l), sym);
+                addTernary(~tst, ~l, sym);
                 if (conf->useFullTranslation) {
                     // adding clauses for tst => (prevSym => prevLit)
                     // ~tst | ~prevSym | prevLit
-                    addTernary(neg(tst), neg(prevSym), prevLit);
+                    addTernary(~tst, ~prevSym, prevLit);
                 }
             } else {
                 // adding clauses for (prevSym => prevLit) & prevTst => tst and tst => (l => sym)
                 tst = getTseitinVar();
                 // prevSym | ~prevTst | tst
-                addTernary(prevSym, neg(prevTst), tst);
+                addTernary(prevSym, ~prevTst, tst);
                 // ~prevLit | ~prevTst | tst
-                addTernary(neg(prevLit), neg(prevTst), tst);
+                addTernary(~prevLit, ~prevTst, tst);
                 // ~tst | ~l | sym
-                addTernary(neg(tst), neg(l), sym);
+                addTernary(~tst, ~l, sym);
                 if (conf->useFullTranslation) {
                     // adding clauses for tst => prevTst and tst => (prevSym => prevLit)
                     // ~tst | prevTst
-                    addBinary(neg(tst), prevTst);
+                    addBinary(~tst, prevTst);
                     // ~tst | ~prevSym | prevLit
-                    addTernary(neg(tst), neg(prevSym), prevLit);
+                    addTernary(~tst, ~prevSym, prevLit);
                 }
             }
             ++nrExtraConstrs;
-            if (sym == neg(l)) {
+            if (sym == ~l) {
                 break;
             }
 
@@ -197,63 +190,64 @@ void Breaker::add(shared_ptr<Permutation> perm, std::vector<uint32_t>& order,
     }
 }
 
-void Breaker::addShatter(shared_ptr<Permutation> perm, std::vector<uint32_t>& order,
+void Breaker::addShatter(shared_ptr<Permutation> perm, std::vector<BLit>& order,
                          bool limitExtraConstrs)
 {
-    std::unordered_set<uint32_t>
-        allowedLits; // which are not the last lit in their cycle, unless they map to their negation
+    // which are not the last lit in their cycle, unless they map to their negation
+    std::unordered_set<BLit> allowedLits;
+
     for (uint32_t i = order.size(); i > 0; --i) {
-        uint32_t lit = order.at(i - 1);
+        BLit lit = order.at(i - 1);
         if (allowedLits.count(lit) == 0) { // we have a last lit of a cycle
-            uint32_t sym = perm->getImage(lit);
-            while (
-                sym !=
-                lit) { // add the other lits of the cycle and the negated cycle
+            BLit sym = perm->getImage(lit);
+
+            // add the other lits of the cycle and the negated cycle
+            while (sym != lit) {
                 allowedLits.insert(sym);
-                allowedLits.insert(neg(sym));
+                allowedLits.insert(~sym);
                 sym = perm->getImage(sym);
             }
         }
     }
 
     int nrExtraConstrs = 0;
-    uint32_t prevLit = 0;
-    uint32_t prevSym = 0;
-    uint32_t prevTst = 0; // previous tseitin
+    BLit prevLit = BLit_Undef;
+    BLit prevSym = BLit_Undef;
+    BLit prevTst = BLit_Undef; // previous tseitin
     for (auto l : order) {
         if (limitExtraConstrs && nrExtraConstrs > conf->symBreakingFormLength) {
             break;
         }
-        uint32_t sym = perm->getImage(l);
+        BLit sym = perm->getImage(l);
         if (sym != l && allowedLits.count(l)) {
-            uint32_t tst = 0;
+            BLit tst = BLit_Undef;
             if (nrExtraConstrs == 0) {
                 // adding clause for l => sym :
                 // ~l | sym
-                addBinary(neg(l), sym);
+                addBinary(~l, sym);
             } else if (nrExtraConstrs == 1) {
                 tst = getTseitinVar();
                 // clause(-z, -x, p[x], 0);
-                addTernary(neg(prevLit), neg(l), sym);
+                addTernary(~prevLit, ~l, sym);
                 // clause(-z, vars+1, 0);
-                addBinary(neg(prevLit), tst);
+                addBinary(~prevLit, tst);
                 // clause(p[z], -x, p[x], 0);
-                addTernary(prevSym, neg(l), sym);
+                addTernary(prevSym, ~l, sym);
                 // clause(p[z], vars+1, 0);
                 addBinary(prevSym, tst);
             } else {
                 tst = getTseitinVar();
                 // clause(-vars, -z, -x, p[x], 0);
-                addQuaternary(neg(prevTst), neg(prevLit), neg(l), sym);
+                addQuaternary(~prevTst, ~prevLit, ~l, sym);
                 // clause(-vars, -z, vars+1, 0);
-                addTernary(neg(prevTst), neg(prevLit), tst);
+                addTernary(~prevTst, ~prevLit, tst);
                 // clause(-vars, p[z], -x, p[x], 0);
-                addQuaternary(neg(prevTst), prevSym, neg(l), sym);
+                addQuaternary(~prevTst, prevSym, ~l, sym);
                 // clause(-vars, p[z], vars+1, 0);
-                addTernary(neg(prevTst), prevSym, tst);
+                addTernary(~prevTst, prevSym, tst);
             }
             ++nrExtraConstrs;
-            if (sym == neg(l)) {
+            if (sym == ~l) {
                 break;
             }
 
@@ -299,8 +293,8 @@ uint32_t Breaker::getNbRegClauses()
     return nbRegClauses;
 }
 
-uint32_t Breaker::getTseitinVar()
+BLit Breaker::getTseitinVar()
 {
     ++nbExtraVars;
-    return encode(getTotalNbVars());
+    return BLit(getTotalNbVars(), false);
 }

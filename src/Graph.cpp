@@ -36,12 +36,12 @@ Graph::Graph(Config* _conf) :
     neighbours.clear();
     lit2color.clear();
     nbedges = 0;
-    color.clear();
+    vertex_to_color.clear();
 
     // Initialize colors
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
         bliss_g->change_color(i, 0);
-        color.push_back(0);
+        vertex_to_color.push_back(0);
     }
     colorcount.push_back(2 * conf->nVars);
     colorcount.push_back(100); //we expect there to be many clauses;
@@ -49,13 +49,13 @@ Graph::Graph(Config* _conf) :
     // Initialize edge lists
     // First construct for each node the list of neighbors
     // Literals have their negations as neighbors
-    for (uint32_t l = 1; l <= conf->nVars; ++l) {
-        uint32_t posID = encode(l);
-        uint32_t negID = encode(-l);
+    for (uint32_t l = 0; l < conf->nVars; l++) {
+        uint32_t posID = BLit(l, false).toInt();
+        uint32_t negID = BLit(l, true).toInt();
         bliss_g->add_edge(posID, negID);
         nbedges += 1;
     }
-    assert(color.size() == n);
+    assert(vertex_to_color.size() == n);
     assert(bliss_g->get_nof_vertices() == n);
 }
 
@@ -65,19 +65,19 @@ void Graph::add_clause(BID::BLit* lits, uint32_t size)
 
     if (size == 1) {
         BID::BLit lit = lits[0];
-        setUniqueColor(encode(lit_to_weird(lit)));
+        setUniqueColor(lit.toInt());
     }
 
     // Clauses have as neighbors the literals occurring in them
     uint32_t v = bliss_g->add_vertex(1);
     for(size_t i = 0; i < size; i++) {
         BID::BLit l = lits[i];
-        bliss_g->add_edge(v, encode(lit_to_weird(l)));
-        used_lits[encode(lit_to_weird(l))] = 1;
+        bliss_g->add_edge(v, l.toInt());
+        used_lits[l.toInt()] = 1;
         nbedges+=1;
     }
-    assert(color.size() == v);
-    color.push_back(1);
+    assert(vertex_to_color.size() == v);
+    vertex_to_color.push_back(1);
 }
 
 void Graph::end_dynamic_cnf()
@@ -97,11 +97,11 @@ void Graph::initializeGraph(uint32_t nbNodes)
 {
     delete bliss_g;
     bliss_g = new bliss::Graph(nbNodes);
-    color.resize(nbNodes);
+    vertex_to_color.resize(nbNodes);
 
     for (size_t n = 0; n < nbNodes; n++) {
         bliss_g->change_color(n, lit2color[n]);
-        color[n] = lit2color[n];
+        vertex_to_color[n] = lit2color[n];
     }
     for (size_t n = 0; n < nbNodes; n++) {
         for (auto other : neighbours[n]) {
@@ -122,8 +122,8 @@ uint32_t Graph::getNbNodesFromGraph()
 
 uint32_t Graph::getColorOf(uint32_t node)
 {
-    assert(node < color.size());
-    return color[node];
+    assert(node < vertex_to_color.size());
+    return vertex_to_color[node];
 }
 
 uint32_t Graph::nbNeighbours(uint32_t /*node*/)
@@ -146,7 +146,7 @@ static void addBlissPermutation(
     shared_ptr<Permutation> permu = std::make_shared<Permutation>(g->conf);
     for (unsigned i = 0; i < n; ++i) {
         if (i != aut[i]) {
-            permu->addFromTo(i, aut[i]);
+            permu->addFromTo(BLit::toBLit(i), BLit::toBLit(aut[i]));
         }
     }
     permu->addPrimeSplitToVector(g->perms);
@@ -190,9 +190,9 @@ Graph::Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clause
     neighbours.clear();
     neighbours.resize(n);
     // Literals have their negations as neighbors
-    for (uint32_t l = 1; l <= conf->nVars; ++l) {
-        uint32_t posID = encode(l);
-        uint32_t negID = encode(-l);
+    for (uint32_t l = 0; l < conf->nVars; l++) {
+        uint32_t posID = BLit(l, false).toInt();
+        uint32_t negID = BLit(l, true).toInt();
         neighbours[posID].push_back(negID);
         neighbours[negID].push_back(posID);
         nbedges += 2;
@@ -201,8 +201,8 @@ Graph::Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clause
     uint32_t c = 2 * conf->nVars;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
-            neighbours[lit].push_back(c);
-            neighbours[c].push_back(lit);
+            neighbours[lit.toInt()].push_back(c);
+            neighbours[c].push_back(lit.toInt());
             nbedges += 2;
         }
         ++c;
@@ -217,8 +217,8 @@ Graph::Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clause
     used_lits.resize(2*conf->nVars, 0);
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
-            used_lits[lit] = 1;
-            used_lits[neg(lit)] = 1;
+            used_lits[lit.toInt()] = 1;
+            used_lits[(~lit).toInt()] = 1;
         }
     }
     for (uint32_t i = 0; i < 2 * conf->nVars; ++i) {
@@ -262,14 +262,14 @@ void Graph::setUniqueColor(uint32_t lit)
     colorcount[mycolor]--;
     uint32_t new_color = colorcount.size();
     bliss_g->change_color(lit, new_color);
-    color[lit] = new_color;
+    vertex_to_color[lit] = new_color;
     colorcount.push_back(1);
 }
 
-void Graph::setUniqueColor(const vector<uint32_t>& lits)
+void Graph::setUniqueColor(const vector<BLit>& lits)
 {
     for (auto lit : lits) {
-        setUniqueColor(lit);
+        setUniqueColor(lit.toInt());
     }
 }
 

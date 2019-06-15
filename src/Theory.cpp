@@ -53,7 +53,7 @@ void CNF::readCNF(string& filename)
         exit(-1);
     }
     string line;
-    set<uint32_t> inclause = set<uint32_t>();
+    set<BLit> inclause = set<BLit>();
     while (getline(file, line)) {
         if (line.size() == 0 || line.front() == 'c') {
             // do nothing, this is a comment line
@@ -82,7 +82,7 @@ void CNF::readCNF(string& filename)
                     }
                     bool isTautology = false;
                     for (auto lit : inclause) {
-                        if (inclause.count(neg(lit)) > 0) {
+                        if (inclause.count(~lit) > 0) {
                             isTautology = true;
                             break;
                         }
@@ -96,7 +96,9 @@ void CNF::readCNF(string& filename)
                     if ((uint32_t)abs(l) > conf->nVars) {
                         conf->nVars = abs(l);
                     }
-                    inclause.insert(encode(l));
+                    uint32_t var = std::abs(l)-1;
+                    bool sign = l < 0;
+                    inclause.insert(BLit(var, sign));
                 }
             }
         }
@@ -131,14 +133,14 @@ CNF::CNF(vector<shared_ptr<Clause> >& clss, Group* grp, Config* _conf) :
     graph = new Graph(clauses, conf);
     group = grp;
     for (uint32_t l = 0; l < 2 * conf->nVars; ++l) {
-        if (!grp->permutes(l)) {
+        if (!grp->permutes(BLit::toBLit(l))) {
             graph->setUniqueColor(l);
         }
     }
     for (uint32_t m = 0; m < grp->getNbMatrices(); ++m) {
         auto mat = grp->getMatrix(m);
         for (uint32_t r = 0; r < mat->nbRows() - 1; ++r) {
-            getGraph()->setUniqueColor(*(mat->getRow(r)));
+            getGraph()->setUniqueColor(*mat->getRow(r));
         }
     }
 }

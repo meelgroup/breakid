@@ -85,12 +85,27 @@ public:
     }
 };
 
+static const BLit BLit_Undef = BLit::toBLit((0xffffffffU >> 3)<<1);
+
 inline std::ostream& operator<<(std::ostream& os, const BLit lit)
 {
 
     os << (lit.sign() ? "-" : "") << (lit.var() + 1);
     return os;
 }
+
+}
+
+namespace std {
+
+  template <>
+  struct hash<BID::BLit>
+  {
+    std::size_t operator()(const BID::BLit& k) const
+    {
+      return k.toInt();
+    }
+  };
 
 }
 

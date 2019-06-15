@@ -62,9 +62,9 @@ struct BreakID {
 
     //Print info
     void print_graph();
-    void print_generators();
     void print_subgroups();
     void print_symm_break_stats();
+    void print_perms_and_matrices(std::ostream& out);
     void print_generators(std::ostream& out);
 
     //Get info
@@ -72,7 +72,7 @@ struct BreakID {
     uint32_t get_num_break_cls();
     uint32_t get_num_aux_vars();
     std::vector<std::vector<BID::BLit>> get_brk_cls();
-    void get_permutations(std::vector<std::unordered_map<uint32_t, uint32_t> >& out);
+    void get_perms(std::vector<std::unordered_map<BLit, BLit> >& out);
 
 private:
     PrivateData* dat = NULL;

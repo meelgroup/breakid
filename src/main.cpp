@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     }
 
     if (conf.verbosity) {
-        breakid.print_generators();
+        breakid.print_generators(std::cout);
     }
 
     if (conf.verbosity) {

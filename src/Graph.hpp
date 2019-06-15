@@ -58,7 +58,7 @@ public:
     uint32_t getNbNodes();
     void print();
     void setUniqueColor(uint32_t lit);
-    void setUniqueColor(const vector<uint32_t>& lits);
+    void setUniqueColor(const vector<BLit>& lits);
     void getSymmetryGenerators(vector<shared_ptr<Permutation> >& out_perms);
 
     //TODO should be private
@@ -77,7 +77,7 @@ private:
     void getSymmetryGeneratorsInternal(
         vector<shared_ptr<Permutation> >& out_perms);
 
-    vector<uint32_t> color;
+    vector<uint32_t> vertex_to_color;
 
     std::map<uint32_t, uint32_t> lit2color;
     vector<vector<uint32_t> > neighbours;

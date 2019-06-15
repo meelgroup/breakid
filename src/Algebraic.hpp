@@ -35,19 +35,19 @@ class Permutation : public std::enable_shared_from_this<Permutation>
 {
 public:
     Permutation(Config* conf);
-    Permutation(vector<std::pair<uint32_t, uint32_t> >& tuples, Config* conf);
+    Permutation(vector<std::pair<BLit, BLit> >& tuples, Config* conf);
 
     ///Permutation constructed from swapping two rows.
-    Permutation(vector<uint32_t>& row1, vector<uint32_t>& row2, Config* conf);
+    Permutation(vector<BLit>& row1, vector<BLit>& row2, Config* conf);
 
     ~Permutation(){};
 
-    uint32_t getImage(uint32_t from) const;
+    BLit getImage(BLit from) const;
     // return value is true iff the image is different from the original
-    bool getImage(vector<uint32_t>& orig, vector<uint32_t>& img) const;
-    void getCycle(uint32_t lit, vector<uint32_t>& orb) const;
+    bool getImage(vector<BLit>& orig, vector<BLit>& img) const;
+    void getCycle(BLit lit, vector<BLit>& orb) const;
     bool isInvolution();
-    bool permutes(uint32_t lit);
+    bool permutes(BLit lit);
     uint32_t supportSize() const;
     bool isIdentity();
 
@@ -56,28 +56,28 @@ public:
     bool formsMatrixWith(shared_ptr<Permutation> other);
     std::pair<shared_ptr<Permutation>, shared_ptr<Permutation> > getLargest(
         shared_ptr<Permutation> other);
-    void getSharedLiterals(shared_ptr<Permutation> other, vector<uint32_t>& shared);
-    vector<uint32_t>& getCycleReprs() const;
+    void getSharedLiterals(shared_ptr<Permutation> other, vector<BLit>& shared);
+    vector<BLit>& getCycleReprs() const;
     uint32_t getMaxCycleSize();
     uint32_t getNbCycles();
 
     bool equals(shared_ptr<Permutation> other);
-    vector<uint32_t> domain;
-    vector<uint32_t> posDomain;
-    vector<uint32_t> image;
+    vector<BLit> domain;
+    vector<BLit> posDomain;
+    vector<BLit> image;
 
-    void addFromTo(uint32_t from, uint32_t to);
-    void addCycle(vector<uint32_t>& cyc);
+    void addFromTo(BLit from, BLit to);
+    void addCycle(vector<BLit>& cyc);
     void addPrimeSplitToVector(vector<shared_ptr<Permutation> >& newPerms);
-    const std::unordered_map<uint32_t, uint32_t>& getPerm();
+    const std::unordered_map<BLit, BLit>& getPerm();
 
 private:
-    std::unordered_map<uint32_t, uint32_t> perm;
+    std::unordered_map<BLit, BLit> perm;
 
     /// smallest lit in each cycle
     /// mutable because we only compute it once
     //  inside getCycleReprs(), the first time it's called
-    mutable vector<uint32_t> cycleReprs;
+    mutable vector<BLit> cycleReprs;
     mutable uint32_t maxCycleSize;
 
     size_t hash;
@@ -87,10 +87,11 @@ private:
 class Matrix
 {
    private:
-    vector<vector<uint32_t>*>
-        rows; // TODO: refactor this as 1 continuous vector
-    std::unordered_map<uint32_t, uint32_t> rowco;
-    std::unordered_map<uint32_t, uint32_t> colco;
+    /// TODO: refactor this as 1 continuous vector
+    vector<vector<BLit>*> rows;
+
+    std::unordered_map<BLit, uint32_t> rowco;
+    std::unordered_map<BLit, uint32_t> colco;
     Config* conf;
 
    public:
@@ -98,17 +99,17 @@ class Matrix
     ~Matrix();
     void print(std::ostream& out) const;
 
-    void add(vector<uint32_t>* row);
+    void add(vector<BLit>* row);
     uint32_t nbColumns() const;
     uint32_t nbRows() const;
     void tryToAddNewRow(shared_ptr<Permutation> p, uint32_t rowIndex,
                         Specification* theory);
-    vector<uint32_t>* getRow(uint32_t rowindex);
-    bool permutes(uint32_t x);
-    uint32_t getLit(uint32_t row, uint32_t column);
+    vector<BLit>* getRow(uint32_t rowindex);
+    bool permutes(BLit x);
+    BLit getLit(uint32_t row, uint32_t column);
 
-    uint32_t getRowNb(uint32_t x);
-    uint32_t getColumnNb(uint32_t x);
+    uint32_t getRowNb(BLit x);
+    uint32_t getColumnNb(BLit x);
 
     shared_ptr<Permutation> testMembership(const shared_ptr<Permutation> p);
     shared_ptr<Permutation> getProductWithRowsWap(const shared_ptr<Permutation> p, uint32_t r1,
@@ -119,7 +120,7 @@ class Group
 {
 public:
     Specification* theory;
-    void add_perms(vector<std::unordered_map<uint32_t, uint32_t>>& out);
+    void get_perms_to(vector<std::unordered_map<BLit, BLit>>& out);
 
     Group(Config* conf);
 
@@ -139,17 +140,17 @@ public:
     void getDisjointGenerators(vector<Group*>& subgroups);
     uint32_t getSize();
 
-    bool permutes(uint32_t lit);
+    bool permutes(BLit lit);
     uint32_t getSupportSize();
 
     ///returns a vector containing a lit for literals relevant to construct sym breaking clauses
     void getOrderAndAddBinaryClausesTo(
         Breaker& brkr,
-        vector<uint32_t>& out_order
+        vector<BLit>& out_order
     );
 
-    void addBinaryClausesTo(Breaker& brkr, vector<uint32_t>& out_order,
-                            const std::unordered_set<uint32_t>& excludedLits);
+    void addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
+                            const std::unordered_set<BLit>& excludedLits);
     void addBreakingClausesTo(Breaker& brkr);
 
     void maximallyExtend(shared_ptr<Matrix> matrix, uint32_t indexOfFirstNewRow);
@@ -157,14 +158,14 @@ public:
 private:
     vector<shared_ptr<Permutation> > permutations;
     vector<shared_ptr<Matrix> > matrices;
-    std::unordered_set<uint32_t> support;
+    std::unordered_set<BLit> support;
 
     ///remove permutations implied by the matrix
     void cleanPermutations(shared_ptr<Matrix> matrix);
     Config* conf;
 };
 
-inline const std::unordered_map<uint32_t, uint32_t>& Permutation::getPerm()
+inline const std::unordered_map<BLit, BLit>& Permutation::getPerm()
 {
     return perm;
 }
