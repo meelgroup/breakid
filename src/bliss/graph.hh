@@ -31,6 +31,7 @@ class AbstractGraph;
 
 #include <cstdio>
 #include <vector>
+#include <limits>
 #include "bignum.hh"
 #include "heap.hh"
 #include "kqueue.hh"
@@ -97,6 +98,9 @@ class Stats
         fflush(fp);
         return r;
     }
+
+    int64_t max_num_steps = std::numeric_limits<int64_t>::max();
+
     /** An approximation (due to possible overflows/rounding errors) of
    * the size of the automorphism group. */
     long double get_group_size_approx() const

@@ -45,7 +45,7 @@ struct BreakID {
     void set_useFullTranslation(bool val);
     void set_symBreakingFormLength(int val);
     void set_verbosity(uint32_t val);
-    void conf_timeLim(int64_t val);
+    void set_steps_lim(int64_t val);
 
     //Static CNF
     void read_cnf(std::string fname);
@@ -71,6 +71,8 @@ struct BreakID {
     uint32_t get_num_generators();
     uint32_t get_num_break_cls();
     uint32_t get_num_aux_vars();
+    int64_t get_steps_remain() const;
+    uint64_t get_num_subgroups() const;
     std::vector<std::vector<BID::BLit>> get_brk_cls();
     void get_perms(std::vector<std::unordered_map<BLit, BLit> >& out);
 

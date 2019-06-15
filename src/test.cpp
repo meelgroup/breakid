@@ -28,8 +28,10 @@ THE SOFTWARE.
 #include <fstream>
 #include <set>
 #include <sstream>
+#include <iomanip>
 
 #include "breakid.hpp"
+#include "time_mem.h"
 #include "breakid/solvertypesmini.hpp"
 
 using std::cout;
@@ -97,14 +99,21 @@ vector<vector<BLit>> readCNF(const char* filename)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)  {
-        cout << "You must give the CNF as a single parameter" << endl;
+    if (argc != 3)  {
+        cout << "You must give the CNF as 1st and max steps as second parameter" << endl;
         exit(-1);
     }
 
     BID::BreakID breakid;
-    int conf_verbosity = 3;
+    int conf_verbosity = 1;
     breakid.set_verbosity(conf_verbosity);
+
+    //Steps
+    int64_t steps_lim = atoi(argv[2]);
+    steps_lim *= 1LL*1000LL;
+    cout << "Limit: " << steps_lim << endl;
+    breakid.set_steps_lim(steps_lim);
+
     vector<vector<BLit>> cls = readCNF(argv[1]);
     cout << "OK, read " << cls.size() << " clauses" << endl;
 
@@ -112,28 +121,57 @@ int main(int argc, char *argv[])
     for(auto cl: cls) {
         breakid.add_clause(cl.data(), cl.size());
     }
+
+    ////////////////
+    //Find symmetry group
+    ////////////////
+    double myTime = cpuTime();
     breakid.end_dynamic_cnf();
-
-    if (conf_verbosity > 3) {
-        breakid.print_graph();
-    }
-
+    int64_t remain = breakid.get_steps_remain();
+    bool timeout = remain <= 0;
+    double remain_ratio = (double)remain/(double)steps_lim;
     if (conf_verbosity) {
-        cout << "Num generators: " << breakid.get_num_generators() << endl;
+        cout << "-> Finished symmetry breaking. T: "
+        << std::setprecision(2)
+        << std::fixed
+        << (cpuTime()-myTime) << " s "
+        << " T-out: " << (timeout? "Y" : "N")
+        << " T-rem: " << remain_ratio
+        << endl;
+    }
+    if (conf_verbosity >= 1) {
+        cout << "-> Num generators: " << breakid.get_num_generators() << endl;
+    }
+    if (conf_verbosity >= 2) {
         breakid.print_generators(std::cout);
     }
 
-    if (conf_verbosity >= 2) {
-        cout << "*** Detecting subgroups..." << endl;
-    }
-    breakid.detect_subgroups();
-
+    ////////////////
+    // Deal with subgroups
+    ////////////////
     if (conf_verbosity) {
+        cout << "Detecting subgroups..." << endl;
+    }
+    myTime = cpuTime();
+    breakid.detect_subgroups();
+    if (conf_verbosity) {
+        cout << "-> Finding subgroups breaking. T: "
+        << std::setprecision(2)
+        << std::fixed
+        << (cpuTime()-myTime) << " s "
+        << endl;
+    }
+    if (conf_verbosity) {
+        cout << "-> num subgroups: " << breakid.get_num_subgroups() << endl;
+    }
+    if (conf_verbosity >= 2) {
         breakid.print_subgroups();
     }
 
+    ////////////////
+    // Break symmetries
+    ////////////////
     breakid.break_symm();
-
     if (false && conf_verbosity) {
         breakid.print_symm_break_stats();
         breakid.write_final_cnf(true);
@@ -141,17 +179,15 @@ int main(int argc, char *argv[])
 
     cout << "Num breaking clasues: "<< breakid.get_num_break_cls() << endl;
     cout << "Num aux vars: "<< breakid.get_num_aux_vars() << endl;
-    auto brk = breakid.get_brk_cls();
-    for (auto cl: brk) {
-        cout << "Breaking clause: ";
-        for(auto lit: cl) {
-            cout << lit << " ";
+    if (conf_verbosity > 3) {
+        auto brk = breakid.get_brk_cls();
+        for (auto cl: brk) {
+            cout << "Breaking clause: ";
+            for(auto lit: cl) {
+                cout << lit << " ";
+            }
+            cout << endl;
         }
-        cout << endl;
-    }
-
-    if (true) {
-        breakid.print_generators(std::cout);
     }
 
     return 0;

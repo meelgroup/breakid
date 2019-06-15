@@ -103,9 +103,14 @@ void BreakID::set_verbosity(uint32_t val)
     dat->conf->verbosity = val;
 }
 
-void BreakID::conf_timeLim(int64_t val)
+void BreakID::set_steps_lim(int64_t val)
 {
-    dat->conf->timeLim = val;
+    dat->conf->steps_lim = val;
+}
+
+int64_t BreakID::get_steps_remain() const
+{
+    return dat->conf->steps_lim;
 }
 
 void BreakID::read_cnf(string filename_) {
@@ -142,11 +147,12 @@ void BreakID::detect_subgroups() {
     dat->theory->getGroup()->getDisjointGenerators(dat->subgroups);
 }
 
-void BreakID::print_subgroups() {
-    cout
-    << "**** subgroups detected: "
-    << dat->subgroups.size() << endl;
+uint64_t BreakID::get_num_subgroups() const
+{
+    return dat->subgroups.size();
+}
 
+void BreakID::print_subgroups() {
     for (auto& grp : dat->subgroups) {
         cout
         << "group size: " << grp->getSize()

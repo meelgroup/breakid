@@ -42,7 +42,7 @@ namespace options {
     string nobinary =   "--no-bin";
     string formlength = "-s";
     string verbosity = "-v";
-    string timelim = "-t";
+    string steps_lim = "-t";
     string help = "-h";
     string nosmall = "--no-small";
     string norelaxed = "--no-relaxed";
@@ -61,7 +61,7 @@ void printUsage()
               << "[" << options::nosmall << "] "
               << "[" << options::norelaxed << "] "
               << "[" << options::formlength << " <nat>] "
-              << "[" << options::timelim << " <nat>] "
+              << "[" << options::steps_lim << " <nat>] "
               << "[" << options::verbosity << " <nat>] "
               << "[" << options::onlybreakers << "] "
               << "[" << options::generatorfile << "] "
@@ -92,7 +92,7 @@ void printUsage()
     << "    formula's, measured as the number of auxiliary variables\n"
     << "    introduced. <-1> means no symmetry breaking.\n\n"
 
-    << options::timelim << " <default: " << conf.timeLim << ">\n"
+    << options::steps_lim << " <default: " << conf.steps_lim << ">\n"
     << "    Upper limit on computing steps spent, approximate measure for time.\n\n"
 
     << options::verbosity << " <default: " << conf.verbosity << ">\n"
@@ -131,9 +131,9 @@ void parseOptions(int argc, char *argv[])
         } else if (0 == input.compare(options::formlength)) {
             ++i;
             conf.symBreakingFormLength = std::stoi(argv[i]);
-        } else if (0 == input.compare(options::timelim)) {
+        } else if (0 == input.compare(options::steps_lim)) {
             ++i;
-            conf.timeLim = std::stoi(argv[i]);
+            conf.steps_lim = std::stoi(argv[i]);
         } else if (0 == input.compare(options::verbosity)) {
             ++i;
             conf.verbosity = std::stoi(argv[i]);
@@ -146,7 +146,7 @@ void parseOptions(int argc, char *argv[])
         cout << "Options used:"
             << " " << options::formlength << " " << conf.symBreakingFormLength
 
-            << " " << options::timelim << " " << conf.timeLim
+            << " " << options::steps_lim << " " << conf.steps_lim
 
             << " " << options::verbosity << " " << conf.verbosity
 

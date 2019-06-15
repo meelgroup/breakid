@@ -215,15 +215,10 @@ void OnlCNF::end_dynamic_cnf()
 {
     graph->end_dynamic_cnf();
 
-    if (conf->verbosity > 1) {
-        cout << "**** Number of nodes: " << graph->getNbNodes()
-                  << endl;
+    if (conf->verbosity) {
+        cout << "-> Detecting symmetry group..." << endl;
     }
-
     group = new Group(conf);
-    if (conf->verbosity > 0) {
-        cout << "*** Detecting symmetry group..." << endl;
-    }
     vector<shared_ptr<Permutation> > symgens;
     graph->getSymmetryGenerators(symgens);
     for (auto symgen : symgens) {

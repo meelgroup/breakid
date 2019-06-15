@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <list>
 #include <set>
+#include <iostream>
 
 #include "defs.hh"
 #include "graph.hh"
@@ -740,7 +741,12 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
     /*
    * The actual backtracking search
    */
-    while (!search_stack.empty()) {
+    while (!search_stack.empty()
+        && stats.max_num_steps > 0
+    ) {
+        //std::cout << "In stack" << std::endl;
+        stats.max_num_steps--;
+
         TreeNode& current_node = search_stack.back();
         const unsigned int current_level =
             (unsigned int)search_stack.size() - 1;

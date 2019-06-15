@@ -156,9 +156,11 @@ void Graph::getSymmetryGeneratorsInternal(
     vector<shared_ptr<Permutation> >& out_perms)
 {
     bliss::Stats stats;
+    stats.max_num_steps = conf->steps_lim;
     //bliss_g->set_splitting_heuristic(bliss::Graph::SplittingHeuristic::shs_fl); //TODO: to decide
 
     bliss_g->find_automorphisms(stats, &addBlissPermutation, (void*)this);
+    conf->steps_lim = stats.max_num_steps;
 
     std::swap(out_perms, perms);
 }

@@ -40,7 +40,7 @@ struct Config {
     bool useFullTranslation = false;
     int symBreakingFormLength = 50;
     uint32_t verbosity = 1;
-    int64_t timeLim = std::numeric_limits<int64_t>::max();
+    int64_t steps_lim = std::numeric_limits<int64_t>::max();
 };
 
 #endif
