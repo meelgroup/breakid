@@ -112,13 +112,6 @@ CNF::CNF(string& filename, Config* _conf) :
     }
     assert(graph == NULL);
     graph = new Graph(clauses, conf);
-    if (conf->verbosity > 1) {
-        cout << "**** Number of nodes: " << graph->getNbNodes()
-                  << endl;
-        cout << "**** Number of edges: " << graph->getNbEdges()
-                  << endl;
-    }
-
     group = new Group(conf);
     if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
@@ -222,8 +215,6 @@ void OnlCNF::end_dynamic_cnf()
 
     if (conf->verbosity > 1) {
         cout << "**** Number of nodes: " << graph->getNbNodes()
-                  << endl;
-        cout << "**** Number of edges: " << graph->getNbEdges()
                   << endl;
     }
 

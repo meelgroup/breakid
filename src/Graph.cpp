@@ -120,11 +120,6 @@ uint32_t Graph::getNbNodesFromGraph()
     return bliss_g->get_nof_vertices();
 }
 
-uint32_t Graph::getNbEdgesFromGraph()
-{
-    return 0; //Not supported, not important
-}
-
 uint32_t Graph::getColorOf(uint32_t node)
 {
     assert(node < color.size());
@@ -253,11 +248,6 @@ void Graph::print()
 uint32_t Graph::getNbNodes()
 {
     return getNbNodesFromGraph();
-}
-
-uint32_t Graph::getNbEdges()
-{
-    return getNbEdgesFromGraph();
 }
 
 void Graph::setUniqueColor(uint32_t lit)

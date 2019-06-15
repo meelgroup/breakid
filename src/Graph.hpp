@@ -56,7 +56,6 @@ public:
     void end_dynamic_cnf();
 
     uint32_t getNbNodes();
-    uint32_t getNbEdges();
     void print();
     void setUniqueColor(uint32_t lit);
     void setUniqueColor(const vector<uint32_t>& lits);
@@ -71,7 +70,6 @@ private:
     void initializeGraph(uint32_t nbNodes);
     void freeGraph();
     uint32_t getNbNodesFromGraph();
-    uint32_t getNbEdgesFromGraph();
     uint32_t getColorOf(uint32_t node);
     uint32_t nbNeighbours(uint32_t node);
     uint32_t getNeighbour(uint32_t node, uint32_t nbthNeighbour);
