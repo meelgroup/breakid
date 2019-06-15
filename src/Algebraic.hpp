@@ -145,7 +145,7 @@ class Group
 
     shared_ptr<Matrix> getMatrix(uint32_t idx);
 
-    void getDisjointGenerators(vector<shared_ptr<Group> >& subgroups);
+    void getDisjointGenerators(vector<Group*>& subgroups);
     uint32_t getSize();
 
     bool permutes(uint32_t lit);

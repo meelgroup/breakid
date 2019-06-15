@@ -560,13 +560,13 @@ uint32_t Group::getSize()
 // Only approximate support for groups with matrices as generators:
 //       all matrices are added to the first subgroup
 // Erases permutations for this group
-void Group::getDisjointGenerators(vector<shared_ptr<Group> >& subgroups)
+void Group::getDisjointGenerators(vector<Group*>& subgroups)
 {
     // calculate maximal subsets of generators with pairwise disjoint supports
     assert(subgroups.empty());
 
     if (matrices.size() > 0) {
-        shared_ptr<Group> current(new Group(conf));
+        Group* current = new Group(conf);
         for (auto m : matrices) {
             current->addMatrix(m);
         }
@@ -591,7 +591,7 @@ void Group::getDisjointGenerators(vector<shared_ptr<Group> >& subgroups)
 
     while (permutations.size() > 0) {
         uint32_t previoussize = 0;
-        shared_ptr<Group> current(new Group(conf));
+        Group* current = new Group(conf);
         current->add(permutations.back());
         permutations.pop_back();
         while (current->getSize() > previoussize) {

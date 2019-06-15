@@ -46,7 +46,7 @@ using namespace BID;
 
 struct BID::PrivateData
 {
-    vector<shared_ptr<Group> > subgroups;
+    vector<Group*> subgroups;
     uint32_t totalNbMatrices = 0;
     uint32_t totalNbRowSwaps = 0;
 
@@ -151,7 +151,7 @@ void BreakID::print_subgroups() {
     << "**** subgroups detected: "
     << dat->subgroups.size() << endl;
 
-    for (auto grp : dat->subgroups) {
+    for (auto& grp : dat->subgroups) {
         cout
         << "group size: " << grp->getSize()
         << " support: " << grp->getSupportSize() << endl;
@@ -163,7 +163,7 @@ void BreakID::print_subgroups() {
 void BreakID::break_symm()
 {
     dat->brkr = new Breaker(dat->theory, dat->conf);
-    for (auto grp : dat->subgroups) {
+    for (auto& grp : dat->subgroups) {
 
         //Try to find matrix row interch. symmetries
         if (grp->getSize() > 1 && dat->conf->useMatrixDetection) {
@@ -190,7 +190,6 @@ void BreakID::break_symm()
             }
             grp->addBreakingClausesTo(*dat->brkr);
         }
-        grp.reset();
     }
 }
 

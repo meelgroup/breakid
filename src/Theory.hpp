@@ -39,7 +39,7 @@ class Specification
 
    protected:
     Graph* graph = NULL;
-    shared_ptr<Group> group;
+    Group* group;
 
    public:
     Specification();
@@ -49,7 +49,7 @@ class Specification
     virtual uint32_t getSize() const = 0;
 
     Graph* getGraph();
-    shared_ptr<Group> getGroup();
+    Group* getGroup();
 
     virtual void add_clause(BID::BLit* /*lits*/, uint32_t /*size*/)
     {}
@@ -57,7 +57,7 @@ class Specification
     {}
 
     ///Only used in matrix row interchangeability symmetry
-    virtual void setSubTheory(shared_ptr<Group> subgroup) = 0;
+    virtual void setSubTheory(Group* subgroup) = 0;
     virtual bool isSymmetry(Permutation& prm) = 0;
 };
 
@@ -65,12 +65,12 @@ class CNF : public Specification
 {
 public:
     CNF(string& filename, Config* conf);
-    CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp, Config* conf);
+    CNF(vector<shared_ptr<Clause> >& clss, Group* grp, Config* conf);
     ~CNF();
 
     void print(std::ostream& out) const;
     uint32_t getSize() const;
-    void setSubTheory(shared_ptr<Group> subgroup);
+    void setSubTheory(Group* subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
 
@@ -94,7 +94,7 @@ public:
 
     void print(std::ostream& out) const;
     uint32_t getSize() const;
-    void setSubTheory(shared_ptr<Group> subgroup);
+    void setSubTheory(Group* subgroup);
     bool isSymmetry(Permutation& prm);
     friend class Breaker;
 

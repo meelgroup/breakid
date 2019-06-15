@@ -119,7 +119,7 @@ CNF::CNF(string& filename, Config* _conf) :
                   << endl;
     }
 
-    group = make_shared<Group>(conf);
+    group = new Group(conf);
     if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
     }
@@ -130,7 +130,7 @@ CNF::CNF(string& filename, Config* _conf) :
     }
 }
 
-CNF::CNF(vector<shared_ptr<Clause> >& clss, shared_ptr<Group> grp, Config* _conf) :
+CNF::CNF(vector<shared_ptr<Clause> >& clss, Group* grp, Config* _conf) :
     conf(_conf)
 {
     clauses.insert(clss.cbegin(), clss.cend());
@@ -167,7 +167,7 @@ uint32_t CNF::getSize() const
 }
 
 ///Find set of clauses that subgroup permutates
-void CNF::setSubTheory(shared_ptr<Group> subgroup)
+void CNF::setSubTheory(Group* subgroup)
 {
     //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves?
     //TODO: Is it simply made approximative on purpose or by accident?
@@ -227,7 +227,7 @@ void OnlCNF::end_dynamic_cnf()
                   << endl;
     }
 
-    group = make_shared<Group>(conf);
+    group = new Group(conf);
     if (conf->verbosity > 0) {
         cout << "*** Detecting symmetry group..." << endl;
     }
@@ -248,7 +248,7 @@ uint32_t OnlCNF::getSize() const
     return num_cls;
 }
 
-void OnlCNF::setSubTheory(shared_ptr<Group>)
+void OnlCNF::setSubTheory(Group*)
 {
     //this will ONLY kill matrix detection
     //disabled matrix detection instead.
@@ -284,7 +284,7 @@ Graph* Specification::getGraph()
     return graph;
 }
 
-shared_ptr<Group> Specification::getGroup()
+Group* Specification::getGroup()
 {
     return group;
 }
