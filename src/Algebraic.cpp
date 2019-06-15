@@ -55,8 +55,10 @@ void Permutation::addPrimeSplitToVector(
 
     //First, we split each cycle up in its relative prime components.
     //E.g., if we have a cycle of length 2^3 * 3 * 5^2
-    //We will split it up in 2^3, 3 and 5^2. We also store the information that 2, 3 and 5 are occurring prime components.
-    //The prime2powers then containss the information that for prime 2, power 3 occurs, for prime 3, power 1 etcetera.
+    //We will split it up in 2^3, 3 and 5^2.
+    //We also store the information that 2, 3 and 5 are occurring prime components.
+    //The prime2powers then contains the information that for
+    //   prime 2, power 3 occurs, for prime 3, power 1 etc.
 
     for (auto l : getCycleReprs()) {
         vector<uint32_t> cycle;
@@ -561,7 +563,7 @@ uint32_t Group::getSize()
 void Group::getDisjointGenerators(vector<shared_ptr<Group> >& subgroups)
 {
     // calculate maximal subsets of generators with pairwise disjoint supports
-    subgroups.clear();
+    assert(subgroups.empty());
 
     if (matrices.size() > 0) {
         shared_ptr<Group> current(new Group(conf));
@@ -737,8 +739,7 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<uint32_t>& out_order,
     }
 }
 
-// NOTE: the order is a list of literals, such that for each literal l, neg(l) is not in the order
-
+///The order is a list of literals, such that for each literal l, neg(l) is not in the order
 void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
                                           vector<uint32_t>& out_order)
 {
@@ -760,7 +761,8 @@ void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
         addBinaryClausesTo(brkr, out_order, matrixLits);
     }
 
-    // now, add all literals that are not matrix literals and not yet in the order by their occurrence count
+    // now, add all literals that are not matrix literals
+    // and not yet in the order by their occurrence count
     // first, add ordered lits to matrixLits
     for (auto l : out_order) {
         matrixLits.insert(l);
@@ -780,9 +782,12 @@ void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
         out_order.push_back(it.second);
     }
 
+    ///////////
     // ok, all that is left is to add the matrix lits
-    matrixLits
-        .clear(); // use this set to avoid double addition of literals occurring in more than one matrix, and avoid addition of negative literals to order
+    ///////////
+
+    // use this set to avoid double addition of literals occurring in more than one matrix, and avoid addition of negative literals to order
+    matrixLits .clear();
     for (auto m : matrices) {
         for (uint32_t i = 0; i < m->nbRows(); ++i) {
             for (auto l : *m->getRow(i)) {
@@ -956,8 +961,7 @@ shared_ptr<Permutation> Matrix::testMembership(const shared_ptr<Permutation> p)
     return g;
 }
 
-// return p*swap(r1,r2)
-
+/// returns p*swap(r1,r2)
 shared_ptr<Permutation> Matrix::getProductWithRowsWap(const shared_ptr<Permutation> p,
                                                 uint32_t r1, uint32_t r2)
 {
