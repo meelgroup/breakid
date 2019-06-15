@@ -240,6 +240,14 @@ void BreakID::print_generators(std::ostream& out)
     }
 }
 
+void BreakID::get_permutations(vector<std::unordered_map<uint32_t, uint32_t> >& out)
+{
+    assert(out.empty());
+    for (auto grp : dat->subgroups) {
+        grp->add_perms(out);
+    }
+}
+
 std::string BreakID::get_sha1_version() const
 {
     return BID::get_version_sha1();

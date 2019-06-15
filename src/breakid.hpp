@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "breakid/solvertypesmini.hpp"
 
 namespace BID {
@@ -48,28 +49,30 @@ struct BreakID {
 
     //Static CNF
     void read_cnf(std::string fname);
+    void write_final_cnf(bool only_breakers);
 
     //Dynamic CNF
     void start_dynamic_cnf(uint32_t nVars);
     void add_clause(BID::BLit* start, size_t num);
     void end_dynamic_cnf();
 
-    void print_graph();
-    uint32_t get_num_generators();
-    void print_generators();
+    //Main functions
     void detect_subgroups();
-    void print_subgroups();
     void break_symm();
-    void print_symm_break_stats();
 
+    //Print info
+    void print_graph();
+    void print_generators();
+    void print_subgroups();
+    void print_symm_break_stats();
+    void print_generators(std::ostream& out);
+
+    //Get info
+    uint32_t get_num_generators();
     uint32_t get_num_break_cls();
     uint32_t get_num_aux_vars();
     std::vector<std::vector<BID::BLit>> get_brk_cls();
-
-
-    void write_final_cnf(bool only_breakers);
-    void print_generators(std::ostream& out);
-
+    void get_permutations(std::vector<std::unordered_map<uint32_t, uint32_t> >& out);
 
 private:
     PrivateData* dat = NULL;

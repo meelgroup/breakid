@@ -177,7 +177,7 @@ Permutation::Permutation(vector<uint32_t>& row1, vector<uint32_t>& row2, Config*
     maxCycleSize = 1;
 }
 
-uint32_t Permutation::getImage(uint32_t from)
+uint32_t Permutation::getImage(uint32_t from) const
 {
     auto it = perm.find(from);
     if (it != perm.end()) {
@@ -187,7 +187,7 @@ uint32_t Permutation::getImage(uint32_t from)
     }
 }
 
-bool Permutation::getImage(vector<uint32_t>& orig, vector<uint32_t>& img)
+bool Permutation::getImage(vector<uint32_t>& orig, vector<uint32_t>& img) const
 {
     img.clear();
     img.reserve(orig.size());
@@ -202,7 +202,7 @@ bool Permutation::getImage(vector<uint32_t>& orig, vector<uint32_t>& img)
 
 // printing cycles
 
-void Permutation::print(std::ostream& out)
+void Permutation::print(std::ostream& out) const
 {
     for (auto lit : getCycleReprs()) {
         out << "( ";
@@ -216,7 +216,7 @@ void Permutation::print(std::ostream& out)
     out << endl;
 }
 
-void Permutation::getCycle(uint32_t lit, vector<uint32_t>& orb)
+void Permutation::getCycle(uint32_t lit, vector<uint32_t>& orb) const
 {
     orb.clear();
     orb.push_back(lit);
@@ -237,7 +237,7 @@ bool Permutation::permutes(uint32_t lit)
     return perm.count(lit) > 0;
 }
 
-uint32_t Permutation::supportSize()
+uint32_t Permutation::supportSize() const
 {
     return domain.size();
 }
@@ -290,13 +290,13 @@ void Permutation::getSharedLiterals(shared_ptr<Permutation> other,
     }
 }
 
-vector<uint32_t>& Permutation::getCycleReprs()
+vector<uint32_t>& Permutation::getCycleReprs() const
 {
     if (cycleReprs.size() == 0 && supportSize() > 0) { // calculate cycles
         unordered_set<uint32_t> marked;
-        for (
-            auto lit :
-            domain) { // TODO: probably possible to replace with more efficient posDomain
+        for (auto lit :
+            domain // TODO: probably possible to replace with more efficient posDomain
+        ) {
             if (marked.count(lit) == 0) {
                 cycleReprs.push_back(lit);
                 vector<uint32_t> cyc;
@@ -370,15 +370,23 @@ void Group::addMatrix(shared_ptr<Matrix> m)
     }
 }
 
-void Group::print(std::ostream& out)
+void Group::print(std::ostream& out) const
 {
     cout << "-- Permutations:" << endl;
-    for (auto p : permutations) {
+    for (const auto& p : permutations) {
         p->print(out);
     }
     cout << "-- Matrices:" << endl;
-    for (auto m : matrices) {
+    for (const auto& m : matrices) {
         m->print(out);
+    }
+}
+
+void Group::add_perms(vector<std::unordered_map<uint32_t, uint32_t>>& out)
+{
+    cout << "-- Permutations:" << endl;
+    for (const auto& p : permutations) {
+        out.push_back(p->getPerm());
     }
 }
 
@@ -845,7 +853,7 @@ Matrix::~Matrix()
     }
 }
 
-void Matrix::print(std::ostream& out)
+void Matrix::print(std::ostream& out) const
 {
     out << "rows " << nbRows() << " columns " << nbColumns() << endl;
     for (auto row : rows) {
@@ -865,12 +873,12 @@ void Matrix::add(vector<uint32_t>* row)
     rows.push_back(row);
 }
 
-uint32_t Matrix::nbRows()
+uint32_t Matrix::nbRows() const
 {
     return rows.size();
 }
 
-uint32_t Matrix::nbColumns()
+uint32_t Matrix::nbColumns() const
 {
     if (nbRows() > 0) {
         return rows[0]->size();
