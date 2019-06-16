@@ -59,7 +59,11 @@ public:
     void print();
     void setUniqueColor(uint32_t lit);
     void setUniqueColor(const vector<BLit>& lits);
-    void getSymmetryGenerators(vector<shared_ptr<Permutation> >& out_perms);
+    void getSymmetryGenerators(
+        vector<shared_ptr<Permutation> >& out_perms
+        , int64_t steps_lim
+        , int64_t* out_steps_lim
+    );
 
     //TODO should be private
     vector<shared_ptr<Permutation> > perms;
@@ -75,7 +79,10 @@ private:
     uint32_t getNeighbour(uint32_t node, uint32_t nbthNeighbour);
     void setNodeToNewColor(uint32_t node);
     void getSymmetryGeneratorsInternal(
-        vector<shared_ptr<Permutation> >& out_perms);
+        vector<shared_ptr<Permutation> >& out_perms
+        , int64_t steps_lim
+        , int64_t* out_steps_lim
+    );
 
     vector<uint32_t> vertex_to_color;
 

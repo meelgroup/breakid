@@ -119,7 +119,7 @@ CNF::CNF(string& filename, Config* _conf) :
         cout << "*** Detecting symmetry group..." << endl;
     }
     vector<shared_ptr<Permutation> > symgens;
-    graph->getSymmetryGenerators(symgens);
+    graph->getSymmetryGenerators(symgens, conf->steps_lim, &conf->remain_steps_lim);
     for (auto symgen : symgens) {
         group->add(symgen);
     }
@@ -222,7 +222,7 @@ void OnlCNF::end_dynamic_cnf()
     }
     group = new Group(conf);
     vector<shared_ptr<Permutation> > symgens;
-    graph->getSymmetryGenerators(symgens);
+    graph->getSymmetryGenerators(symgens, conf->steps_lim, &conf->remain_steps_lim);
     for (auto symgen : symgens) {
         group->add(symgen);
     }

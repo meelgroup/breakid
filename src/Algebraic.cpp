@@ -467,7 +467,9 @@ void Group::addMatrices()
             oldNbRows = matrix->nbRows();
 
             vector<shared_ptr<Permutation> > symgens;
-            theory->getGraph()->getSymmetryGenerators(symgens);
+            theory->getGraph()->getSymmetryGenerators(
+                symgens, std::numeric_limits<int64_t>::max(), NULL);
+
             // now test stabilizer generators on the (former) last row
             for (auto p : symgens) {
                 matrix->tryToAddNewRow(p, oldNbRows - 1, theory);

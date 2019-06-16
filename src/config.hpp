@@ -41,6 +41,7 @@ struct Config {
     int symBreakingFormLength = 50;
     uint32_t verbosity = 1;
     int64_t steps_lim = std::numeric_limits<int64_t>::max();
+    int64_t remain_steps_lim;
 };
 
 #endif

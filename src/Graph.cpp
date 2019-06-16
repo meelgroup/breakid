@@ -157,14 +157,18 @@ static void addBlissPermutation(
 }
 
 void Graph::getSymmetryGeneratorsInternal(
-    vector<shared_ptr<Permutation> >& out_perms)
-{
+    vector<shared_ptr<Permutation> >& out_perms
+    , int64_t steps_lim
+    , int64_t* out_steps_lim
+) {
     bliss::Stats stats;
-    stats.max_num_steps = conf->steps_lim;
+    stats.max_num_steps = steps_lim;
     //bliss_g->set_splitting_heuristic(bliss::Graph::SplittingHeuristic::shs_fl); //TODO: to decide
 
     bliss_g->find_automorphisms(stats, &addBlissPermutation, (void*)this);
-    conf->steps_lim = stats.max_num_steps;
+    if (out_steps_lim) {
+        *out_steps_lim = stats.max_num_steps;
+    }
 
     std::swap(out_perms, perms);
 }
@@ -279,8 +283,11 @@ void Graph::setUniqueColor(const vector<BLit>& lits)
     }
 }
 
-void Graph::getSymmetryGenerators(vector<shared_ptr<Permutation> >& out_perms)
-{
+void Graph::getSymmetryGenerators(
+    vector<shared_ptr<Permutation> >& out_perms
+    , int64_t steps_lim
+    , int64_t* out_steps_lim
+) {
     out_perms.clear();
-    getSymmetryGeneratorsInternal(out_perms);
+    getSymmetryGeneratorsInternal(out_perms, steps_lim, out_steps_lim);
 }

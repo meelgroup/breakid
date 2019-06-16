@@ -110,7 +110,7 @@ void BreakID::set_steps_lim(int64_t val)
 
 int64_t BreakID::get_steps_remain() const
 {
-    return dat->conf->steps_lim;
+    return dat->conf->remain_steps_lim;
 }
 
 void BreakID::read_cnf(string filename_) {
