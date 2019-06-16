@@ -65,7 +65,6 @@ class CNF : public Specification
 {
 public:
     CNF(string& filename, Config* conf);
-    CNF(vector<shared_ptr<Clause> >& clss, Group* grp, Config* conf);
     ~CNF();
 
     void print(std::ostream& out) const;
@@ -78,6 +77,7 @@ private:
     ///must be an unordered_set, since we need to be able to test
     ///whether a clause exists to detect symmetries
     std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual> clauses;
+    CNF(vector<shared_ptr<Clause> >& clss, Group* grp, Config* conf);
 
     void readCNF(string& filename);
     Config* conf;
