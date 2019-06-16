@@ -148,9 +148,11 @@ void AbstractGraph::refine_to_equitable(Partition::Cell* const unit_cell1,
 
 bool AbstractGraph::do_refine_to_equitable()
 {
+    Timer timer1;
     eqref_hash.reset();
 
     while (!p.splitting_queue_is_empty()) {
+        (*max_num_steps)--;
         Partition::Cell* const cell = p.splitting_queue_pop();
 
         if (cell->is_unit()) {
@@ -177,11 +179,26 @@ bool AbstractGraph::do_refine_to_equitable()
         }
     }
 
+    if (verbstr and verbose_level >= 3) {
+        fprintf(verbstr, "do_refine_to_equitable TRUE done in %.2f seconds\n",
+                timer1.get_duration());
+        fflush(verbstr);
+        timer1.reset();
+    }
+
     return true;
 
 worse_exit:
     /* Clear splitting_queue */
     p.splitting_queue_clear();
+
+    if (verbstr and verbose_level >= 3) {
+        fprintf(verbstr, "do_refine_to_equitable FALSE done in %.2f seconds\n",
+                timer1.get_duration());
+        fflush(verbstr);
+        timer1.reset();
+    }
+
     return false;
 }
 
@@ -524,6 +541,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
     stats.reset();
     stats.nof_nodes = 1;
     stats.nof_leaf_nodes = 1;
+    max_num_steps = &stats.max_num_steps;
 
     /* Free old first path data structures */
     if (first_path_labeling) {
@@ -575,13 +593,12 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
     compute_eqref_hash = false;
 
     Timer timer1;
-
     make_initial_equitable_partition();
-
     if (verbstr and verbose_level >= 2) {
         fprintf(verbstr, "Initial partition computed in %.2f seconds\n",
                 timer1.get_duration());
         fflush(verbstr);
+        timer1.reset();
     }
 
     /*
@@ -738,14 +755,28 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
     /* Do not compare certificates during refinement until the first path has been traversed to the leaf */
     refine_compare_certificate = false;
 
+
+    if (verbstr and verbose_level >= 2) {
+        fprintf(verbstr, "Until initial backtracking search another %.2f seconds\n",
+                timer1.get_duration());
+        fflush(verbstr);
+        timer1.reset();
+    }
+
     /*
    * The actual backtracking search
    */
     while (!search_stack.empty()
-        && stats.max_num_steps > 0
+        && *max_num_steps > 0
     ) {
         //std::cout << "In stack" << std::endl;
-        stats.max_num_steps--;
+        (*max_num_steps)--;
+        if (verbstr and verbose_level >= 2 && (*max_num_steps & 0xfff) == 0xfff) {
+            fprintf(verbstr, "Until next in search stack: %.2f seconds, stats.max_num_steps: %ld\n",
+                    timer1.get_duration(), *max_num_steps);
+            fflush(verbstr);
+            timer1.reset();
+        }
 
         TreeNode& current_node = search_stack.back();
         const unsigned int current_level =

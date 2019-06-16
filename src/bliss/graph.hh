@@ -145,6 +145,7 @@ class Stats
 class AbstractGraph
 {
     friend class Partition;
+    int64_t* max_num_steps;
 
    public:
     AbstractGraph();
