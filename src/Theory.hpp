@@ -77,6 +77,8 @@ private:
     ///must be an unordered_set, since we need to be able to test
     ///whether a clause exists to detect symmetries
     std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual> clauses;
+
+    //used for subtheories
     CNF(vector<shared_ptr<Clause> >& clss, Group* grp, Config* conf);
 
     void readCNF(string& filename);
