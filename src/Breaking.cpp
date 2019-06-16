@@ -295,6 +295,8 @@ uint32_t Breaker::getNbRegClauses()
 
 BLit Breaker::getTseitinVar()
 {
+    BLit ret = BLit(getTotalNbVars(), false);
     ++nbExtraVars;
-    return BLit(getTotalNbVars(), false);
+
+    return ret;
 }
