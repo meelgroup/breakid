@@ -204,6 +204,8 @@ OnlCNF::OnlCNF(uint32_t nVars, Config* _conf) :
 
 OnlCNF::~OnlCNF()
 {
+    delete group;
+    group = NULL;
 }
 
 void OnlCNF::add_clause(BID::BLit* lits, uint32_t size)
