@@ -372,11 +372,11 @@ void Group::addMatrix(shared_ptr<Matrix> m)
 
 void Group::print(std::ostream& out) const
 {
-    cout << "-- Permutations:" << endl;
+    out << "-- Permutations:" << endl;
     for (const auto& p : permutations) {
         p->print(out);
     }
-    cout << "-- Matrices:" << endl;
+    out << "-- Matrices:" << endl;
     for (const auto& m : matrices) {
         m->print(out);
     }
@@ -384,7 +384,6 @@ void Group::print(std::ostream& out) const
 
 void Group::get_perms_to(vector<std::unordered_map<BLit, BLit>>& out)
 {
-    cout << "-- Permutations:" << endl;
     for (const auto& p : permutations) {
         out.push_back(p->getPerm());
     }
