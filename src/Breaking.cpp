@@ -107,12 +107,12 @@ void Breaker::addSym(
         assert(false);
         addShatter(perm, order, limitExtraConstrs);
     } else {
-        add(perm, order, limitExtraConstrs);
+        addBreakID(perm, order, limitExtraConstrs);
     }
     nbRegClauses += getTotalNbClauses() - current;
 }
 
-void Breaker::add(shared_ptr<Permutation> perm, std::vector<BLit>& order,
+void Breaker::addBreakID(shared_ptr<Permutation> perm, std::vector<BLit>& order,
                   bool limitExtraConstrs)
 {
     /// which are not the last lit in their cycle, unless they map to their negation

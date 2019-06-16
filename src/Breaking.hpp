@@ -290,7 +290,7 @@ private:
     void addTernary(BLit l1, BLit l2, BLit l3);
     void addQuaternary(BLit l1, BLit l2, BLit l3, BLit l4);
     void add(shared_ptr<Clause> cl);
-    void add(shared_ptr<Permutation> perm, vector<BLit>& order,
+    void addBreakID(shared_ptr<Permutation> perm, vector<BLit>& order,
              bool limitExtraConstrs);
     void addShatter(shared_ptr<Permutation> perm, vector<BLit>& order,
                     bool limitExtraConstrs);
