@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
         cout << "-> num subgroups: " << breakid.get_num_subgroups() << endl;
     }
     if (conf_verbosity >= 2) {
-        breakid.print_subgroups();
+        breakid.print_subgroups(cout);
     }
 
     ////////////////

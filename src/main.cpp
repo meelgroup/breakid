@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     breakid.detect_subgroups();
 
     if (conf.verbosity) {
-        breakid.print_subgroups();
+        breakid.print_subgroups(cout);
     }
     breakid.break_symm();
 

@@ -152,13 +152,13 @@ uint64_t BreakID::get_num_subgroups() const
     return dat->subgroups.size();
 }
 
-void BreakID::print_subgroups() {
+void BreakID::print_subgroups(std::ostream& out) {
     for (auto& grp : dat->subgroups) {
-        cout
+        out
         << "group size: " << grp->getSize()
         << " support: " << grp->getSupportSize() << endl;
 
-        grp->print(cout);
+        grp->print(out);
     }
 }
 
