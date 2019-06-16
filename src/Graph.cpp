@@ -57,6 +57,10 @@ Graph::Graph(Config* _conf) :
     }
     assert(vertex_to_color.size() == n);
     assert(bliss_g->get_nof_vertices() == n);
+
+    //DEBUG speed
+    /*bliss_g->set_verbose_level(2);
+    bliss_g->set_verbose_file(stdout);*/
 }
 
 void Graph::add_clause(BID::BLit* lits, uint32_t size)
