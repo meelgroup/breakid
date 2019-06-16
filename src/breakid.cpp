@@ -246,11 +246,11 @@ void BreakID::print_generators(std::ostream& out) {
     dat->theory->getGroup()->print(cout);
 }
 
-void BreakID::get_perms(vector<std::unordered_map<BLit, BLit> >& out)
+void BreakID::get_perms(vector<std::unordered_map<BLit, BLit> >* out)
 {
-    assert(out.empty());
+    assert(out->empty());
     for (auto grp : dat->subgroups) {
-        grp->get_perms_to(out);
+        grp->get_perms_to(*out);
     }
 }
 

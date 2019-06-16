@@ -74,7 +74,7 @@ struct BreakID {
     int64_t get_steps_remain() const;
     uint64_t get_num_subgroups() const;
     std::vector<std::vector<BID::BLit>> get_brk_cls();
-    void get_perms(std::vector<std::unordered_map<BLit, BLit> >& out);
+    void get_perms(std::vector<std::unordered_map<BLit, BLit> >* out);
 
 private:
     PrivateData* dat = NULL;
