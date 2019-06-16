@@ -39,7 +39,7 @@ class Specification
 
    protected:
     Graph* graph = NULL;
-    Group* group;
+    Group* group = NULL;
 
    public:
     Specification();
