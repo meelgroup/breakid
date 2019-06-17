@@ -56,6 +56,11 @@ struct BID::PrivateData
 
     ~PrivateData()
     {
+        for(auto& sg: subgroups) {
+            delete sg;
+        }
+        subgroups.clear();
+
         delete theory;
         delete conf;
         delete brkr;
