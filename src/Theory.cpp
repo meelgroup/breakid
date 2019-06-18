@@ -162,10 +162,11 @@ uint32_t CNF::getSize() const
 }
 
 ///Find set of clauses that subgroup permutates
+///TODO fix this is super slow!!!!
 void CNF::setSubTheory(Group* subgroup)
 {
-    //TODO: what is this method supposed to do: keep all clauses that are not mapped to themselves?
-    //TODO: Is it simply made approximative on purpose or by accident?
+    //WARNING What is this method supposed to do: keep all clauses that are not mapped to themselves?
+    //WARNING Is it simply made approximative on purpose or by accident?
     vector<shared_ptr<Clause> > subclauses;
     for (auto cl : clauses) {
         for (auto lit : cl->lits) {
