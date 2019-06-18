@@ -187,15 +187,14 @@ BLit Permutation::getImage(BLit from) const
     }
 }
 
-bool Permutation::getImage(vector<BLit>& orig, vector<BLit>& img) const
+bool Permutation::getImage(const BLit* orig, size_t sz, vector<BLit>& img) const
 {
     img.clear();
-    img.reserve(orig.size());
     bool result = false;
-    for (auto lit : orig) {
-        BLit image = getImage(lit);
+    for (uint32_t i = 0; i < sz; i++) {
+        BLit image = getImage(orig[i]);
         img.push_back(image);
-        result = result || image != lit;
+        result = result || image != orig[i];
     }
     return result;
 }
@@ -362,7 +361,7 @@ void Group::addMatrix(shared_ptr<Matrix> m)
         support.insert(row->cbegin(), row->cend());
     }
 
-    if (conf->verbosity > 1) {
+    if (conf->verbosity > 0) {
         cout << "Matrix with " << m->nbRows() << " rows and "
                   << m->nbColumns() << " columns detected" << endl;
     } else if (conf->verbosity > 2) {
@@ -896,7 +895,7 @@ vector<BLit>* Matrix::getRow(uint32_t rowindex)
 }
 
 void Matrix::tryToAddNewRow(shared_ptr<Permutation> p, uint32_t rowIndex,
-                            Specification* theory)
+                            OnlCNF* theory)
 {
     // checks whether the image of the current row can be used as a new row
     vector<BLit>* image = new vector<BLit>();

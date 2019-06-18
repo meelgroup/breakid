@@ -48,8 +48,7 @@ using std::unordered_set;
 
 class Permutation;
 class Clause;
-class Rule;
-class Specification;
+class OnlCNF;
 
 template <class T>
 void swapErase(vector<T>& vec, uint32_t index)
@@ -63,6 +62,15 @@ inline size_t _getHash(const vector<BLit>& xs)
     size_t seed = xs.size();
     for (auto x : xs) {
         seed ^= x.toInt() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+    return seed;
+}
+
+inline size_t _getHash(const BLit* lit, uint32_t sz)
+{
+    size_t seed = sz;
+    for (uint32_t i = 0; i < sz; i++) {
+        seed ^= lit[i].toInt() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
     return seed;
 }
@@ -105,74 +113,6 @@ class Clause
     }
 };
 
-class Rule
-{
-   private:
-    size_t hashValue;
-
-   public:
-    //Note: we use "constraints" as basic rules with an empty head. Thus, there is no nice correspondence between our representation of rules and the lparse-smodels format
-    //Note: similarly, we use "disjunctive rules" as basic rules with multiple heads. (quite standard representation of those). Again: not nice  correspondence between our representation of rules and the lparse-smodels format
-    //to respresent rules. As such, there is currently not yet a GOOD printing method for the rules.
-    int ruleType;
-    vector<BLit> headLits;
-    vector<BLit> bodyLits;
-    int bound; //Only relevant for rules of type 2 and 5
-    vector<BLit> weights;
-
-    Rule(int inRuleType, const vector<uint32_t>& inHeads,
-         const vector<uint32_t>& bodies, int inBound,
-         vector<BLit>& inWeights) :
-
-    hashValue(0),
-    ruleType(inRuleType),
-    bound(inBound)
-    {
-        for(const auto& x: inWeights) {
-            weights.push_back(x);
-        }
-        for(const auto& x: inHeads) {
-            headLits.push_back(BLit::toBLit(x));
-        }
-
-        for(const auto& x: bodies) {
-            bodyLits.push_back(BLit::toBLit(x));
-        }
-
-
-        std::sort(headLits.begin(), headLits.end());
-        if (ruleType != 5 && ruleType != 6) {
-            std::sort(bodyLits.begin(), bodyLits.end());
-        }
-        assert(ruleType != 5 || ruleType != 6 ||
-               weights.size() == bodyLits.size());
-    }
-
-    Rule() : hashValue(0), ruleType(1), bound(0){};
-
-    ~Rule(){};
-
-    size_t getHashValue()
-    {
-        if (hashValue == 0) {
-            hashValue = ruleType + _getHash(headLits) + 2 * _getHash(bodyLits) +
-                        3 * bound + 4 * _getHash(weights);
-            if (hashValue == 0) {
-                // avoid recalculation of hash
-                hashValue = 1;
-            }
-        }
-        return hashValue;
-    }
-
-    void print(std::ostream& /*ostr*/)
-    {
-        std::cout << "ERROR: Not implemented: printing rules\n";
-        assert(false);
-        exit(-1);
-    }
-};
-
 template <class T>
 bool isDisjoint(std::unordered_set<T>& uset, vector<T>& vec)
 {
@@ -184,6 +124,13 @@ bool isDisjoint(std::unordered_set<T>& uset, vector<T>& vec)
     return true;
 }
 
+struct MyCl
+{
+    BLit* lits;
+    uint32_t sz;
+    uint32_t hashValue;
+};
+
 struct UVecHash {
     size_t operator()(const std::shared_ptr<vector<BLit> > first) const
     {
@@ -194,28 +141,38 @@ struct UVecHash {
     {
         return cl->getHashValue();
     }
+};
 
-    size_t operator()(const std::shared_ptr<Rule> r) const
+struct MyClHash {
+        size_t operator()(const MyCl& cl) const
     {
-        return r->getHashValue();
+        return cl.hashValue;
     }
 };
 
-struct UvecEqual {
-    bool equals(const vector<int>& first,
-                const vector<int>& second) const
+struct MyClEqual {
+    bool operator()(
+        const MyCl& first,
+        const MyCl& second) const
     {
-        if (first.size() != second.size()) {
+        if (first.sz != second.sz) {
             return false;
         }
-        for (unsigned int k = 0; k < first.size(); ++k) {
-            if (first.at(k) != second.at(k)) {
+
+        if (first.hashValue != second.hashValue) {
+            return false;
+        }
+
+        for (unsigned int k = 0; k < first.sz; ++k) {
+            if (first.lits[k] != second.lits[k]) {
                 return false;
             }
         }
         return true;
     }
+};
 
+struct UvecEqual {
     bool equals(const vector<BLit>& first,
                 const vector<BLit>& second) const
     {
@@ -240,21 +197,12 @@ struct UvecEqual {
     {
         return equals(first->lits, second->lits);
     }
-
-    bool operator()(const std::shared_ptr<Rule> first, const std::shared_ptr<Rule> second) const
-    {
-        return (first->ruleType == second->ruleType) &&
-               equals(first->headLits, second->headLits) &&
-               equals(first->bodyLits, second->bodyLits) &&
-               equals(first->weights, second->weights) &&
-               (first->bound == second->bound);
-    }
 };
 
 class Breaker
 {
 public:
-    Breaker(Specification const* origTheo, Config* conf);
+    Breaker(OnlCNF const* origTheo, Config* conf);
     ~Breaker(){};
 
     //Prints the current breaker
@@ -280,7 +228,7 @@ public:
 
 private:
     unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual> clauses;
-    Specification const* originalTheory;
+    OnlCNF const* originalTheory;
     uint32_t nbExtraVars = 0;
     uint32_t nbBinClauses = 0;
     uint32_t nbRowClauses = 0;

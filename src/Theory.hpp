@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "config.hpp"
 #include "Breaking.hpp"
 #include "breakid/solvertypesmini.hpp"
+#include <unordered_set>
 
 class Graph;
 class Permutation;
@@ -33,66 +34,18 @@ class Group;
 class Matrix;
 class Breaker;
 
-class Specification
-{
-    friend class Breaker;
-
-   protected:
-    Graph* graph = NULL;
-    Group* group = NULL;
-
-   public:
-    Specification();
-    virtual ~Specification();
-
-    virtual void print(std::ostream& out) const = 0;
-    virtual uint32_t getSize() const = 0;
-
-    Graph* getGraph();
-    Group* getGroup();
-
-    virtual void add_clause(BID::BLit* /*lits*/, uint32_t /*size*/)
-    {}
-    virtual void end_dynamic_cnf()
-    {}
-
-    ///Only used in matrix row interchangeability symmetry
-    virtual void setSubTheory(Group* subgroup) = 0;
-    virtual bool isSymmetry(Permutation& prm) = 0;
-};
-
-class CNF : public Specification
+class OnlCNF
 {
 public:
-    CNF(string& filename, Config* conf);
-    ~CNF();
-
-    void print(std::ostream& out) const;
-    uint32_t getSize() const;
-    void setSubTheory(Group* subgroup);
-    bool isSymmetry(Permutation& prm);
-    friend class Breaker;
-
-private:
-    ///must be an unordered_set, since we need to be able to test
-    ///whether a clause exists to detect symmetries
-    std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual> clauses;
-
-    //used for subtheories
-    CNF(vector<shared_ptr<Clause> >& clss, Group* grp, Config* conf);
-
-    void readCNF(string& filename);
-    Config* conf;
-};
-
-class OnlCNF : public Specification
-{
-public:
-    OnlCNF(uint32_t num_cls, Config* conf);
+    OnlCNF(Config* conf);
     ~OnlCNF();
 
     void end_dynamic_cnf();
     void add_clause(BID::BLit* lits, uint32_t size);
+    void set_new_group();
+    void set_old_group(Group* grp);
+    Graph* getGraph();
+    Group* getGroup();
 
     void print(std::ostream& out) const;
     uint32_t getSize() const;
@@ -103,6 +56,13 @@ public:
 private:
     Config* conf;
     uint32_t num_cls;
+    Graph* graph = NULL;
+    Group* group = NULL;
+    vector<uint32_t> cl_sizes;
+    vector<BLit> cl_lits;
+
+    //ONLY filled when isSymmetry is called
+    std::unordered_set<MyCl, MyClHash, MyClEqual> clauses;
 };
 
 #endif

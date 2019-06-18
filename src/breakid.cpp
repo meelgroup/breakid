@@ -50,7 +50,7 @@ struct BID::PrivateData
     uint32_t totalNbMatrices = 0;
     uint32_t totalNbRowSwaps = 0;
 
-    Specification* theory = NULL;
+    OnlCNF* theory = NULL;
     Breaker* brkr = NULL;
     Config* conf = NULL;
 
@@ -118,15 +118,11 @@ int64_t BreakID::get_steps_remain() const
     return dat->conf->remain_steps_lim;
 }
 
-void BreakID::read_cnf(string filename_) {
-    assert(dat->theory == NULL);
-    dat->theory = new CNF(filename_, dat->conf);
-}
-
 void BreakID::start_dynamic_cnf(uint32_t nVars)
 {
     assert(dat->theory == NULL);
-    dat->theory = new OnlCNF(nVars, dat->conf);
+    dat->conf->nVars = nVars;
+    dat->theory = new OnlCNF(dat->conf);
 }
 
 void BreakID::add_clause(BID::BLit* start, size_t num)
@@ -137,6 +133,7 @@ void BreakID::add_clause(BID::BLit* start, size_t num)
 void BreakID::end_dynamic_cnf()
 {
     dat->theory->end_dynamic_cnf();
+    dat->theory->set_new_group();
 }
 
 void BreakID::print_graph() {
@@ -174,7 +171,7 @@ void BreakID::break_symm()
 
         //Try to find matrix row interch. symmetries
         if (grp->getSize() > 1 && dat->conf->useMatrixDetection) {
-            if (dat->conf->verbosity > 1) {
+            if (dat->conf->verbosity > 0) {
                 cout << "*** Detecting row interchangeability..." << endl;
             }
 
@@ -192,7 +189,7 @@ void BreakID::break_symm()
 
         //Symmetry
         if (dat->conf->symBreakingFormLength > -1) {
-            if (dat->conf->verbosity > 1) {
+            if (dat->conf->verbosity > 0) {
                 cout << "*** Constructing symmetry breaking formula..." << endl;
             }
             grp->addBreakingClausesTo(*dat->brkr);
@@ -234,10 +231,6 @@ uint32_t BreakID::get_num_aux_vars()
 vector<vector<BID::BLit>> BreakID::get_brk_cls()
 {
     return dat->brkr->get_brk_cls();
-}
-
-void BreakID::write_final_cnf(bool only_breakers) {
-    dat->brkr->print(only_breakers);
 }
 
 void BreakID::print_perms_and_matrices(std::ostream& out)

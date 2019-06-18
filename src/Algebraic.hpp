@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "config.hpp"
 #include "Breaking.hpp"
 
-class Specification;
+class OnlCNF;
 class Breaker;
 
 class Permutation : public std::enable_shared_from_this<Permutation>
@@ -43,8 +43,10 @@ public:
     ~Permutation(){};
 
     BLit getImage(BLit from) const;
-    // return value is true iff the image is different from the original
-    bool getImage(vector<BLit>& orig, vector<BLit>& img) const;
+
+    ///return value is true iff the image is different from the original
+    bool getImage(const BLit* orig, size_t sz, vector<BLit>& img) const;
+
     void getCycle(BLit lit, vector<BLit>& orb) const;
     bool isInvolution();
     bool permutes(BLit lit);
@@ -103,7 +105,7 @@ class Matrix
     uint32_t nbColumns() const;
     uint32_t nbRows() const;
     void tryToAddNewRow(shared_ptr<Permutation> p, uint32_t rowIndex,
-                        Specification* theory);
+                        OnlCNF* theory);
     vector<BLit>* getRow(uint32_t rowindex);
     bool permutes(BLit x);
     BLit getLit(uint32_t row, uint32_t column);
@@ -119,7 +121,7 @@ class Matrix
 class Group
 {
 public:
-    Specification* theory;
+    OnlCNF* theory;
     void get_perms_to(vector<std::unordered_map<BLit, BLit>>& out);
 
     Group(Config* conf);

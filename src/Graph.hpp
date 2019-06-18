@@ -46,8 +46,6 @@ public:
     ///so that no color is never used (seems to give Saucy trouble)
     ///@INVAR: for all x: colorcount[x]>0
     vector<uint32_t> colorcount;
-
-    Graph(std::unordered_set<shared_ptr<Clause>, UVecHash, UvecEqual>& clauses, Config* conf);
     ~Graph();
 
     //Dynamic graph

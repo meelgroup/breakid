@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
     steps_lim *= 1LL*1000LL;
     cout << "Limit: " << steps_lim << endl;
     breakid.set_steps_lim(steps_lim);
+    breakid.set_useMatrixDetection(true);
 
     vector<vector<BLit>> cls = readCNF(argv[1]);
     cout << "OK, read " << cls.size() << " clauses" << endl;
@@ -174,7 +175,6 @@ int main(int argc, char *argv[])
     breakid.break_symm();
     if (false && conf_verbosity) {
         breakid.print_symm_break_stats();
-        breakid.write_final_cnf(true);
     }
 
     cout << "Num breaking clasues: "<< breakid.get_num_break_cls() << endl;

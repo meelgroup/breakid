@@ -53,23 +53,23 @@ set_target_properties(breakid PROPERTIES
 
 ###############
 
-add_executable(breakid-bin
-    main.cpp
-)
-set_target_properties(breakid-bin PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
-    INSTALL_RPATH_USE_LINK_PATH TRUE
-    OUTPUT_NAME breakid
-)
-
-if (STATICCOMPILE)
-    SET_TARGET_PROPERTIES(breakid-bin PROPERTIES LINK_SEARCH_START_STATIC 1)
-endif()
-
-target_link_libraries(breakid-bin
-    breakid
-    # ${Boost_LIBRARIES}
-)
+# add_executable(breakid-bin
+#     main.cpp
+# )
+# set_target_properties(breakid-bin PROPERTIES
+#     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+#     INSTALL_RPATH_USE_LINK_PATH TRUE
+#     OUTPUT_NAME breakid
+# )
+#
+# if (STATICCOMPILE)
+#     SET_TARGET_PROPERTIES(breakid-bin PROPERTIES LINK_SEARCH_START_STATIC 1)
+# endif()
+#
+# target_link_libraries(breakid-bin
+#     breakid
+#     # ${Boost_LIBRARIES}
+# )
 
 add_executable(mytest
     test.cpp
@@ -120,7 +120,7 @@ install(TARGETS breakid
 )
 
 
-install(TARGETS breakid-bin
+install(TARGETS mytest
     # EXPORT ${BREAKID_EXPORT_NAME}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

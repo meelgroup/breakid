@@ -343,7 +343,7 @@ set(BREAKID_TARGETS_FILENAME "breakidTargets.cmake")
 set(BREAKID_CONFIG_FILENAME "breakidConfig.cmake")
 
 # Export targets
-export(TARGETS breakid breakid-bin
+export(TARGETS breakid mytest
     FILE "${PROJECT_BINARY_DIR}/${BREAKID_TARGETS_FILENAME}")
 
 # Create breakidConfig file

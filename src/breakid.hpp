@@ -47,10 +47,6 @@ struct BreakID {
     void set_verbosity(uint32_t val);
     void set_steps_lim(int64_t val);
 
-    //Static CNF
-    void read_cnf(std::string fname);
-    void write_final_cnf(bool only_breakers);
-
     //Dynamic CNF
     void start_dynamic_cnf(uint32_t nVars);
     void add_clause(BID::BLit* start, size_t num);

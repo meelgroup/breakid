@@ -28,7 +28,7 @@ THE SOFTWARE.
 using std::cout;
 using std::endl;
 
-Breaker::Breaker(Specification const* origTheo, Config* _conf) :
+Breaker::Breaker(OnlCNF const* origTheo, Config* _conf) :
     originalTheory(origTheo)
     , conf(_conf)
 {
