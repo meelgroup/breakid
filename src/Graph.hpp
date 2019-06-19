@@ -53,8 +53,7 @@ public:
     void add_clause(BID::BLit* start, uint32_t size);
     void end_dynamic_cnf();
 
-    uint32_t getNbNodes();
-    void print();
+    uint32_t getNbNodes() const;
     void setUniqueColor(uint32_t lit);
     void setUniqueColor(const vector<BLit>& lits);
     void getSymmetryGenerators(
@@ -71,10 +70,8 @@ private:
     //Interaction with saucy:
     void initializeGraph(uint32_t nbNodes);
     void freeGraph();
-    uint32_t getNbNodesFromGraph();
-    uint32_t getColorOf(uint32_t node);
-    uint32_t nbNeighbours(uint32_t node);
-    uint32_t getNeighbour(uint32_t node, uint32_t nbthNeighbour);
+    uint32_t getNbNodesFromGraph() const;
+    uint32_t getColorOf(uint32_t node) const;
     void setNodeToNewColor(uint32_t node);
     void getSymmetryGeneratorsInternal(
         vector<shared_ptr<Permutation> >& out_perms

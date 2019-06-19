@@ -136,17 +136,13 @@ void BreakID::end_dynamic_cnf()
     dat->theory->set_new_group();
 }
 
-void BreakID::print_graph() {
-    dat->theory->getGraph()->print();
-}
-
 uint32_t BreakID::get_num_generators()
 {
-    return dat->theory->getGroup()->getSize();
+    return dat->theory->group->getSize();
 }
 
 void BreakID::detect_subgroups() {
-    dat->theory->getGroup()->getDisjointGenerators(dat->subgroups);
+    dat->theory->group->getDisjointGenerators(dat->subgroups);
 }
 
 uint64_t BreakID::get_num_subgroups() const
@@ -241,7 +237,7 @@ void BreakID::print_perms_and_matrices(std::ostream& out)
 }
 
 void BreakID::print_generators(std::ostream& out) {
-    dat->theory->getGroup()->print(cout);
+    dat->theory->group->print(cout);
 }
 
 void BreakID::get_perms(vector<std::unordered_map<BLit, BLit> >* out)

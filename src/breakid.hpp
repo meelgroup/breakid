@@ -57,7 +57,7 @@ struct BreakID {
     void break_symm();
 
     //Print info
-    void print_graph();
+    void print_graph() const;
     void print_subgroups(std::ostream& out);
     void print_symm_break_stats();
     void print_perms_and_matrices(std::ostream& out);

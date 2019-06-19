@@ -121,10 +121,11 @@ class Matrix
 class Group
 {
 public:
-    OnlCNF* theory;
+    OnlCNF* theory = NULL;
     void get_perms_to(vector<std::unordered_map<BLit, BLit>>& out);
 
     Group(Config* conf);
+    ~Group();
 
     void add(shared_ptr<Permutation> p);
     void checkColumnInterchangeability(shared_ptr<Matrix> m);

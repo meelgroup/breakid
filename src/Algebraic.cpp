@@ -346,6 +346,15 @@ Group::Group(Config* _conf) :
     conf(_conf)
 {}
 
+Group::~Group()
+{
+    if (theory) {
+        theory->group = NULL;
+        delete theory;
+        theory = NULL;
+    }
+}
+
 void Group::add(shared_ptr<Permutation> p)
 {
     permutations.push_back(p);
@@ -461,12 +470,12 @@ void Group::addMatrices()
             // find stabilizer group for all lits but those in the last row of the matrix
             for (uint32_t i = oldNbRows; i < matrix->nbRows() - 1; ++i) {
                 // fix all lits but the last row
-                theory->getGraph()->setUniqueColor(*matrix->getRow(i));
+                theory->graph->setUniqueColor(*matrix->getRow(i));
             }
             oldNbRows = matrix->nbRows();
 
             vector<shared_ptr<Permutation> > symgens;
-            theory->getGraph()->getSymmetryGenerators(
+            theory->graph->getSymmetryGenerators(
                 symgens, std::numeric_limits<int64_t>::max(), NULL);
 
             // now test stabilizer generators on the (former) last row
@@ -481,7 +490,7 @@ void Group::addMatrices()
         addMatrix(matrix);
         checkColumnInterchangeability(matrix);
         // fix lits of last row as well
-        theory->getGraph()->setUniqueColor(
+        theory->graph->setUniqueColor(
             *matrix->getRow(matrix->nbRows() - 1));
 
         //Get new matrix to evaluate

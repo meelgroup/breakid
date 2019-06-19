@@ -44,8 +44,9 @@ public:
     void add_clause(BID::BLit* lits, uint32_t size);
     void set_new_group();
     void set_old_group(Group* grp);
-    Graph* getGraph();
-    Group* getGroup();
+    const Graph* getGraph() const;
+    Group* group = NULL;
+    Graph* graph = NULL;
 
     void print(std::ostream& out) const;
     uint32_t getSize() const;
@@ -56,8 +57,6 @@ public:
 private:
     Config* conf;
     uint32_t num_cls;
-    Graph* graph = NULL;
-    Group* group = NULL;
     vector<uint32_t> cl_sizes;
     vector<BLit> cl_lits;
 

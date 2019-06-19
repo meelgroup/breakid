@@ -95,7 +95,7 @@ void OnlCNF::set_old_group(Group* grp) {
     for (uint32_t m = 0; m < grp->getNbMatrices(); ++m) {
         auto mat = grp->getMatrix(m);
         for (uint32_t r = 0; r < mat->nbRows() - 1; ++r) {
-            getGraph()->setUniqueColor(*mat->getRow(r));
+            graph->setUniqueColor(*mat->getRow(r));
         }
     }
 }
@@ -179,12 +179,7 @@ bool OnlCNF::isSymmetry(Permutation& prm)
     return true;
 }
 
-Graph* OnlCNF::getGraph()
+const Graph* OnlCNF::getGraph() const
 {
     return graph;
-}
-
-Group* OnlCNF::getGroup()
-{
-    return group;
 }

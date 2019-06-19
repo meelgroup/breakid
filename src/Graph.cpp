@@ -119,24 +119,15 @@ void Graph::freeGraph()
     delete (bliss_g);
 }
 
-uint32_t Graph::getNbNodesFromGraph()
+uint32_t Graph::getNbNodesFromGraph() const
 {
     return bliss_g->get_nof_vertices();
 }
 
-uint32_t Graph::getColorOf(uint32_t node)
+uint32_t Graph::getColorOf(uint32_t node) const
 {
     assert(node < vertex_to_color.size());
     return vertex_to_color[node];
-}
-
-uint32_t Graph::nbNeighbours(uint32_t /*node*/)
-{
-    return 0; //Not supported, only used for printing
-}
-uint32_t Graph::getNeighbour(uint32_t /*node*/, uint32_t /*nbthNeighbour*/)
-{
-    return 0; //Not supported, only used for printing
 }
 
 ///This method is given to BLISS as a polymorphic consumer
@@ -178,19 +169,7 @@ Graph::~Graph()
     freeGraph();
 }
 
-void Graph::print()
-{
-    for (size_t i = 0; i < getNbNodes(); ++i) {
-        fprintf(stderr, "node %i with color %i has neighbours\n", (int)i,
-                getColorOf(i));
-        for (size_t j = 0; j < nbNeighbours(i); ++j) {
-            fprintf(stderr, "%i ", getNeighbour(i, j));
-        }
-        fprintf(stderr, "\n");
-    }
-}
-
-uint32_t Graph::getNbNodes()
+uint32_t Graph::getNbNodes() const
 {
     return getNbNodesFromGraph();
 }
