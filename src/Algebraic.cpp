@@ -371,7 +371,7 @@ void Group::addMatrix(shared_ptr<Matrix> m)
     }
 
     if (conf->verbosity > 0) {
-        cout << "Matrix with " << m->nbRows() << " rows and "
+        cout << "-> Matrix with " << m->nbRows() << " rows and "
                   << m->nbColumns() << " columns detected" << endl;
     } else if (conf->verbosity > 2) {
         m->print(cout);

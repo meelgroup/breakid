@@ -168,7 +168,7 @@ void BreakID::break_symm()
         //Try to find matrix row interch. symmetries
         if (grp->getSize() > 1 && dat->conf->useMatrixDetection) {
             if (dat->conf->verbosity > 0) {
-                cout << "*** Detecting row interchangeability..." << endl;
+                cout << "Detecting row interchangeability..." << endl;
             }
 
             // Find set of clauses group permutates
