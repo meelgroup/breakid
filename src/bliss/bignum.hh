@@ -114,7 +114,9 @@ class BigNum
    */
     void multiply(const int n)
     {
-        v *= (long double)n;
+        if (v < 1e4000L) {
+            v *= (long double)n;
+        }
     }
 
     /**
