@@ -640,7 +640,7 @@ uint32_t Group::getSupportSize()
     return support.size();
 }
 
-void eliminateNonStabilizers(vector<shared_ptr<Permutation> >& permutations,
+void AlgebraicAlgos::eliminateNonStabilizers(vector<shared_ptr<Permutation> >& permutations,
                              BLit lit)
 {
     for (uint32_t i = 0; i < permutations.size(); ++i) {
@@ -652,7 +652,7 @@ void eliminateNonStabilizers(vector<shared_ptr<Permutation> >& permutations,
     }
 }
 
-void getOrbits2(const vector<shared_ptr<Permutation> >& permutations,
+void AlgebraicAlgos::getOrbits2(const vector<shared_ptr<Permutation> >& permutations,
                 vector<shared_ptr<vector<BLit> > >& orbits)
 {
     // find positively supported literals
@@ -683,7 +683,7 @@ void getOrbits2(const vector<shared_ptr<Permutation> >& permutations,
     }
 }
 
-void getPosLitOccurrenceCount(
+void AlgebraicAlgos::getPosLitOccurrenceCount(
     const vector<shared_ptr<Permutation> >& permutations,
     std::unordered_map<BLit, uint32_t>& lits2occ)
 {
@@ -707,9 +707,9 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
         // 1) in _a_ largest orbit with non-excluded variables
         // 2) has the lowest occurrence of literals adhering to 0) and 1)
         vector<shared_ptr<vector<BLit> > > orbs;
-        getOrbits2(perms, orbs);
+        AlgebraicAlgos::getOrbits2(perms, orbs);
         std::unordered_map<BLit, uint32_t> lits2occ;
-        getPosLitOccurrenceCount(perms, lits2occ);
+        AlgebraicAlgos::getPosLitOccurrenceCount(perms, lits2occ);
 
         shared_ptr<vector<BLit> > finalOrb(new vector<BLit>());
         BLit finalLit = BLit_Undef;
@@ -750,7 +750,7 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
             out_order.push_back(finalLit);
 
             // continue with stabilizer subgroup
-            eliminateNonStabilizers(perms, finalLit);
+            AlgebraicAlgos::eliminateNonStabilizers(perms, finalLit);
         } else {
             // no more orbits left with positive non-excluded vars
             perms.clear();
@@ -789,7 +789,7 @@ void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
     }
     // then create map ordering lits not occurring in matrixLits by their occurrence
     std::unordered_map<BLit, uint32_t> lits2occ;
-    getPosLitOccurrenceCount(permutations, lits2occ);
+    AlgebraicAlgos::getPosLitOccurrenceCount(permutations, lits2occ);
     std::multimap<uint32_t, BLit> occ2lit;
     for (auto it : lits2occ) {
         if (matrixLits.count(it.first) == 0) {

@@ -168,6 +168,25 @@ private:
     Config* conf;
 };
 
+class AlgebraicAlgos
+{
+public:
+    static
+    void eliminateNonStabilizers(
+        vector<shared_ptr<Permutation> >& permutations,
+        BLit lit);
+
+    static
+    void getOrbits2(
+        const vector<shared_ptr<Permutation> >& permutations,
+        vector<shared_ptr<vector<BLit> > >& orbits);
+
+    static
+    void getPosLitOccurrenceCount(
+        const vector<shared_ptr<Permutation> >& permutations,
+        std::unordered_map<BLit, uint32_t>& lits2occ);
+};
+
 inline const std::unordered_map<BLit, BLit>& Permutation::getPerm()
 {
     return perm;
