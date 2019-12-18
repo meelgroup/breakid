@@ -694,6 +694,7 @@ void AlgebraicAlgos::getPosLitOccurrenceCount(
     }
 }
 
+//The "excludedLits" is the matrix literals that will be dealt in other ways
 void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
                                const std::unordered_set<BLit>& excludedLits)
 {
