@@ -157,6 +157,7 @@ bool OnlCNF::isSymmetry(Permutation& prm)
         }
     }
 
+    //Every change clause's image MUST exist in the clause database
     size_t at = 0;
     vector<BLit> symmetrical;
     for (const uint32_t sz : cl_sizes) {
