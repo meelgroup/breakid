@@ -723,7 +723,8 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
             }
             // check whether o contains a positive non-excluded lit
             for (auto l : *o) {
-                if (excludedLits.count(l) == 0 && lits2occ.count(l) > 0 &&
+                if (excludedLits.count(l) == 0 &&
+                    lits2occ.count(l) > 0 &&
                     lits2occ[l] < finalOccurrence) {
                     // success!
                     finalLit = l;
