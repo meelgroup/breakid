@@ -35,8 +35,8 @@ void Permutation::addFromTo(BLit from, BLit to)
 {
     if (from != to
         // only ID's < 2*conf->nVars represent literals
-        && from.toInt() < 2 * conf->nVars
-        && to.toInt() < 2 * conf->nVars
+        && from.var() < conf->nVars
+        && to.var() < conf->nVars
     ) {
         perm[from] = to;
         domain.push_back(from);
