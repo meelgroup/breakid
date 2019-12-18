@@ -700,7 +700,8 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
     // now, look for literals with large orbits (of a stabilizer group for smaller literals) as first elements of the order
     vector<shared_ptr<Permutation> > perms = permutations;
     while (perms.size() > 0) {
-        // as long as we have some permutations stabilizing everything in order so far, continue looking for other literals to add to the order
+        // as long as we have some permutations stabilizing everything in
+        // order so far, continue looking for other literals to add to the order
 
         // figure out which literal is:
         // 0) a non-excluded variable
