@@ -717,9 +717,8 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
         uint32_t finalOccurrence = std::numeric_limits<uint32_t>::max();
         for (auto o : orbs) {
             // check whether o is bigger
-            if (o->size() <
-                finalOrb
-                    ->size()) { // note the strict inequality (see condition 1)
+            if (o->size() < finalOrb->size()) {
+                // note the strict inequality above (see condition 1)
                 continue;
             }
             // check whether o contains a positive non-excluded lit
