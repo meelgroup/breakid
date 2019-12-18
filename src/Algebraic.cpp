@@ -40,10 +40,10 @@ void Permutation::addFromTo(BLit from, BLit to)
     ) {
         perm[from] = to;
         domain.push_back(from);
-        image.push_back(to);
         if (!from.sign()) {
             posDomain.push_back(from);
         }
+        image.push_back(to);
     }
 }
 
