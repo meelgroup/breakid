@@ -764,6 +764,8 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
 void Group::getOrderAndAddBinaryClausesTo(Breaker& brkr,
                                           vector<BLit>& out_order)
 {
+    assert(out_order.empty());
+
     // first, figure out which literals occur in the matrix, since their order is fixed.
     std::unordered_set<BLit> matrixLits;
     for (auto m : matrices) {
