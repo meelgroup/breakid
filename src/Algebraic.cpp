@@ -752,6 +752,7 @@ void Group::addBinaryClausesTo(Breaker& brkr, vector<BLit>& out_order,
             out_order.push_back(finalLit);
 
             // continue with stabilizer subgroup
+            // see the GAP tool's StabChain method
             AlgebraicAlgos::eliminateNonStabilizers(perms, finalLit);
         } else {
             // no more orbits left with positive non-excluded vars
