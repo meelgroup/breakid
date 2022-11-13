@@ -33,6 +33,7 @@ set(breakid_lib_files
     Theory.cpp
     breakid.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp
+    breakid_c.cpp
     $<TARGET_OBJECTS:bliss>
 )
 
@@ -50,26 +51,6 @@ set_target_properties(breakid PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
 
-###############
-
-# add_executable(breakid-bin
-#     main.cpp
-# )
-# set_target_properties(breakid-bin PROPERTIES
-#     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
-#     INSTALL_RPATH_USE_LINK_PATH TRUE
-#     OUTPUT_NAME breakid
-# )
-#
-# if (STATICCOMPILE)
-#     SET_TARGET_PROPERTIES(breakid-bin PROPERTIES LINK_SEARCH_START_STATIC 1)
-# endif()
-#
-# target_link_libraries(breakid-bin
-#     breakid
-#     # ${Boost_LIBRARIES}
-# )
-
 add_executable(mytest
     test.cpp
 )
@@ -83,7 +64,7 @@ target_link_libraries(mytest
     # ${Boost_LIBRARIES}
 )
 
-
+breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid_c.h )
 breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
 
 # -----------------------------------------------------------------------------

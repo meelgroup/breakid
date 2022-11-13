@@ -3,8 +3,15 @@
  *
  */
 
-#include "breakid.h"
+#include "breakid_c.h"
+#include "breakid.hpp"
+#include "constants.h"
 #include <vector>
+#include <iostream>
+#include <sstream>
+#include <cassert>
+
+using namespace BID;
 
 template<typename T>
 std::vector<T> wrap(const T* vals, size_t num_vals)
@@ -24,98 +31,142 @@ Dest unwrap(const std::vector<T>& vec)
     std::exit(-1);\
 } }
 
+BLit int_to_lit(const int i) {
+    assert(i != 0);
+    if (i < 0) return BLit(abs(i)-1, true);
+    else return  BLit(abs(i)-1, false);
+}
+
+int lit_to_int(const BLit lit) {
+    if (lit.sign()) return lit.var()+1;
+    else return -(lit.var()+1);
+}
+
 extern "C"
 {
-
-    DLL_PUBLIC SATSolver* cmsat_new(void) NOEXCEPT_START {
-            return new SATSolver();
+    //create and destroy
+    DLL_PUBLIC BreakID* breakid_new(void) NOEXCEPT_START {
+            return new BreakID();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_free(SATSolver* s) NOEXCEPT_START {
-        delete s;
+    DLL_PUBLIC void breakid_free(BreakID* breakid) NOEXCEPT_START {
+            delete breakid;
     } NOEXCEPT_END
 
-    DLL_PUBLIC unsigned cmsat_nvars(const SATSolver* self) NOEXCEPT_START {
-        return self->nVars();
+
+    //configuration functions
+    DLL_PUBLIC void breakid_set_useMatrixDetection(BreakID* bid, bool val) NOEXCEPT_START {
+            bid->set_useMatrixDetection(val);
     } NOEXCEPT_END
 
-    DLL_PUBLIC bool cmsat_add_clause(SATSolver* self, const c_Lit* lits, size_t num_lits) NOEXCEPT_START {
-        return self->add_clause(wrap(fromc(lits), num_lits));
+    DLL_PUBLIC void breakid_set_useBinaryClauses(BreakID* bid, bool val) NOEXCEPT_START {
+            bid->set_useBinaryClauses(val);
     } NOEXCEPT_END
 
-    DLL_PUBLIC bool cmsat_add_xor_clause(SATSolver* self, const unsigned* vars, size_t num_vars, bool rhs) NOEXCEPT_START {
-        return self->add_xor_clause(wrap(vars, num_vars), rhs);
+    DLL_PUBLIC void breakid_set_useShatterTranslation(BreakID* bid, bool val) NOEXCEPT_START {
+            bid->set_useShatterTranslation(val);
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_new_vars(SATSolver* self, const size_t n) NOEXCEPT_START {
-        self->new_vars(n);
+    DLL_PUBLIC void breakid_set_useFullTranslation(BreakID* bid, bool val) NOEXCEPT_START {
+            bid->set_useFullTranslation(val);
     } NOEXCEPT_END
 
-    DLL_PUBLIC c_lbool cmsat_solve(SATSolver* self) NOEXCEPT_START {
-        return toc(self->solve(nullptr));
+    DLL_PUBLIC void breakid_set_symBreakingFormLength(BreakID* bid, int val) NOEXCEPT_START {
+            bid->set_symBreakingFormLength(val);
     } NOEXCEPT_END
 
-    DLL_PUBLIC c_lbool cmsat_solve_with_assumptions(SATSolver* self, const c_Lit* assumptions, size_t num_assumptions) NOEXCEPT_START {
-        auto temp = wrap(fromc(assumptions), num_assumptions);
-        return toc(self->solve(&temp));
+    DLL_PUBLIC void breakid_set_verbosity(BreakID* bid, uint32_t val) NOEXCEPT_START {
+            bid->set_verbosity(val);
     } NOEXCEPT_END
 
-    DLL_PUBLIC slice_lbool cmsat_get_model(const SATSolver* self) NOEXCEPT_START {
-        return unwrap<slice_lbool>(self->get_model());
+    DLL_PUBLIC void breakid_set_steps_lim(BreakID* bid, int64_t val) NOEXCEPT_START {
+            bid->set_steps_lim(val);
     } NOEXCEPT_END
 
-    DLL_PUBLIC slice_Lit cmsat_get_conflict(const SATSolver* self) NOEXCEPT_START {
-        return unwrap<slice_Lit>(self->get_conflict());
+
+    //Print info
+    DLL_PUBLIC void breakid_print_subgroups(BreakID* bid) NOEXCEPT_START {
+        bid->print_subgroups(std::cout);
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_print_stats(const SATSolver* self) NOEXCEPT_START {
-        self->print_stats();
-    } NOEXCEPT_END
-    
-    //Setup
-    DLL_PUBLIC void cmsat_set_num_threads(SATSolver* self, unsigned n) NOEXCEPT_START {
-        self->set_num_threads(n);
+    DLL_PUBLIC void breakid_print_symm_break_stats(BreakID* bid) NOEXCEPT_START {
+        bid->print_symm_break_stats();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_verbosity(SATSolver* self, unsigned n) NOEXCEPT_START {
-        self->set_verbosity(n);
+    DLL_PUBLIC void breakid_print_perms_and_matrices(BreakID* bid) NOEXCEPT_START {
+        bid->print_perms_and_matrices(std::cout);
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_default_polarity(SATSolver* self, int polarity) NOEXCEPT_START {
-        self->set_default_polarity(polarity);
+    DLL_PUBLIC void breakid_print_generators(BreakID* bid) NOEXCEPT_START {
+        bid->print_generators(std::cout);
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_no_simplify(SATSolver* self) NOEXCEPT_START {
-        self->set_no_simplify();
+
+    //Get info
+    DLL_PUBLIC uint32_t breakid_get_num_generators(BreakID* bid) NOEXCEPT_START {
+        return bid->get_num_generators();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_no_simplify_at_startup(SATSolver* self)  NOEXCEPT_START {
-        self->set_no_simplify_at_startup();
+    DLL_PUBLIC uint32_t breakid_get_num_break_cls(BreakID* bid) NOEXCEPT_START {
+        return bid->get_num_break_cls();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_no_equivalent_lit_replacement(SATSolver* self)  NOEXCEPT_START {
-        self->set_no_equivalent_lit_replacement();
+    DLL_PUBLIC uint32_t breakid_get_num_aux_vars(BreakID* bid) NOEXCEPT_START {
+        return bid->get_num_aux_vars();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_no_bva(SATSolver* self)  NOEXCEPT_START {
-        self->set_no_bva();
+    DLL_PUBLIC int64_t  breakid_get_steps_remain(BreakID* bid) NOEXCEPT_START {
+        return bid->get_steps_remain();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_no_bve(SATSolver* self)  NOEXCEPT_START {
-        self->set_no_bve();
-    } NOEXCEPT_END
-    DLL_PUBLIC void cmsat_set_up_for_scalmc(SATSolver* self)  NOEXCEPT_START {
-        self->set_up_for_scalmc();
-    } NOEXCEPT_END
-    DLL_PUBLIC void cmsat_set_up_for_arjun(SATSolver* self)  NOEXCEPT_START {
-        self->set_up_for_arjun();
-    } NOEXCEPT_END
-    DLL_PUBLIC c_lbool cmsat_simplify(SATSolver* self, const c_Lit* assumptions, size_t num_assumptions) NOEXCEPT_START {
-        auto temp = wrap(fromc(assumptions), num_assumptions);
-        return toc(self->simplify(&temp));
+    DLL_PUBLIC uint64_t breakid_get_num_subgroups(BreakID* bid) NOEXCEPT_START {
+        return bid->get_num_subgroups();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void cmsat_set_max_time(SATSolver* self, double max_time) NOEXCEPT_START {
-        self->set_max_time(max_time);
+    //Dynamic CNF
+    DLL_PUBLIC void breakid_start_dynamic_cnf(BreakID* bid, uint32_t nVars) NOEXCEPT_START {
+        bid->start_dynamic_cnf(nVars);
+    } NOEXCEPT_END
+
+    DLL_PUBLIC void breakid_add_clause(BreakID* bid, int* start, size_t num) NOEXCEPT_START {
+        int* at = start;
+        for(size_t i = 0; i < num; i ++) {
+            *at = (int)int_to_lit(*at).toInt();
+            at++;
+        }
+        bid->add_clause((BID::BLit*)start, num);
+    } NOEXCEPT_END
+
+    DLL_PUBLIC void breakid_end_dynamic_cnf(BreakID* bid) NOEXCEPT_START {
+        bid->end_dynamic_cnf();
+    } NOEXCEPT_END
+
+    //Main functions
+    DLL_PUBLIC void breakid_detect_subgroups(BreakID* bid) NOEXCEPT_START {
+        bid->detect_subgroups();
+    } NOEXCEPT_END
+
+    DLL_PUBLIC void breakid_break_symm(BreakID* bid) NOEXCEPT_START {
+        bid->break_symm();
+    } NOEXCEPT_END
+
+    DLL_PUBLIC int* breakid_get_brk_cls(BreakID* bid, int* num) NOEXCEPT_START {
+       auto brk = bid->get_brk_cls();
+       *num = brk.size();
+       size_t total_sz = 0;
+       for (auto cl: brk) {
+           total_sz += cl.size()+1;
+       }
+       int* cls_ptr = (int*) malloc(total_sz * sizeof(int));
+       int* at = cls_ptr;
+       for (auto cl: brk) {
+            for(auto lit: cl) {
+                *at = lit_to_int(lit);
+                at++;
+            }
+            *at = 0;
+            at++;
+        }
+       return at;
     } NOEXCEPT_END
 }
