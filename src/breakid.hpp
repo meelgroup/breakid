@@ -26,11 +26,76 @@ THE SOFTWARE.
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "breakid/solvertypesmini.hpp"
+#include <iostream>
 
 namespace BID {
 
 struct PrivateData;
+
+class BLit
+{
+    uint32_t x;
+    explicit BLit(uint32_t i) : x(i) { }
+public:
+    BLit() : x((0xffffffffU >> 3)<<1) {}   // (lit_Undef)
+    explicit BLit(uint32_t var, bool is_inverted) :
+        x((var<<1) | (uint32_t)is_inverted)
+    {}
+
+    const uint32_t& toInt() const { // Guarantees small, positive integers suitable for array indexing.
+        return x;
+    }
+    BLit  operator~() const {
+        return BLit(x ^ 1);
+    }
+    BLit  operator^(const bool b) const {
+        return BLit(x ^ (uint32_t)b);
+    }
+    BLit& operator^=(const bool b) {
+        x ^= (uint32_t)b;
+        return *this;
+    }
+    bool sign() const {
+        return x & 1;
+    }
+    uint32_t  var() const {
+        return x >> 1;
+    }
+    BLit  unsign() const {
+        return BLit(x & ~1U);
+    }
+    bool operator==(const BLit& p) const {
+        return x == p.x;
+    }
+    bool operator!= (const BLit& p) const {
+        return x != p.x;
+    }
+    /**
+    @brief ONLY to be used for ordering such as: a, b, ~b, etc.
+    */
+    bool operator <  (const BLit& p) const {
+        return x < p.x;     // '<' guarantees that p, ~p are adjacent in the ordering.
+    }
+    bool operator >  (const BLit& p) const {
+        return x > p.x;
+    }
+    bool operator >=  (const BLit& p) const {
+        return x >= p.x;
+    }
+    static BLit toBLit(uint32_t data)
+    {
+        return BLit(data);
+    }
+};
+
+static const BLit BLit_Undef = BLit::toBLit((0xffffffffU >> 3)<<1);
+
+inline std::ostream& operator<<(std::ostream& os, const BLit lit)
+{
+
+    os << (lit.sign() ? "-" : "") << (lit.var() + 1);
+    return os;
+}
 
 struct BreakID {
     BreakID();
@@ -73,9 +138,21 @@ struct BreakID {
     void get_perms(std::vector<std::unordered_map<BLit, BLit> >* out);
 
 private:
-    PrivateData* dat = NULL;
+    BID::PrivateData* dat = NULL;
 };
 
 }
 
+namespace std {
+
+  template <>
+  struct hash<BID::BLit>
+  {
+    std::size_t operator()(const BID::BLit& k) const
+    {
+      return k.toInt();
+    }
+  };
+
+}
 #endif

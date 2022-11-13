@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "Algebraic.hpp"
 #include "Breaking.hpp"
 #include "Graph.hpp"
-#include "breakid/solvertypesmini.hpp"
+#include "breakid.hpp"
 
 using std::cout;
 using std::endl;

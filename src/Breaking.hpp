@@ -32,9 +32,9 @@ THE SOFTWARE.
 #include <iostream>
 #include <iostream>
 #include <unordered_set>
+#include "breakid.hpp"
 
 #include "config.hpp"
-#include "breakid/solvertypesmini.hpp"
 
 using namespace BID;
 using std::vector;

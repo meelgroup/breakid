@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "Algebraic.hpp"
 #include "Breaking.hpp"
-#include "breakid/solvertypesmini.hpp"
+#include "breakid.hpp"
 
 class Matrix;
 class Group;

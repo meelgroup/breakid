@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include "Theory.hpp"
 #include "Graph.hpp"
 #include "config.hpp"
-#include "breakid/solvertypesmini.hpp"
+#include "breakid.hpp"
 #include "GitSHA1.h"
 
 #include <cstdlib>

@@ -25,7 +25,6 @@ THE SOFTWARE.
 
 #include "config.hpp"
 #include "Breaking.hpp"
-#include "breakid/solvertypesmini.hpp"
 #include <unordered_set>
 
 class Graph;

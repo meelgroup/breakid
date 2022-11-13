@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "breakid.hpp"
 #include "time_mem.h"
-#include "breakid/solvertypesmini.hpp"
 
 using std::cout;
 using std::string;
