@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
         breakid.print_symm_break_stats();
     }
 
-    cout << "Num breaking clasues: "<< breakid.get_num_break_cls() << endl;
+    cout << "Num breaking clauses: "<< breakid.get_num_break_cls() << endl;
     cout << "Num aux vars: "<< breakid.get_num_aux_vars() << endl;
     if (conf_verbosity > 3) {
         auto brk = breakid.get_brk_cls();
