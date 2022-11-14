@@ -49,7 +49,7 @@ extern "C"
             return new BreakID();
     } NOEXCEPT_END
 
-    DLL_PUBLIC void breakid_free(BreakID* breakid) NOEXCEPT_START {
+    DLL_PUBLIC void breakid_del(BreakID* breakid) NOEXCEPT_START {
             delete breakid;
     } NOEXCEPT_END
 
