@@ -68,8 +68,8 @@ BID_DLL_PUBLIC uint64_t breakid_get_num_subgroups(BreakID* bid) NOEXCEPT;
 
 // Returns the number of clauses in `num_ret` and returns an int* that
 // contains all clauses's literals with a 0 in between:
-// lit1 lit2 lit3 0 lit1 lit2 0 ... where 1st clause contains lit1, lit2, lit3
-BID_DLL_PUBLIC int*     breakid_get_brk_cls(BreakID* bid, int* num_ret) NOEXCEPT;
+// lit1 lit2 lit3 UINT_MAX lit1 lit2 UINT_MAX ... where 1st clause contains lit1, lit2, lit3
+BID_DLL_PUBLIC unsigned* breakid_get_brk_cls(BreakID* bid, int* num_ret) NOEXCEPT;
 
 
 

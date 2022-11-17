@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <limits.h>
 
 using namespace BID;
 
@@ -30,17 +31,6 @@ Dest unwrap(const std::vector<T>& vec)
     std::cerr << "ERROR: exception thrown past FFI boundary" << std::endl;\
     std::exit(-1);\
 } }
-
-BLit int_to_lit(const int i) {
-    assert(i != 0);
-    if (i < 0) return BLit(abs(i)-1, true);
-    else return  BLit(abs(i)-1, false);
-}
-
-int lit_to_int(const BLit lit) {
-    if (lit.sign()) return lit.var()+1;
-    else return -(lit.var()+1);
-}
 
 extern "C"
 {
@@ -129,11 +119,6 @@ extern "C"
     } NOEXCEPT_END
 
     DLL_PUBLIC void breakid_add_clause(BreakID* bid, int* start, size_t num) NOEXCEPT_START {
-        int* at = start;
-        for(size_t i = 0; i < num; i ++) {
-            *at = (int)int_to_lit(*at).toInt();
-            at++;
-        }
         bid->add_clause((BID::BLit*)start, num);
     } NOEXCEPT_END
 
@@ -150,21 +135,21 @@ extern "C"
         bid->break_symm();
     } NOEXCEPT_END
 
-    DLL_PUBLIC int* breakid_get_brk_cls(BreakID* bid, int* num) NOEXCEPT_START {
+    DLL_PUBLIC unsigned* breakid_get_brk_cls(BreakID* bid, int* num) NOEXCEPT_START {
        auto brk = bid->get_brk_cls();
        *num = brk.size();
        size_t total_sz = 0;
        for (auto cl: brk) {
            total_sz += cl.size()+1;
        }
-       int* cls_ptr = (int*) malloc(total_sz * sizeof(int));
-       int* at = cls_ptr;
+       unsigned* cls_ptr = (unsigned*) malloc(total_sz * sizeof(int));
+       unsigned* at = cls_ptr;
        for (auto cl: brk) {
             for(auto lit: cl) {
-                *at = lit_to_int(lit);
+                *at = lit.toInt();
                 at++;
             }
-            *at = 0;
+            *at = UINT_MAX;
             at++;
         }
        return at;

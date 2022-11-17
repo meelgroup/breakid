@@ -186,7 +186,7 @@ void BreakID::break_symm()
         //Symmetry
         if (dat->conf->symBreakingFormLength > -1) {
             if (dat->conf->verbosity > 0) {
-                cout << "*** Constructing symmetry breaking formula..." << endl;
+                cout << "c *** Constructing symmetry breaking formula..." << endl;
             }
             grp->addBreakingClausesTo(*dat->brkr);
         }
