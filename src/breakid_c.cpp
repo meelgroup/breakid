@@ -136,22 +136,22 @@ extern "C"
     } NOEXCEPT_END
 
     DLL_PUBLIC unsigned* breakid_get_brk_cls(BreakID* bid, int* num) NOEXCEPT_START {
-       auto brk = bid->get_brk_cls();
-       *num = brk.size();
-       size_t total_sz = 0;
-       for (auto cl: brk) {
-           total_sz += cl.size()+1;
-       }
-       unsigned* cls_ptr = (unsigned*) malloc(total_sz * sizeof(int));
-       unsigned* at = cls_ptr;
-       for (auto cl: brk) {
-            for(auto lit: cl) {
-                *at = lit.toInt();
-                at++;
-            }
-            *at = UINT_MAX;
-            at++;
+        auto brk = bid->get_brk_cls();
+        *num = brk.size();
+        size_t total_sz = 0;
+        for (auto cl: brk) {
+            total_sz += cl.size()+1;
         }
-       return at;
+        unsigned* cls_ptr = (unsigned*) malloc(total_sz * sizeof(unsigned));
+        unsigned* at = cls_ptr;
+        for (auto const& cl: brk) {
+             for(auto const& lit: cl) {
+                 *at = lit.toInt();
+                 at++;
+             }
+             *at = UINT_MAX;
+             at++;
+        }
+        return cls_ptr;
     } NOEXCEPT_END
 }
