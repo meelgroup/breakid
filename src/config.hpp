@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include <vector>
 #include <string>
 #include <limits>
+#include <cstdint>
 
 using std::vector;
 using std::string;

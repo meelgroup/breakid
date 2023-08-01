@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <vector>
 #include <unordered_map>
 #include <iostream>
+#include <cstdint>
 
 namespace BID {
 
