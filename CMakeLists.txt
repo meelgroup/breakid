@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 11)
 
@@ -94,30 +94,18 @@ if (STATICCOMPILE)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
-
 if (NOT MSVC)
     add_compile_options( -g)
     add_compile_options( -pthread )
-
-    #NOTE: out-satrace19-8373595 has confirmed that O3+flto only hurts compared to O2
-    #      on gcc version 7.3.0
     add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:-O2>")
-
     add_compile_options("$<$<CONFIG:RELEASE>:-O2>")
     add_compile_options("$<$<CONFIG:RELEASE>:-g0>")
-
     add_compile_options("$<$<CONFIG:DEBUG>:-O0>")
-
     if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -O2")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2")
     endif()
-
 else()
-    # see https://msdn.microsoft.com/en-us/library/fwkeyyhe.aspx for details
-    # /ZI = include debug info
-    # /Wall = all warnings
-
     add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:/O2>")
     add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:/ZI>")
 
@@ -158,29 +146,11 @@ else()
     # Disable STL used in DLL-boundary warning
     add_compile_options(/wd4251)
     add_compile_options(/D_CRT_SECURE_NO_WARNINGS)
-
-    # Wall is MSVC's Weverything, so annoying unless used from the start
-    # and with judiciously used warning disables
-    # add_compile_options(/Wall)
-
-    # /Za = only ansi C98 & C++11
-    # /Za is not recommended for use, not tested, etc.
-    # see: http://stackoverflow.com/questions/5489326/za-compiler-directive-does-not-compile-system-headers-in-vs2010
-    # add_compile_options(/Za)
-
     add_compile_options(/fp:precise)
-
-    # exception handling. s = The exception-handling model that catches C++ exceptions only and tells the compiler to assume that functions declared as extern "C" may throw an exception.
-    # exception handling. c = If used with s (/EHsc), catches C++ exceptions only and tells the compiler to assume that functions declared as extern "C" never throw a C++ exception.
     add_compile_options(/EHsc)
-
-
-    # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /INCREMENTAL:NO")
-    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /PDBCOMPRESS")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:1572864")
 
-    #what does this do?
-    set(DEF_INSTALL_CMAKE_DIR CMake)
+    # for windows, cmake definitions are in a different directory
 endif()
 
 include(CheckCXXCompilerFlag)
@@ -222,9 +192,6 @@ if (NOT WIN32)
         add_cxx_flag_if_supported("-Wunreachable-code")
         add_cxx_flag_if_supported("-ggdb3")
         add_cxx_flag_if_supported("-Wno-unused-parameter")
-
-        # Apparently needed before OS X Maverics (2013)
-        #add_c_flag_if_supported("-stdlib=libc++")
     endif()
 endif()
 
@@ -242,38 +209,6 @@ else()
     add_cxx_flag_if_supported("-fno-stack-protector")
     add_definitions(-D_FORTIFY_SOURCE=0)
 endif()
-
-if ((${CMAKE_SYSTEM_NAME} MATCHES "Linux") OR (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-    if(STATICCOMPILE)
-        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-        MESSAGE(STATUS "Compiling for static library use")
-        if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-            #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -Wl,--whole-archive -ldl -lpthread -Wl,--no-whole-archive -static ")
-            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  -static ")
-        endif()
-
-        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-
-        # removing -rdynamic that's automatically added
-        foreach (language CXX C)
-            set(VAR_TO_MODIFY "CMAKE_SHARED_LIBRARY_LINK_${language}_FLAGS")
-            string(REGEX REPLACE "(^| )-rdynamic($| )"
-                                 " "
-                                 replacement
-                                 "${${VAR_TO_MODIFY}}")
-            #message("Original (${VAR_TO_MODIFY}) is ${${VAR_TO_MODIFY}} replacement is ${replacement}")
-            set(${VAR_TO_MODIFY} "${replacement}" CACHE STRING "Default flags for ${build_config} configuration" FORCE)
-        endforeach()
-    else()
-        add_definitions(-DBOOST_TEST_DYN_LINK)
-        MESSAGE(STATUS "Compiling for dynamic library use")
-    endif()
-endif()
-
-# find_package( Boost 1.46 COMPONENTS program_options REQUIRED)
-# message(STATUS "Boost -- found at library: ${Boost_LIBRARIES}")
-# message(STATUS "Boost -- adding '${Boost_LIBRARY_DIRS}' to link directories")
-# link_directories(${Boost_LIBRARY_DIRS})
 
 # -----------------------------------------------------------------------------
 # Add GIT version
@@ -359,9 +294,15 @@ configure_file(breakidConfig.cmake.in
 # Now the user can just use find_package(breakid) on their system
 export(PACKAGE breakid)
 
-set(DEF_INSTALL_CMAKE_DIR lib/cmake/breakid)
-set(BREAKID_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
-    "Installation directory for BreakID CMake files")
+if (NOT LIB_SUFFIX)
+    set(LIB_SUFFIX "")
+endif()
+
+ if(WIN32 AND NOT CYGWIN)
+   set(DEF_INSTALL_CMAKE_DIR cmake)
+ else()
+   set(DEF_INSTALL_CMAKE_DIR lib${LIB_SUFFIX}/cmake/libwebsockets)
+ endif()
 
 # Create breakidConfig file
 set(EXPORT_TYPE "installed")

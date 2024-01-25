@@ -1,3 +1,5 @@
+# File by CMake, see cmake-license.txt for copyright details
+
 cmake_policy(SET CMP0007 NEW) # Suppress warnings see `cmake --help-policy CMP0007`
 
 if (NOT EXISTS "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")

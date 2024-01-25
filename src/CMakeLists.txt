@@ -41,10 +41,6 @@ add_library(breakid
     ${breakid_lib_files}
 )
 
-target_link_libraries(breakid
-    # nothing
-)
-
 set_target_properties(breakid PROPERTIES
     PUBLIC_HEADER "${breakid_public_headers}"
     VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -61,7 +57,6 @@ set_target_properties(mytest PROPERTIES
 )
 target_link_libraries(mytest
     breakid
-    # ${Boost_LIBRARIES}
 )
 
 breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid_c.h )

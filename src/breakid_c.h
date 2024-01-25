@@ -1,7 +1,25 @@
-/* C header for BreakID
- *
- *
- */
+/* C header for BreakID */
+/******************************************
+Copyright (c) 2022 Mate Soos
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+***********************************************/
 
 #include <stdint.h>
 #include <stddef.h>
@@ -70,7 +88,6 @@ BID_DLL_PUBLIC uint64_t breakid_get_num_subgroups(BreakID* bid) NOEXCEPT;
 // contains all clauses's literals with a 0 in between:
 // lit1 lit2 lit3 UINT_MAX lit1 lit2 UINT_MAX ... where 1st clause contains lit1, lit2, lit3
 BID_DLL_PUBLIC unsigned* breakid_get_brk_cls(BreakID* bid, int* num_ret) NOEXCEPT;
-
 
 
 #ifdef __cplusplus
