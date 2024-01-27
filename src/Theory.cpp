@@ -70,10 +70,7 @@ void OnlCNF::add_clause(BID::BLit* lits, uint32_t size)
 void OnlCNF::end_dynamic_cnf()
 {
     graph->end_dynamic_cnf();
-
-    if (conf->verbosity) {
-        cout << "-> Detecting symmetry group..." << endl;
-    }
+    if (conf->verbosity) cout << "c Detecting symmetry group..." << endl;
 }
 
 void OnlCNF::set_new_group() {

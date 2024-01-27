@@ -203,6 +203,7 @@ bool Permutation::getImage(const BLit* orig, size_t sz, vector<BLit>& img) const
 
 void Permutation::print(std::ostream& out) const
 {
+    out << "c ";
     for (auto lit : getCycleReprs()) {
         out << "( ";
         vector<BLit> cyc;
@@ -827,10 +828,8 @@ void Group::addBreakingClausesTo(Breaker& brkr)
     getOrderAndAddBinaryClausesTo(brkr, order);
 
     if (conf->verbosity > 3) {
-        cout << "order: ";
-        for (auto x : order) {
-            cout << x << " ";
-        }
+        cout << "c order: ";
+        for (auto x : order) cout << x << " ";
         cout << endl;
     }
 

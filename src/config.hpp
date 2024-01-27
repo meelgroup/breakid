@@ -35,7 +35,7 @@ struct Config {
     string inputSymFile;
 
     // OPTIONS
-    bool useMatrixDetection = false;
+    bool useMatrixDetection = true;
     bool useBinaryClauses = true;
     bool useShatterTranslation = false;
     bool useFullTranslation = false;
