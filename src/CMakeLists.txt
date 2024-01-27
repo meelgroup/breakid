@@ -44,13 +44,13 @@ set_target_properties(breakid PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
 
-add_executable(breakid-main breakid-main.cpp)
-set_target_properties(breakid-main PROPERTIES
+add_executable(breakid-bin breakid-main.cpp)
+set_target_properties(breakid-bin PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     INSTALL_RPATH_USE_LINK_PATH TRUE
     OUTPUT_NAME breakid
 )
-target_link_libraries(breakid-main breakid)
+target_link_libraries(breakid-bin breakid)
 
 breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid_c.h )
 breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
@@ -78,7 +78,7 @@ foreach(public_header ${breakid_public_headers})
 endforeach()
 
 
-install(TARGETS breakid breakid-main
+install(TARGETS breakid breakid-bin
     EXPORT ${BREAKID_EXPORT_NAME}
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"

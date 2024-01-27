@@ -226,12 +226,36 @@ include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
 set(BREAKID_FULL_VERSION "1.0.0")
-string(REPLACE "." ";" BREAKID_FULL_VERSION ${BREAKID_FULL_VERSION})
-SetVersionNumber("PROJECT" ${BREAKID_FULL_VERSION})
+string(REPLACE "." ";" BREAKID_FULL_VERSION_LIST ${BREAKID_FULL_VERSION})
+SetVersionNumber("PROJECT" ${BREAKID_FULL_VERSION_LIST})
 MESSAGE(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
 MESSAGE(STATUS "PROJECT_VERSION_MAJOR: ${PROJECT_VERSION_MAJOR}")
 MESSAGE(STATUS "PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
 MESSAGE(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
+
+# ----------
+# manpage
+# ----------
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    find_program(HELP2MAN_FOUND help2man)
+    if (HELP2MAN_FOUND)
+        ADD_CUSTOM_TARGET(man_breakid ALL DEPENDS breakid-bin)
+        ADD_CUSTOM_COMMAND(
+            TARGET man_breakid
+            COMMAND help2man
+            ARGS --version-string=${BREAKID_FULL_VERSION} $<TARGET_FILE:breakid-bin> -o ${CMAKE_CURRENT_BINARY_DIR}/breakid.1
+        )
+
+        INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/breakid.1
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
+        message(STATUS "Manpage will be created and installed")
+    else()
+        MESSAGE(STATUS "Cannot find help2man, not creating manpage")
+    endif()
+else()
+    MESSAGE(STATUS "Not on Linux, not creating manpage")
+endif()
+
 
 
 # headers, install locations, etc
@@ -280,7 +304,7 @@ set(BREAKID_TARGETS_FILENAME "breakidTargets.cmake")
 set(BREAKID_CONFIG_FILENAME "breakidConfig.cmake")
 
 # Export targets
-export(TARGETS breakid breakid-main
+export(TARGETS breakid breakid-bin
     FILE "${PROJECT_BINARY_DIR}/${BREAKID_TARGETS_FILENAME}")
 
 # Create breakidConfig file
