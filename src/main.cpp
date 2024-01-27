@@ -184,9 +184,7 @@ int main(int argc, char *argv[])
         breakid.print_generators(std::cout);
     }
 
-    if (conf.verbosity) {
-        cout << "*** Detecting subgroups..." << endl;
-    }
+    if (conf.verbosity) cout << "*** Detecting subgroups..." << endl;
     breakid.detect_subgroups();
 
     if (conf.verbosity) {

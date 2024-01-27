@@ -371,23 +371,17 @@ void Group::addMatrix(shared_ptr<Matrix> m)
     }
 
     if (conf->verbosity > 0) {
-        cout << "-> Matrix with " << m->nbRows() << " rows and "
+        cout << "c -> Matrix with " << m->nbRows() << " rows and "
                   << m->nbColumns() << " columns detected" << endl;
-    } else if (conf->verbosity > 2) {
-        m->print(cout);
-    }
+    } else if (conf->verbosity > 2) m->print(cout);
 }
 
 void Group::print(std::ostream& out) const
 {
-    out << "-- Permutations:" << endl;
-    for (const auto& p : permutations) {
-        p->print(out);
-    }
-    out << "-- Matrices:" << endl;
-    for (const auto& m : matrices) {
-        m->print(out);
-    }
+    out << "c -- Permutations:" << endl;
+    for (const auto& p : permutations) p->print(out);
+    out << "c -- Matrices:" << endl;
+    for (const auto& m : matrices) m->print(out);
 }
 
 void Group::get_perms_to(vector<std::unordered_map<BLit, BLit>>& out)
@@ -871,11 +865,10 @@ Matrix::~Matrix()
 
 void Matrix::print(std::ostream& out) const
 {
-    out << "rows " << nbRows() << " columns " << nbColumns() << endl;
+    out << "c rows " << nbRows() << " columns " << nbColumns() << endl;
     for (auto row : rows) {
-        for (auto lit : *row) {
-            out << lit << " ";
-        }
+        out << "c ";
+        for (auto lit : *row) out << lit << " ";
         out << endl;
     }
 }
@@ -955,12 +948,12 @@ uint32_t Matrix::getColumnNb(BLit x)
 shared_ptr<Permutation> Matrix::testMembership(const shared_ptr<Permutation> p)
 {
     /**
-   * NOTE: 
+   * NOTE:
    * We use the first column as base for the matrix.
    * A stabilizer chain then is formed by all submatrices formed by removing the upmost row.
    * A corresponding set of basic orbits is formed by taking as ith orbit (Delta_i) the first elements of row i to row last.
    * A representative function (u_i) for each ith step in the stabilizer chain then maps row j to the swap of row i and j (with j>=i).
-   * 
+   *
    * We follow here algorithm 2.5.1 from http://www.maths.usyd.edu.au/u/murray/research/essay.pdf
    */
 

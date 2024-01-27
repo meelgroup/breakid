@@ -36,10 +36,7 @@ set(breakid_lib_files
     breakid_c.cpp
     $<TARGET_OBJECTS:bliss>
 )
-
-add_library(breakid
-    ${breakid_lib_files}
-)
+add_library(breakid ${breakid_lib_files})
 
 set_target_properties(breakid PROPERTIES
     PUBLIC_HEADER "${breakid_public_headers}"
@@ -47,17 +44,13 @@ set_target_properties(breakid PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
 
-add_executable(mytest
-    test.cpp
-)
-set_target_properties(mytest PROPERTIES
+add_executable(breakid-main breakid-main.cpp)
+set_target_properties(breakid-main PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     INSTALL_RPATH_USE_LINK_PATH TRUE
-    OUTPUT_NAME mytest
+    OUTPUT_NAME breakid
 )
-target_link_libraries(mytest
-    breakid
-)
+target_link_libraries(breakid-main breakid)
 
 breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid_c.h )
 breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
@@ -85,11 +78,10 @@ foreach(public_header ${breakid_public_headers})
 endforeach()
 
 
-install(TARGETS breakid
+install(TARGETS breakid breakid-main
     EXPORT ${BREAKID_EXPORT_NAME}
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/breakid"
 )
-

@@ -167,9 +167,7 @@ void BreakID::break_symm()
 
         //Try to find matrix row interch. symmetries
         if (grp->getSize() > 1 && dat->conf->useMatrixDetection) {
-            if (dat->conf->verbosity > 0) {
-                cout << "Detecting row interchangeability..." << endl;
-            }
+            if (dat->conf->verbosity > 0) cout << "c Detecting row interchangeability..." << endl;
 
             // Find set of clauses group permutates
             // add the subgroup to "grp->theory"
@@ -185,9 +183,7 @@ void BreakID::break_symm()
 
         //Symmetry
         if (dat->conf->symBreakingFormLength > -1) {
-            if (dat->conf->verbosity > 0) {
-                cout << "c *** Constructing symmetry breaking formula..." << endl;
-            }
+            if (dat->conf->verbosity > 0) cout << "c Constructing symmetry breaking formula..." << endl;
             grp->addBreakingClausesTo(*dat->brkr);
         }
     }
@@ -195,23 +191,13 @@ void BreakID::break_symm()
 
 void BreakID::print_symm_break_stats()
 {
-    cout << "**** matrices detected: " << dat->totalNbMatrices << endl;
-    cout << "**** row swaps detected: " << dat->totalNbRowSwaps << endl;
-
-    cout << "**** extra binary symmetry breaking clauses added: "
-              << dat->brkr->getNbBinClauses() << "\n";
-
-    cout << "**** regular symmetry breaking clauses added: "
-              << dat->brkr->getNbRegClauses() << "\n";
-
-    cout << "**** row interchangeability breaking clauses added: "
-              << dat->brkr->getNbRowClauses() << "\n";
-
-    cout << "**** total symmetry breaking clauses added: "
-              << dat->brkr->getAddedNbClauses() << "\n";
-
-    cout << "**** auxiliary variables introduced: "
-              << dat->brkr->getAuxiliaryNbVars() << "\n";
+    cout << "c matrices detected: " << dat->totalNbMatrices << endl;
+    cout << "c row swaps detected: " << dat->totalNbRowSwaps << endl;
+    cout << "c extra binary symmetry breaking clauses added: " << dat->brkr->getNbBinClauses() << "\n";
+    cout << "c regular symmetry breaking clauses added: " << dat->brkr->getNbRegClauses() << "\n";
+    cout << "c row interchangeability breaking clauses added: " << dat->brkr->getNbRowClauses() << "\n";
+    cout << "c total symmetry breaking clauses added: " << dat->brkr->getAddedNbClauses() << "\n";
+    cout << "c auxiliary variables introduced: " << dat->brkr->getAuxiliaryNbVars() << "\n";
 }
 
 uint32_t BreakID::get_num_break_cls()

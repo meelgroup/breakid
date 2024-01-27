@@ -6,7 +6,7 @@ A new symmetry detecting and breaking library. This is based on Jo Devriendt's [
 Compile
 -----
 
-```
+```bash
 mkdir build
 cd build
 cmake ..
@@ -19,8 +19,8 @@ Please see the `test.cpp` file for usage and the `breakid.hpp` header file for t
 
 Test Binary
 -----
-```brainfuck
-./mytest myfile.cnf 8000
+```bash
+./breakid myfile.cnf 8000
 ```
 
 This runs the library on the CNF you supply and output the generators, etc.

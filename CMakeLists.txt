@@ -280,7 +280,7 @@ set(BREAKID_TARGETS_FILENAME "breakidTargets.cmake")
 set(BREAKID_CONFIG_FILENAME "breakidConfig.cmake")
 
 # Export targets
-export(TARGETS breakid mytest
+export(TARGETS breakid breakid-main
     FILE "${PROJECT_BINARY_DIR}/${BREAKID_TARGETS_FILENAME}")
 
 # Create breakidConfig file
@@ -311,8 +311,10 @@ configure_file(breakidConfig.cmake.in
    "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}" @ONLY
 )
 
-install(FILES
-    "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}"
+set(BREAKID_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+    "Installation directory for breakid CMake files")
+
+install(FILES "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}"
     DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
 )
 

@@ -1,5 +1,5 @@
 /******************************************
-Copyright (c) 2019 Jo Devriendt - KU Leuven
+Copyright (c) 2021 Mate Soos
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "time_mem.h"
 
 using std::cout;
+using std::cerr;
 using std::string;
 using std::endl;
 using BID::BLit;
@@ -42,21 +43,19 @@ using std::istringstream;
 
 uint32_t nVars;
 
-inline uint32_t encode(int lit)
-{
+inline uint32_t encode(int lit) {
     return (lit > 0 ? 2 * (lit - 1) : 2 * (-lit - 1) + 1);
 }
 
 vector<vector<BLit>> readCNF(const char* filename)
 {
-    vector<vector<BLit>> clauses;
-    //cout << "*** Reading CNF: " << filename << endl;
-
     std::ifstream file(filename);
     if (!file) {
-        std::cout << "ERROR: No CNF file found." << endl;
+        cerr << "ERROR: No CNF file found." << endl;
         exit(-1);
     }
+
+    vector<vector<BLit>> clauses;
     string line;
     vector<BLit> inclause;
     while (getline(file, line)) {
@@ -78,7 +77,7 @@ vector<vector<BLit>> readCNF(const char* filename)
             while (iss >> l) {
                 if (l == 0) {
                     if (inclause.size() == 0) {
-                        std::cout << "ERROR: Theory can not contain empty clause." << endl;
+                        cerr << "ERROR: Theory can not contain empty clause." << endl;
                         exit(-1);
                     }
                     clauses.push_back(inclause);
@@ -98,8 +97,12 @@ vector<vector<BLit>> readCNF(const char* filename)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3)  {
-        cout << "You must give the CNF as 1st and max steps as second parameter" << endl;
+    if (argc < 2) {
+        cout << "ERROR: you must give the CNF as 1st and max steps as second parameter" << endl;
+        exit(-1);
+    }
+    if (argc > 3) {
+        cout << "You must give the CNF as 1st and optionally max-steps as a second parameter" << endl;
         exit(-1);
     }
 
@@ -108,19 +111,17 @@ int main(int argc, char *argv[])
     breakid.set_verbosity(conf_verbosity);
 
     //Steps
-    int64_t steps_lim = atoi(argv[2]);
+    int64_t steps_lim;
+    if (argc >= 3) steps_lim = std::atoi(argv[2]);
+    else steps_lim = 10*1000LL;
     steps_lim *= 1LL*1000LL;
-    cout << "Limit: " << steps_lim << endl;
+    cout << "c Limit: " << steps_lim << endl;
     breakid.set_steps_lim(steps_lim);
     breakid.set_useMatrixDetection(true);
 
     vector<vector<BLit>> cls = readCNF(argv[1]);
-    cout << "OK, read " << cls.size() << " clauses" << endl;
-
     breakid.start_dynamic_cnf(nVars);
-    for(auto cl: cls) {
-        breakid.add_clause(cl.data(), cl.size());
-    }
+    for(auto cl: cls) breakid.add_clause(cl.data(), cl.size());
 
     ////////////////
     //Find symmetry group
@@ -131,7 +132,7 @@ int main(int argc, char *argv[])
     bool timeout = remain <= 0;
     double remain_ratio = (double)remain/(double)steps_lim;
     if (conf_verbosity) {
-        cout << "-> Finished symmetry breaking. T: "
+        cout << "c -> Finished symmetry breaking. T: "
         << std::setprecision(2)
         << std::fixed
         << (cpuTime()-myTime) << " s "
@@ -139,55 +140,43 @@ int main(int argc, char *argv[])
         << " T-rem: " << remain_ratio
         << endl;
     }
-    if (conf_verbosity >= 1) {
-        cout << "-> Num generators: " << breakid.get_num_generators() << endl;
-    }
-    if (conf_verbosity >= 2) {
-        breakid.print_generators(std::cout);
-    }
+    if (conf_verbosity >= 1) cout << "c -> Num generators: " << breakid.get_num_generators() << endl;
+    if (conf_verbosity >= 2) breakid.print_generators(cout);
 
     ////////////////
     // Deal with subgroups
     ////////////////
-    if (conf_verbosity) {
-        cout << "Detecting subgroups..." << endl;
-    }
+    if (conf_verbosity) cout << "c Detecting subgroups..." << endl;
     myTime = cpuTime();
     breakid.detect_subgroups();
     if (conf_verbosity) {
-        cout << "-> Finding subgroups breaking. T: "
+        cout << "c -> Finding subgroups breaking. T: "
         << std::setprecision(2)
         << std::fixed
         << (cpuTime()-myTime) << " s "
         << endl;
     }
-    if (conf_verbosity) {
-        cout << "-> num subgroups: " << breakid.get_num_subgroups() << endl;
-    }
-    if (conf_verbosity >= 2) {
-        breakid.print_subgroups(cout);
-    }
+    if (conf_verbosity) cout << "c -> num subgroups: " << breakid.get_num_subgroups() << endl;
+    if (conf_verbosity >= 2) breakid.print_subgroups(cout);
 
     ////////////////
     // Break symmetries
     ////////////////
     breakid.break_symm();
-    if (false && conf_verbosity) {
-        breakid.print_symm_break_stats();
-    }
+    if (conf_verbosity) breakid.print_symm_break_stats();
 
-    cout << "Num breaking clauses: "<< breakid.get_num_break_cls() << endl;
-    cout << "Num aux vars: "<< breakid.get_num_aux_vars() << endl;
-    if (conf_verbosity > 3) {
-        auto brk = breakid.get_brk_cls();
-        for (auto cl: brk) {
-            cout << "Breaking clause: ";
-            for(auto lit: cl) {
-                cout << lit << " ";
-            }
-            cout << endl;
-        }
+    cout << "c Num breaking clauses: "<< breakid.get_num_break_cls() << endl;
+    cout << "c Num aux vars: "<< breakid.get_num_aux_vars() << endl;
+    cout << "p cnf " << (nVars + breakid.get_num_aux_vars())
+        << " " << (cls.size() + breakid.get_brk_cls().size()) << endl;
+    for(auto cl: cls) {
+        for(auto lit: cl) cout << lit << " ";
+        cout << "0" << endl;
     }
-
+    auto brk = breakid.get_brk_cls();
+    for (auto cl: brk) {
+        for(auto lit: cl) cout << lit << " ";
+        cout << "0" << endl;
+    }
     return 0;
 }
