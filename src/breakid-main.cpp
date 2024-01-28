@@ -252,8 +252,6 @@ int main(int argc, char *argv[])
     breakid.break_symm();
     if (conf.verbosity) breakid.print_symm_break_stats();
 
-    cout << "c Num breaking clauses: "<< breakid.get_num_break_cls() << endl;
-    cout << "c Num aux vars: "<< breakid.get_num_aux_vars() << endl;
     std::ostream* out = &std::cout;
     if (!out_fname.empty()) {
         std::ofstream* f = new std::ofstream;
