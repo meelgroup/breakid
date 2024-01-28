@@ -38,11 +38,21 @@ set(breakid_lib_files
 )
 add_library(breakid ${breakid_lib_files})
 
-set_target_properties(breakid PROPERTIES
-    PUBLIC_HEADER "${breakid_public_headers}"
-    VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-)
+if (NOT WIN32)
+    set_target_properties(breakid PROPERTIES
+        PUBLIC_HEADER "${breakid_public_headers}"
+        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    )
+else()
+    set_target_properties(breakid PROPERTIES
+        OUTPUT_NAME breakidwin
+        PUBLIC_HEADER "${breakid_public_headers}"
+        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    )
+endif()
+
 
 add_executable(breakid-bin breakid-main.cpp)
 set_target_properties(breakid-bin PROPERTIES
