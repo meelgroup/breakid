@@ -785,7 +785,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
         if (opt_use_comprec) {
             CR_CEP& cep = cr_cep_stack[current_node.cr_cep_index];
             if (cep.first_checked == true &&
-                current_node.fp_extendable == TreeNode::MAYBE and
+                current_node.fp_extendable == TreeNode::MAYBE &&
                 !search_stack[cep.creation_level].fp_on) {
                 current_node.fp_extendable = TreeNode::NO;
             }
@@ -812,7 +812,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
                 continue;
             }
             if (current_node.fp_extendable == TreeNode::NO &&
-                (!canonical or current_node.cmp_to_best_path < 0)) {
+                (!canonical || current_node.cmp_to_best_path < 0)) {
                 if (opt_use_failure_recording) {
                     TreeNode& parent_node = search_stack[current_level - 1];
                     if (parent_node.fp_on)
@@ -913,7 +913,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
              * a minimal orbit representative w.r.t. first_path_orbits */
                 for (unsigned int i = cell->length; i > 0; i--, ep++) {
                     if ((int)(*ep) > current_node.split_element &&
-                        *ep < next_split_element and
+                        *ep < next_split_element &&
                         first_path_orbits.is_minimal_representative(*ep)) {
                         next_split_element = *ep;
                         //next_split_element_pos = ep;
@@ -924,9 +924,9 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
              * a minimal orbit representative w.r.t. best_path_orbits */
                 for (unsigned int i = cell->length; i > 0; i--, ep++) {
                     if ((int)(*ep) > current_node.split_element &&
-                        *ep < next_split_element and
-                        best_path_orbits.is_minimal_representative(*ep) and
-                        (!opt_use_long_prune or
+                        *ep < next_split_element &&
+                        best_path_orbits.is_minimal_representative(*ep) &&
+                        (!opt_use_long_prune ||
                          current_node.long_prune_redundant.find(*ep) ==
                              current_node.long_prune_redundant.end())) {
                         next_split_element = *ep;
@@ -937,8 +937,8 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
                 /* Find the next larger splitting element */
                 for (unsigned int i = cell->length; i > 0; i--, ep++) {
                     if ((int)(*ep) > current_node.split_element &&
-                        *ep < next_split_element and
-                        (!opt_use_long_prune or
+                        *ep < next_split_element &&
+                        (!opt_use_long_prune ||
                          current_node.long_prune_redundant.find(*ep) ==
                              current_node.long_prune_redundant.end())) {
                         next_split_element = *ep;
@@ -1090,7 +1090,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
            * if canonical labeling is desired, also worse than the
            * current best path */
             if (refine_equal_to_first == false &&
-                (!canonical or (refine_cmp_to_best < 0))) {
+                (!canonical || (refine_cmp_to_best < 0))) {
                 /* Yes, backtrack */
                 stats.nof_bad_nodes++;
                 if (current_node.fp_cert_equal == true &&
@@ -1125,8 +1125,8 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
         child_node.in_best_path = false;
 
         child_node.fp_cert_equal = refine_equal_to_first;
-        if (current_node.fp_extendable == TreeNode::NO or
-            (current_node.fp_extendable == TreeNode::MAYBE and
+        if (current_node.fp_extendable == TreeNode::NO ||
+            (current_node.fp_extendable == TreeNode::MAYBE &&
              child_node.fp_cert_equal == false))
             child_node.fp_extendable = TreeNode::NO;
         else
@@ -1247,7 +1247,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
                     CR_CEP& cep = cr_cep_stack[cr_cep_index];
 
                     /* First, compare with respect to the first path */
-                    if (first_path_info.empty() or child_node.fp_cert_equal) {
+                    if (first_path_info.empty() || child_node.fp_cert_equal) {
                         if (cep.first_checked == false) {
                             /* First time, go to the next component */
                             cep.first_checked = true;
@@ -1392,7 +1392,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
                 // cr_cep_stack[cr_cep_index].discrete_cell_limit)
                 if (nucr_find_first_component(cr_level, cr_component,
                                               cr_component_elements,
-                                              next_split_cell) == true and
+                                              next_split_cell) == true &&
                     p.nof_discrete_cells() + cr_component_elements <
                         cr_cep_stack[cr_cep_index].discrete_cell_limit) {
                     const unsigned int next_cr_level =
@@ -2309,7 +2309,7 @@ bool Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
                 cert_add_redundant(CERT_SPLIT, c->first, c->length);
                 /* No need to continue? */
                 if (refine_compare_certificate &&
-                    (refine_equal_to_first == false) and
+                    (refine_equal_to_first == false) &&
                     (refine_cmp_to_best < 0))
                     goto worse_exit;
             }
@@ -2371,7 +2371,7 @@ bool Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
                 cert_add_redundant(CERT_SPLIT, c->first, c->length);
                 /* No need to continue? */
                 if (refine_compare_certificate &&
-                    (refine_equal_to_first == false) and
+                    (refine_equal_to_first == false) &&
                     (refine_cmp_to_best < 0))
                     goto worse_exit;
             }
@@ -2545,7 +2545,7 @@ bool Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
                 cert_add(CERT_EDGE, unit_cell->first, i);
                 /* No need to continue? */
                 if (refine_compare_certificate &&
-                    (refine_equal_to_first == false) and
+                    (refine_equal_to_first == false) &&
                     (refine_cmp_to_best < 0))
                     goto worse_exit;
             }
@@ -2662,7 +2662,7 @@ bool Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
                 cert_add(CERT_EDGE, i, unit_cell->first);
                 /* No need to continue? */
                 if (refine_compare_certificate &&
-                    (refine_equal_to_first == false) and
+                    (refine_equal_to_first == false) &&
                     (refine_cmp_to_best < 0))
                     goto worse_exit;
             }
@@ -3025,7 +3025,7 @@ Partition::Cell* Digraph::sh_first_smallest_max_neighbours()
             neighbour_cell->max_ival = 0;
         }
 
-        if ((value > best_value) or
+        if ((value > best_value) ||
             (value == best_value && cell->length < best_size)) {
             best_value = value;
             best_size = cell->length;
@@ -3418,13 +3418,13 @@ bool Digraph::nucr_find_first_component(const unsigned int level,
         /*| Phase 3: splitting heuristics */
         switch (sh) {
             case shs_f:
-                if (sh_return == 0 or cell->first <= sh_first) {
+                if (sh_return == 0 || cell->first <= sh_first) {
                     sh_return = cell;
                     sh_first = cell->first;
                 }
                 break;
             case shs_fs:
-                if (sh_return == 0 or cell->length < sh_size or
+                if (sh_return == 0 || cell->length < sh_size ||
                     (cell->length == sh_size && cell->first <= sh_first)) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -3432,7 +3432,7 @@ bool Digraph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_fl:
-                if (sh_return == 0 or cell->length > sh_size or
+                if (sh_return == 0 || cell->length > sh_size ||
                     (cell->length == sh_size && cell->first <= sh_first)) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -3440,7 +3440,7 @@ bool Digraph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_fm:
-                if (sh_return == 0 or nuconn > sh_nuconn or
+                if (sh_return == 0 || nuconn > sh_nuconn ||
                     (nuconn == sh_nuconn && cell->first <= sh_first)) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -3448,9 +3448,9 @@ bool Digraph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_fsm:
-                if (sh_return == 0 or nuconn > sh_nuconn or
-                    (nuconn == sh_nuconn and
-                     (cell->length < sh_size or
+                if (sh_return == 0 || nuconn > sh_nuconn ||
+                    (nuconn == sh_nuconn &&
+                     (cell->length < sh_size ||
                       (cell->length == sh_size && cell->first <= sh_first)))) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -3459,9 +3459,9 @@ bool Digraph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_flm:
-                if (sh_return == 0 or nuconn > sh_nuconn or
-                    (nuconn == sh_nuconn and
-                     (cell->length > sh_size or
+                if (sh_return == 0 || nuconn > sh_nuconn ||
+                    (nuconn == sh_nuconn &&
+                     (cell->length > sh_size ||
                       (cell->length == sh_size && cell->first <= sh_first)))) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -4098,7 +4098,7 @@ bool Graph::split_neighbourhood_of_cell(Partition::Cell* const cell)
                 cert_add_redundant(CERT_SPLIT, c->first, c->length);
                 /* No need to continue? */
                 if (refine_compare_certificate &&
-                    (refine_equal_to_first == false) and
+                    (refine_equal_to_first == false) &&
                     (refine_cmp_to_best < 0))
                     goto worse_exit;
             }
@@ -4266,7 +4266,7 @@ bool Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
                 cert_add(CERT_EDGE, unit_cell->first, i);
                 /* No need to continue? */
                 if (refine_compare_certificate &&
-                    (refine_equal_to_first == false) and
+                    (refine_equal_to_first == false) &&
                     (refine_cmp_to_best < 0))
                     goto worse_exit;
             }
@@ -4542,7 +4542,7 @@ Partition::Cell* Graph::sh_first_smallest_max_neighbours()
                 value++;
             neighbour_cell->max_ival = 0;
         }
-        if ((value > best_value) or
+        if ((value > best_value) ||
             (value == best_value && cell->length < best_size)) {
             best_value = value;
             best_size = cell->length;
@@ -4588,7 +4588,7 @@ Partition::Cell* Graph::sh_first_largest_max_neighbours()
                 value++;
             neighbour_cell->max_ival = 0;
         }
-        if ((value > best_value) or
+        if ((value > best_value) ||
             (value == best_value && cell->length > best_size)) {
             best_value = value;
             best_size = cell->length;
@@ -4826,13 +4826,13 @@ bool Graph::nucr_find_first_component(const unsigned int level,
 
         switch (sh) {
             case shs_f:
-                if (sh_return == 0 or cell->first <= sh_first) {
+                if (sh_return == 0 || cell->first <= sh_first) {
                     sh_return = cell;
                     sh_first = cell->first;
                 }
                 break;
             case shs_fs:
-                if (sh_return == 0 or cell->length < sh_size or
+                if (sh_return == 0 || cell->length < sh_size ||
                     (cell->length == sh_size && cell->first <= sh_first)) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -4840,7 +4840,7 @@ bool Graph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_fl:
-                if (sh_return == 0 or cell->length > sh_size or
+                if (sh_return == 0 || cell->length > sh_size ||
                     (cell->length == sh_size && cell->first <= sh_first)) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -4848,7 +4848,7 @@ bool Graph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_fm:
-                if (sh_return == 0 or nuconn > sh_nuconn or
+                if (sh_return == 0 || nuconn > sh_nuconn ||
                     (nuconn == sh_nuconn && cell->first <= sh_first)) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -4856,9 +4856,9 @@ bool Graph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_fsm:
-                if (sh_return == 0 or nuconn > sh_nuconn or
-                    (nuconn == sh_nuconn and
-                     (cell->length < sh_size or
+                if (sh_return == 0 || nuconn > sh_nuconn ||
+                    (nuconn == sh_nuconn &&
+                     (cell->length < sh_size ||
                       (cell->length == sh_size && cell->first <= sh_first)))) {
                     sh_return = cell;
                     sh_first = cell->first;
@@ -4867,9 +4867,9 @@ bool Graph::nucr_find_first_component(const unsigned int level,
                 }
                 break;
             case shs_flm:
-                if (sh_return == 0 or nuconn > sh_nuconn or
-                    (nuconn == sh_nuconn and
-                     (cell->length > sh_size or
+                if (sh_return == 0 || nuconn > sh_nuconn ||
+                    (nuconn == sh_nuconn &&
+                     (cell->length > sh_size ||
                       (cell->length == sh_size && cell->first <= sh_first)))) {
                     sh_return = cell;
                     sh_first = cell->first;

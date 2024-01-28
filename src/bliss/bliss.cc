@@ -10,9 +10,9 @@
 /*
   Copyright (c) 2003-2015 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -55,7 +55,7 @@ static void usage(FILE* const fp, const char* argv0)
         program_name++;
     else
         program_name = argv0;
-    if (!program_name or *program_name == 0)
+    if (!program_name || *program_name == 0)
         program_name = "bliss";
 
     fprintf(fp,
@@ -96,7 +96,7 @@ static void parse_options(const int argc, const char** argv)
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-can") == 0)
             opt_canonize = true;
-        else if ((strncmp(argv[i], "-ocan=", 6) == 0) and
+        else if ((strncmp(argv[i], "-ocan=", 6) == 0) &&
                  (strlen(argv[i]) > 6)) {
             opt_canonize = true;
             opt_output_can_file = argv[i] + 6;
@@ -112,7 +112,7 @@ static void parse_options(const int argc, const char** argv)
             opt_use_component_recursion = false;
         else if (strcmp(argv[i], "-cr=y") == 0)
             opt_use_component_recursion = true;
-        else if ((strncmp(argv[i], "-sh=", 4) == 0) and (strlen(argv[i]) > 4)) {
+        else if ((strncmp(argv[i], "-sh=", 4) == 0) && (strlen(argv[i]) > 4)) {
             opt_splitting_heuristics = argv[i] + 4;
         } else if (strcmp(argv[i], "-version") == 0) {
             fprintf(stdout, "bliss version %s\n", bliss::version);
@@ -268,7 +268,7 @@ int main(const int argc, const char** argv)
     }
 
     /* Output search statistics */
-    if (verbose_level > 0 and verbstr)
+    if (verbose_level > 0 && verbstr)
         stats.print(verbstr);
 
     if (verbose_level > 0) {
