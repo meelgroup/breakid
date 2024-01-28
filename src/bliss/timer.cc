@@ -1,6 +1,4 @@
 #include "timer.hh"
-#include <sys/times.h>
-#include <unistd.h>
 #include "../time_mem.h"
 
 /*
