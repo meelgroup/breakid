@@ -955,7 +955,7 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
                         first_path_info[search_stack.size() - 1]
                             .splitting_element);
                     stats.group_size.multiply(index);
-                    if (stats.group_size_approx < 1e4000L) {
+                    if (stats.group_size_approx < 1e400L) {
                         stats.group_size_approx *= (long double)index;
                     }
                     /*
