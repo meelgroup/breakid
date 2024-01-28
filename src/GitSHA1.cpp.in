@@ -58,7 +58,6 @@ const char* BID::get_compilation_env()
     "MY_TARGETS = @MY_TARGETS@ | "
     "LARGEMEM = @LARGEMEM@ | "
     "LIMITMEM = @LIMITMEM@ | "
-    "compilation date time = " __DATE__ " " __TIME__
     ""
     ;
     return compilation_env;

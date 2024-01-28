@@ -7,9 +7,9 @@
 /*
   Copyright (c) 2003-2015 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -185,7 +185,7 @@ void Partition::goto_backtrack_point(BacktrackPoint p)
             assert(cell->prev);
             cell = cell->prev;
         }
-        while (cell->next and
+        while (cell->next &&
                cell->next->split_level > dest_refinement_stack_size) {
             /* Merge next cell */
             Cell* const next_cell = cell->next;
@@ -565,7 +565,7 @@ Partition::Cell* Partition::sort_and_split_cell1(Partition::Cell* const cell)
 /**
  * An auxiliary function for distribution count sorting.
  * Build start array so that
- * dcs_start[0] = 0 and dcs_start[i+1] = dcs_start[i] + dcs_count[i].
+ * dcs_start[0] = 0 && dcs_start[i+1] = dcs_start[i] + dcs_count[i].
  */
 void Partition::dcs_cumulate_count(const unsigned int max)
 {
@@ -700,7 +700,7 @@ bool Partition::shellsort_cell(Partition::Cell* const cell)
             const unsigned int element = ep[i];
             const unsigned int ival = invariant_values[element];
             unsigned int j = i;
-            while (j >= h and invariant_values[ep[j - h]] > ival) {
+            while (j >= h && invariant_values[ep[j - h]] > ival) {
                 ep[j] = ep[j - h];
                 j -= h;
             }
@@ -751,7 +751,7 @@ Partition::Cell* Partition::split_cell(Partition::Cell* const original_cell)
         Cell* const new_cell =
             aux_split_in_two(cell, (ep - elements) - cell->first);
 
-        if (graph and graph->compute_eqref_hash) {
+        if (graph && graph->compute_eqref_hash) {
             graph->eqref_hash.update(new_cell->first);
             graph->eqref_hash.update(new_cell->length);
             graph->eqref_hash.update(ival);

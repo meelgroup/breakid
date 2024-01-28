@@ -1,13 +1,14 @@
 #include "timer.hh"
 #include <sys/times.h>
 #include <unistd.h>
+#include "../time_mem.h"
 
 /*
   Copyright (c) 2003-2015 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -23,8 +24,6 @@
 
 namespace bliss {
 
-static const double numTicksPerSec = (double)(sysconf(_SC_CLK_TCK));
-
 Timer::Timer()
 {
     reset();
@@ -32,22 +31,12 @@ Timer::Timer()
 
 void Timer::reset()
 {
-    struct tms clkticks;
-
-    times(&clkticks);
-    start_time = ((double)clkticks.tms_utime + (double)clkticks.tms_stime) /
-                 numTicksPerSec;
+    start_time = cpuTime();
 }
 
 double Timer::get_duration()
 {
-    struct tms clkticks;
-
-    times(&clkticks);
-    double intermediate =
-        ((double)clkticks.tms_utime + (double)clkticks.tms_stime) /
-        numTicksPerSec;
-    return intermediate - start_time;
+    return cpuTime() - start_time;
 }
 
 } // namespace bliss

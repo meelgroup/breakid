@@ -20,13 +20,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***********************************************************/
+#pragma once
 
-#ifndef TIME_MEM_H
-#define TIME_MEM_H
 #include <cassert>
 #include <time.h>
 
 #include <ios>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -134,5 +134,3 @@ static inline size_t memUsedTotal(double& vm_usage)
     return 0;
 }
 #endif
-
-#endif //TIME_MEM_H
