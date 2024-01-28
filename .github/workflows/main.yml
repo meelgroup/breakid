@@ -64,21 +64,21 @@ jobs:
       
     - name: Upload Artifact - Linux
       if: matrix.os == 'ubuntu-20.04' && matrix.staticcompile == 'ON'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: breakid-linux-amd64
         path: breakid
     
     - name: Upload Artifact - Mac
       if: matrix.os == 'macos-13' && matrix.staticcompile == 'ON'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-amd64
         path: breakid
 
     - name: Upload Artifact - Windows
       if: matrix.os == 'windows-2022' && matrix.staticcompile == 'ON'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: breakid-win64.exe
         path: Release\breakid.exe
