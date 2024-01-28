@@ -20,6 +20,7 @@
   along with bliss.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <limits>
 #if defined(BLISS_USE_GMP)
 #include <gmp.h>
 #endif
@@ -114,7 +115,7 @@ class BigNum
    */
     void multiply(const int n)
     {
-        if (v < 1e400L) {
+        if (v < std::numeric_limits<long double>::max()/std::numeric_limits<int>::max()) {
             v *= (long double)n;
         }
     }

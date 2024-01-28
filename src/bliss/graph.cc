@@ -2,6 +2,7 @@
 #include <cassert>
 #include <climits>
 #include <cstdio>
+#include <limits>
 #include <list>
 #include <set>
 #include <iostream>
@@ -955,7 +956,8 @@ void AbstractGraph::search(const bool canonical, Stats& stats)
                         first_path_info[search_stack.size() - 1]
                             .splitting_element);
                     stats.group_size.multiply(index);
-                    if (stats.group_size_approx < 1e400L) {
+                    if (stats.group_size_approx <
+                            std::numeric_limits<long double>::max()/std::numeric_limits<unsigned>::max()) {
                         stats.group_size_approx *= (long double)index;
                     }
                     /*
@@ -2115,14 +2117,14 @@ Digraph* Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
                         line_num);
             goto error_exit;
         }
-        if (not((1 <= from) && (from <= nof_vertices))) {
+        if (!((1 <= from) && (from <= nof_vertices))) {
             if (errstr)
                 fprintf(errstr,
                         "error in line %u: vertex %u not in range [1,...%u]\n",
                         line_num, from, nof_vertices);
             goto error_exit;
         }
-        if (not((1 <= to) && (to <= nof_vertices))) {
+        if (!((1 <= to) && (to <= nof_vertices))) {
             if (errstr)
                 fprintf(errstr,
                         "error in line %u: vertex %u not in range [1,...%u]\n",
