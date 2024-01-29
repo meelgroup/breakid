@@ -225,7 +225,7 @@ endfunction()
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-set(BREAKID_FULL_VERSION "3.1.0")
+set(BREAKID_FULL_VERSION "3.1.2")
 string(REPLACE "." ";" BREAKID_FULL_VERSION_LIST ${BREAKID_FULL_VERSION})
 SetVersionNumber("PROJECT" ${BREAKID_FULL_VERSION_LIST})
 MESSAGE(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
@@ -325,7 +325,7 @@ endif()
  if(WIN32 AND NOT CYGWIN)
    set(DEF_INSTALL_CMAKE_DIR cmake)
  else()
-   set(DEF_INSTALL_CMAKE_DIR lib${LIB_SUFFIX}/cmake/libwebsockets)
+   set(DEF_INSTALL_CMAKE_DIR lib${LIB_SUFFIX}/cmake/breakid)
  endif()
 
 # Create breakidConfig file
