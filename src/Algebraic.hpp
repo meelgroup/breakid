@@ -55,7 +55,7 @@ public:
     uint32_t supportSize() const;
     bool isIdentity();
 
-    void print(std::ostream& out) const;
+    void print(std::ostream& out, const char* prefix) const;
 
     bool formsMatrixWith(shared_ptr<Permutation> other);
     std::pair<shared_ptr<Permutation>, shared_ptr<Permutation> > getLargest(
@@ -101,7 +101,7 @@ class Matrix
    public:
     Matrix(Config* conf);
     ~Matrix();
-    void print(std::ostream& out) const;
+    void print(std::ostream& out, const char* prefix) const;
 
     void add(vector<BLit>* row);
     uint32_t nbColumns() const;
@@ -131,7 +131,7 @@ public:
 
     void add(shared_ptr<Permutation> p);
     void checkColumnInterchangeability(shared_ptr<Matrix> m);
-    void print(std::ostream& out) const;
+    void print(std::ostream& out, const char* prefix) const;
     shared_ptr<Matrix> getInitialMatrix();
     void addMatrices();
 

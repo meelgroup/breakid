@@ -203,9 +203,9 @@ bool Permutation::getImage(const BLit* orig, size_t sz, vector<BLit>& img) const
 
 // printing cycles
 
-void Permutation::print(std::ostream& out) const
+void Permutation::print(std::ostream& out, const char* prefix) const
 {
-    out << "c ";
+    out << prefix;
     for (auto lit : getCycleReprs()) {
         out << "( ";
         vector<BLit> cyc;
@@ -376,15 +376,15 @@ void Group::addMatrix(shared_ptr<Matrix> m)
     if (conf->verbosity > 0) {
         cout << "c -> Matrix with " << m->nbRows() << " rows and "
                   << m->nbColumns() << " columns detected" << endl;
-    } else if (conf->verbosity > 2) m->print(cout);
+    } else if (conf->verbosity > 2) m->print(cout, "c ");
 }
 
-void Group::print(std::ostream& out) const
+void Group::print(std::ostream& out, const char* prefix) const
 {
-    out << "c -- Permutations:" << endl;
-    for (const auto& p : permutations) p->print(out);
-    out << "c -- Matrices:" << endl;
-    for (const auto& m : matrices) m->print(out);
+    out << prefix << "-- Permutations:" << endl;
+    for (const auto& p : permutations) p->print(out, prefix);
+    out << prefix << "-- Matrices:" << endl;
+    for (const auto& m : matrices) m->print(out, prefix);
 }
 
 void Group::get_perms_to(vector<std::unordered_map<BLit, BLit>>& out)
@@ -864,11 +864,11 @@ Matrix::~Matrix()
     }
 }
 
-void Matrix::print(std::ostream& out) const
+void Matrix::print(std::ostream& out, const char* prefix) const
 {
-    out << "c rows " << nbRows() << " columns " << nbColumns() << endl;
+    out << prefix << "rows " << nbRows() << " columns " << nbColumns() << endl;
     for (auto row : rows) {
-        out << "c ";
+        out << prefix;
         for (auto lit : *row) out << lit << " ";
         out << endl;
     }

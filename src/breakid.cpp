@@ -152,13 +152,13 @@ uint64_t BreakID::get_num_subgroups() const
     return dat->subgroups.size();
 }
 
-void BreakID::print_subgroups(std::ostream& out) {
+void BreakID::print_subgroups(std::ostream& out, const char* prefix) {
     for (auto& grp : dat->subgroups) {
         out
         << "group size: " << grp->getSize()
         << " support: " << grp->getSupportSize() << endl;
 
-        grp->print(out);
+        grp->print(out, prefix);
     }
 }
 
@@ -191,15 +191,15 @@ void BreakID::break_symm()
     }
 }
 
-void BreakID::print_symm_break_stats()
+void BreakID::print_symm_break_stats(const char* prefix)
 {
-    cout << "c matrices detected: " << dat->totalNbMatrices << endl;
-    cout << "c row swaps detected: " << dat->totalNbRowSwaps << endl;
-    cout << "c extra binary symmetry breaking clauses added: " << dat->brkr->getNbBinClauses() << "\n";
-    cout << "c regular symmetry breaking clauses added: " << dat->brkr->getNbRegClauses() << "\n";
-    cout << "c row interchangeability breaking clauses added: " << dat->brkr->getNbRowClauses() << "\n";
-    cout << "c total symmetry breaking clauses added: " << dat->brkr->getAddedNbClauses() << "\n";
-    cout << "c auxiliary variables introduced: " << dat->brkr->getAuxiliaryNbVars() << "\n";
+    cout << prefix << "matrices detected: " << dat->totalNbMatrices << endl;
+    cout << prefix << "row swaps detected: " << dat->totalNbRowSwaps << endl;
+    cout << prefix << "extra binary symmetry breaking clauses added: " << dat->brkr->getNbBinClauses() << "\n";
+    cout << prefix << "regular symmetry breaking clauses added: " << dat->brkr->getNbRegClauses() << "\n";
+    cout << prefix << "row interchangeability breaking clauses added: " << dat->brkr->getNbRowClauses() << "\n";
+    cout << prefix << "total symmetry breaking clauses added: " << dat->brkr->getAddedNbClauses() << "\n";
+    cout << prefix << "auxiliary variables introduced: " << dat->brkr->getAuxiliaryNbVars() << "\n";
 }
 
 uint32_t BreakID::get_num_break_cls()
@@ -217,15 +217,15 @@ vector<vector<BID::BLit>> BreakID::get_brk_cls()
     return dat->brkr->get_brk_cls();
 }
 
-void BreakID::print_perms_and_matrices(std::ostream& out)
+void BreakID::print_perms_and_matrices(std::ostream& out, const char* prefix)
 {
     for (auto grp : dat->subgroups) {
-        grp->print(out);
+        grp->print(out, prefix);
     }
 }
 
-void BreakID::print_generators(std::ostream& out) {
-    dat->theory->group->print(cout);
+void BreakID::print_generators(std::ostream& out, const char* prefix) {
+    dat->theory->group->print(cout, prefix);
 }
 
 void BreakID::get_perms(vector<std::unordered_map<BLit, BLit> >* out)

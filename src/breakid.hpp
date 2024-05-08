@@ -105,10 +105,10 @@ struct BreakID {
     DLL_PUBLIC void break_symm();
 
     //Print info
-    DLL_PUBLIC void print_subgroups(std::ostream& out);
-    DLL_PUBLIC void print_symm_break_stats();
-    DLL_PUBLIC void print_perms_and_matrices(std::ostream& out);
-    DLL_PUBLIC void print_generators(std::ostream& out);
+    DLL_PUBLIC void print_subgroups(std::ostream& out, const char* prefix = "c ");
+    DLL_PUBLIC void print_symm_break_stats(const char* prefix = "c ");
+    DLL_PUBLIC void print_perms_and_matrices(std::ostream& out, const char* prefix = "c ");
+    DLL_PUBLIC void print_generators(std::ostream& out, const char* prefix = "c ");
 
     //Get info
     DLL_PUBLIC uint32_t get_num_generators();
