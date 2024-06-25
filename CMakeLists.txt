@@ -173,7 +173,6 @@ if (NOT WIN32)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
     else()
-        add_cxx_flag_if_supported("-mtune=native")
         add_cxx_flag_if_supported("-Wall")
         add_cxx_flag_if_supported("-pedantic")
         add_cxx_flag_if_supported("-Wunused")
