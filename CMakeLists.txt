@@ -19,13 +19,6 @@
 # THE SOFTWARE.
 
 cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 17)
-
-enable_language( CXX )
-
-include (GenerateExportHeader)
-include (GNUInstallDirs)
 
 message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
 message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")
@@ -85,6 +78,14 @@ endforeach()
 
 
 PROJECT(breakid)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 17)
+
+enable_language( CXX )
+
+include (GenerateExportHeader)
+include (GNUInstallDirs)
+
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # static compilation
