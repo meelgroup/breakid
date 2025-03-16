@@ -4,3 +4,4 @@ experiments/
 paper/
 test_asp/
 /result
+.cache
