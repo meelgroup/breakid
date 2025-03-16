@@ -1,5 +1,5 @@
 {
-  description = "minimal independent set calculator and CNF minimizer";
+  description = "Symmetry detection and breaking library and binary for CNF formulas";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   };
