@@ -5,3 +5,4 @@ paper/
 test_asp/
 /result
 .cache
+compile_commands.json
