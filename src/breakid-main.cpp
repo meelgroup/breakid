@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    if (conf.verbosity) cout << "c BreakID version " << breakid.get_sha1_version() << endl;
+    if (conf.verbosity) cout << "c BreakID version " << BID::BreakID::get_version_sha1() << endl;
 
     vector<vector<BLit>> cls = readCNF(in_fname.c_str());
     breakid.start_dynamic_cnf(nVars);
