@@ -84,7 +84,7 @@ struct BreakID {
     DLL_PUBLIC BreakID();
     DLL_PUBLIC ~BreakID();
 
-    DLL_PUBLIC static std::string get_sha1_version();
+    DLL_PUBLIC static std::string get_version_sha1();
 
     //configuration functions
     DLL_PUBLIC void set_useMatrixDetection(bool val);

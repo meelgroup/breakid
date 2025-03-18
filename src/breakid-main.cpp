@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     if (program["version"] == true) {
-        cout << "c BreakID SHA1: " << BID::BreakID::get_sha1_version() << endl;
+        cout << "c BreakID SHA1: " << BID::BreakID::get_version_sha1() << endl;
         std::exit(0);
     }
 
