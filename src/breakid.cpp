@@ -236,7 +236,7 @@ void BreakID::get_perms(vector<std::unordered_map<BLit, BLit> >* out)
     }
 }
 
-std::string BreakID::get_sha1_version() const
+std::string BreakID::get_sha1_version()
 {
     return BID::get_version_sha1();
 }

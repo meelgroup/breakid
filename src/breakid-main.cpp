@@ -168,12 +168,12 @@ int main(int argc, char *argv[])
         std::cerr << program;
         exit(-1);
     }
-    BID::BreakID breakid;
     if (program["version"] == true) {
-        cout << "c BreakID version " << breakid.get_sha1_version() << endl;
+        cout << "c BreakID SHA1: " << BID::BreakID::get_sha1_version() << endl;
         std::exit(0);
     }
 
+    BID::BreakID breakid;
     breakid.set_useMatrixDetection(conf.useMatrixDetection);
     breakid.set_useBinaryClauses(conf.useBinaryClauses);
     breakid.set_useShatterTranslation(conf.useShatterTranslation);
