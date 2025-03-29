@@ -28,7 +28,6 @@ if(POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
 endif()
 
-
 if(POLICY CMP0022)
     cmake_policy(SET CMP0022 NEW)
 endif()
@@ -256,10 +255,10 @@ else()
     MESSAGE(STATUS "Not on Linux, not creating manpage")
 endif()
 
-
+# generate JSON file of compile commands -- useful for code extension
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # headers, install locations, etc
-
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
