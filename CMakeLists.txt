@@ -87,6 +87,9 @@ include (GNUInstallDirs)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+# generate JSON file of compile commands -- useful for code extension
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 # static compilation
 option(BUILD_SHARED_LIBS "Build the shared library" ON)
 option(STATICCOMPILE "Compile to static executable" OFF)
@@ -255,9 +258,6 @@ else()
     MESSAGE(STATUS "Not on Linux, not creating manpage")
 endif()
 
-# generate JSON file of compile commands -- useful for code extension
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-
 # headers, install locations, etc
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
@@ -303,8 +303,10 @@ set(BREAKID_TARGETS_FILENAME "breakidTargets.cmake")
 set(BREAKID_CONFIG_FILENAME "breakidConfig.cmake")
 
 # Export targets
-export(TARGETS breakid breakid-bin
-    FILE "${PROJECT_BINARY_DIR}/${BREAKID_TARGETS_FILENAME}")
+export(
+    TARGETS breakid
+    FILE "${PROJECT_BINARY_DIR}/${BREAKID_TARGETS_FILENAME}"
+)
 
 # Create breakidConfig file
 set(EXPORT_TYPE "Build-tree")
@@ -317,15 +319,9 @@ configure_file(breakidConfig.cmake.in
 # Now the user can just use find_package(breakid) on their system
 export(PACKAGE breakid)
 
-if (NOT LIB_SUFFIX)
-    set(LIB_SUFFIX "")
-endif()
-
- if(WIN32 AND NOT CYGWIN)
-   set(DEF_INSTALL_CMAKE_DIR cmake)
- else()
-   set(DEF_INSTALL_CMAKE_DIR lib${LIB_SUFFIX}/cmake/breakid)
- endif()
+set(DEF_INSTALL_CMAKE_DIR lib/cmake/breakid)
+set(BREAKID_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+    "Installation directory for breakid CMake files")
 
 # Create breakidConfig file
 set(EXPORT_TYPE "installed")
@@ -334,14 +330,13 @@ configure_file(breakidConfig.cmake.in
    "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}" @ONLY
 )
 
-set(BREAKID_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
-    "Installation directory for breakid CMake files")
-
-install(FILES "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}"
+install(FILES
+    "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}"
     DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
 )
 
 # Install the export set for use with the install-tree
-install(EXPORT ${BREAKID_EXPORT_NAME}
+install(
+    EXPORT ${BREAKID_EXPORT_NAME}
     DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
 )

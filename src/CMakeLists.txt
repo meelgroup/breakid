@@ -87,11 +87,15 @@ foreach(public_header ${breakid_public_headers})
                       )
 endforeach()
 
-
-install(TARGETS breakid breakid-bin
-    EXPORT ${BREAKID_EXPORT_NAME}
+install(TARGETS breakid
+    EXPORT ${breakid_EXPORT_NAME}
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/breakid"
+)
+
+install(TARGETS breakid-bin
+    EXPORT ${breakid_EXPORT_NAME}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
