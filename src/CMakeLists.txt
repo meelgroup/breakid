@@ -53,7 +53,6 @@ else()
     )
 endif()
 
-
 add_executable(breakid-bin breakid-main.cpp)
 set_target_properties(breakid-bin PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -70,7 +69,7 @@ breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
 # The breakidConfig.cmake we generate in the build directory depends on
 # this.
 # -----------------------------------------------------------------------------
-set(HEADER_DEST "${PROJECT_BINARY_DIR}/include")
+set(HEADER_DEST "${PROJECT_BINARY_DIR}/include/breakid")
 add_custom_target(CopyPublicHeaders ALL)
 get_target_property(breakid_public_headers breakid PUBLIC_HEADER)
 foreach(public_header ${breakid_public_headers})
