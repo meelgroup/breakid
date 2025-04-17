@@ -274,10 +274,6 @@ configure_file(breakidConfig.cmake.in
     "${CMAKE_BINARY_DIR}/${BREAKID_CONFIG_FILENAME}" @ONLY
 )
 
-# Export this package to the CMake user package registry
-# Now the user can just use find_package(breakid) on their system
-export(PACKAGE breakid)
-
 set(BREAKID_INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/breakid" CACHE PATH
     "Installation directory for breakid CMake files")
 
