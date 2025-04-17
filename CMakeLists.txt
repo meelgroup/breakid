@@ -229,20 +229,12 @@ endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-macro(breakid_add_public_header LIBTARGET HEADER)
-    get_target_property(EXISTING_PUBLIC_HEADERS ${LIBTARGET} PUBLIC_HEADER)
-    if(EXISTING_PUBLIC_HEADERS)
-        list(APPEND EXISTING_PUBLIC_HEADERS "${HEADER}")
-    else()
-        # Do not append to empty list
-        set(EXISTING_PUBLIC_HEADERS "${HEADER}")
-    endif()
-    set_target_properties(
-        ${LIBTARGET}
-        PROPERTIES
-        PUBLIC_HEADER "${EXISTING_PUBLIC_HEADERS}"
-     )
-endmacro()
+function(breakid_add_public_header LIBTARGET HEADER)
+    set_property(TARGET ${LIBTARGET}
+        PROPERTY PUBLIC_HEADER "${HEADER}"
+        APPEND
+    )
+endfunction()
 
 # -----------------------------------------------------------------------------
 # Provide an export name to be used by targets that wish to export themselves.
