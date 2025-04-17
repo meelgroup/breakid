@@ -66,8 +66,9 @@ project(breakid
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 
-include (GenerateExportHeader)
-include (GNUInstallDirs)
+include(GenerateExportHeader)
+include(GNUInstallDirs)
+include(CMakeDependentOption)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -75,11 +76,9 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # static compilation
-option(BUILD_SHARED_LIBS "Build the shared library" ON)
 option(STATICCOMPILE "Compile to static executable" OFF)
-if (STATICCOMPILE)
-    set(BUILD_SHARED_LIBS OFF)
-endif()
+cmake_dependent_option(BUILD_SHARED_LIBS "Build the shared library" ON
+    "NOT STATICCOMPILE" OFF)
 
 if (NOT MSVC)
     add_compile_options( -g)
