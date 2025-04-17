@@ -60,6 +60,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(GNUInstallDirs)
 include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -257,39 +258,32 @@ add_custom_target(uninstall
 # Export our targets so that other CMake based projects can interface with
 # the build of breakid in the build-tree
 # -----------------------------------------------------------------------------
-set(BREAKID_TARGETS_FILENAME "breakidTargets.cmake")
-set(BREAKID_CONFIG_FILENAME "breakidConfig.cmake")
 
-# Export targets
-export(
-    TARGETS breakid
-    FILE "${PROJECT_BINARY_DIR}/${BREAKID_TARGETS_FILENAME}"
-)
-
-# Create breakidConfig file
-set(EXPORT_TYPE "Build-tree")
-set(CONF_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/include")
-configure_file(breakidConfig.cmake.in
-    "${CMAKE_BINARY_DIR}/${BREAKID_CONFIG_FILENAME}" @ONLY
+# Export targets for build tree
+export(TARGETS breakid breakid-bin
+    FILE "${PROJECT_BINARY_DIR}/breakidTargets.cmake"
+    NAMESPACE breakid::
 )
 
 set(BREAKID_INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/breakid" CACHE PATH
     "Installation directory for breakid CMake files")
 
 # Create breakidConfig file
-set(EXPORT_TYPE "installed")
-set(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
-configure_file(breakidConfig.cmake.in
-   "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}" @ONLY
+configure_package_config_file(breakidConfig.cmake.in breakidConfig.cmake
+   INSTALL_DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
+)
+write_basic_package_version_file(breakidConfigVersion.cmake
+    COMPATIBILITY SameMinorVersion
 )
 
 install(FILES
-    "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}"
+    "${CMAKE_CURRENT_BINARY_DIR}/breakidConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/breakidConfigVersion.cmake"
     DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
 )
 
 # Install the export set for use with the install-tree
-install(
-    EXPORT ${BREAKID_EXPORT_NAME}
+install(EXPORT breakidTargets
     DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
+    NAMESPACE breakid::
 )

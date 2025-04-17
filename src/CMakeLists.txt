@@ -53,6 +53,7 @@ add_executable(breakid-bin breakid-main.cpp)
 set_target_properties(breakid-bin PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     OUTPUT_NAME breakid
+    EXPORT_NAME bin
 )
 target_link_libraries(breakid-bin breakid)
 
