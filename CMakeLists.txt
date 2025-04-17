@@ -62,7 +62,7 @@ include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(CMakeDependentOption)
 
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # generate JSON file of compile commands -- useful for code extension
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
