@@ -24,16 +24,11 @@ cmake_minimum_required(VERSION 3.11)
 # Make RelWithDebInfo the default build type if otherwise not set
 # -----------------------------------------------------------------------------
 set(build_types Debug Release RelWithDebInfo MinSizeRel)
-if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "You can choose the type of build, options are:${build_types}")
-    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
-        "Options are ${build_types}"
-        FORCE
-    )
+message(STATUS "You can choose the type of build, options are:${build_types}")
+set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Options are ${build_types}")
 
-    # Provide drop down menu options in cmake-gui
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${build_types})
-endif()
+# Provide drop down menu options in cmake-gui
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${build_types})
 message(STATUS "Doing a ${CMAKE_BUILD_TYPE} build")
 
 # -----------------------------------------------------------------------------
