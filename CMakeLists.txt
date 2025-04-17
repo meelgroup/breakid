@@ -20,9 +20,6 @@
 
 cmake_minimum_required(VERSION 3.11)
 
-message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
-message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")
-
 # -----------------------------------------------------------------------------
 # Make RelWithDebInfo the default build type if otherwise not set
 # -----------------------------------------------------------------------------
@@ -79,6 +76,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 option(STATICCOMPILE "Compile to static executable" OFF)
 cmake_dependent_option(BUILD_SHARED_LIBS "Build the shared library" ON
     "NOT STATICCOMPILE" OFF)
+
+message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
+message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")
 
 if (NOT MSVC)
     add_compile_options( -g)
