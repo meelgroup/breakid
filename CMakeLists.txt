@@ -278,8 +278,7 @@ configure_file(breakidConfig.cmake.in
 # Now the user can just use find_package(breakid) on their system
 export(PACKAGE breakid)
 
-set(DEF_INSTALL_CMAKE_DIR lib/cmake/breakid)
-set(BREAKID_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+set(BREAKID_INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/breakid" CACHE PATH
     "Installation directory for breakid CMake files")
 
 # Create breakidConfig file
