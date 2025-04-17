@@ -65,15 +65,7 @@ breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
 # this.
 # -----------------------------------------------------------------------------
 
-install(TARGETS breakid
+install(TARGETS breakid breakid-bin
     EXPORT ${BREAKID_EXPORT_NAME}
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
     PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/breakid"
-)
-
-install(TARGETS breakid-bin
-    EXPORT ${BREAKID_EXPORT_NAME}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
