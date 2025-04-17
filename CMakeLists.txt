@@ -59,11 +59,12 @@ foreach (build_config ${build_types})
 endforeach()
 
 
-PROJECT(breakid)
+project(breakid
+    VERSION 3.1.2
+    LANGUAGES C CXX
+)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
-
-enable_language( CXX )
 
 include (GenerateExportHeader)
 include (GNUInstallDirs)
@@ -198,25 +199,14 @@ endif()
 # -----------------------------------------------------------------------------
 # Add GIT version
 # -----------------------------------------------------------------------------
-function(SetVersionNumber PREFIX VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
-  set(${PREFIX}_VERSION_MAJOR ${VERSION_MAJOR} PARENT_SCOPE)
-  set(${PREFIX}_VERSION_MINOR ${VERSION_MINOR} PARENT_SCOPE)
-  set(${PREFIX}_VERSION_PATCH ${VERSION_PATCH} PARENT_SCOPE)
-  set(${PREFIX}_VERSION
-        "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-        PARENT_SCOPE)
-endfunction()
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-set(BREAKID_FULL_VERSION "3.1.2")
-string(REPLACE "." ";" BREAKID_FULL_VERSION_LIST ${BREAKID_FULL_VERSION})
-SetVersionNumber("PROJECT" ${BREAKID_FULL_VERSION_LIST})
-MESSAGE(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
-MESSAGE(STATUS "PROJECT_VERSION_MAJOR: ${PROJECT_VERSION_MAJOR}")
-MESSAGE(STATUS "PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
-MESSAGE(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
+message(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
+message(STATUS "PROJECT_VERSION_MAJOR: ${PROJECT_VERSION_MAJOR}")
+message(STATUS "PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
+message(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
 
 # ----------
 # manpage
