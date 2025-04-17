@@ -18,27 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.11)
 
 message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
 message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")
-
-if(POLICY CMP0048)
-    #policy for VERSION in cmake 3.0
-    cmake_policy(SET CMP0048 NEW)
-endif()
-
-if(POLICY CMP0022)
-    cmake_policy(SET CMP0022 NEW)
-endif()
-
-if(POLICY CMP0046)
-    cmake_policy(SET CMP0046 NEW)
-endif()
-
-if(POLICY CMP0026)
-    cmake_policy(SET CMP0026 NEW)
-endif()
 
 # -----------------------------------------------------------------------------
 # Make RelWithDebInfo the default build type if otherwise not set
