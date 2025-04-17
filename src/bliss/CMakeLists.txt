@@ -18,10 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-include_directories( ${PROJECT_SOURCE_DIR} )
-include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
-
-add_library(bliss OBJECT
+target_sources(breakid PRIVATE
     # bliss.cc
     bliss_C.cc
     defs.cc
@@ -32,4 +29,7 @@ add_library(bliss OBJECT
     timer.cc
     uintseqhash.cc
     utils.cc
+)
+target_include_directories(breakid PRIVATE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
 )

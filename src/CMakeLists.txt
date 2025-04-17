@@ -18,15 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-add_subdirectory(bliss)
+add_library(breakid)
 
-include_directories( ${PROJECT_SOURCE_DIR} )
+add_subdirectory(bliss)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
 
-include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-set(breakid_lib_files
+target_sources(breakid PRIVATE
     Algebraic.cpp
     Breaking.cpp
     Graph.cpp
@@ -34,29 +32,26 @@ set(breakid_lib_files
     breakid.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp
     breakid_c.cpp
-    $<TARGET_OBJECTS:bliss>
 )
-add_library(breakid ${breakid_lib_files})
+target_include_directories(breakid PRIVATE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/breakid>"
+)
 
-if (NOT WIN32)
-    set_target_properties(breakid PROPERTIES
-        PUBLIC_HEADER "${breakid_public_headers}"
-        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-        SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    )
-else()
+set_target_properties(breakid PROPERTIES
+    VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+)
+
+if(WIN32)
     set_target_properties(breakid PROPERTIES
         OUTPUT_NAME breakidwin
-        PUBLIC_HEADER "${breakid_public_headers}"
-        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-        SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     )
 endif()
 
 add_executable(breakid-bin breakid-main.cpp)
 set_target_properties(breakid-bin PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
-    INSTALL_RPATH_USE_LINK_PATH TRUE
     OUTPUT_NAME breakid
 )
 target_link_libraries(breakid-bin breakid)
@@ -69,22 +64,6 @@ breakid_add_public_header(breakid ${CMAKE_CURRENT_SOURCE_DIR}/breakid.hpp )
 # The breakidConfig.cmake we generate in the build directory depends on
 # this.
 # -----------------------------------------------------------------------------
-set(HEADER_DEST "${PROJECT_BINARY_DIR}/include/breakid")
-add_custom_target(CopyPublicHeaders ALL)
-get_target_property(breakid_public_headers breakid PUBLIC_HEADER)
-foreach(public_header ${breakid_public_headers})
-    get_filename_component(HEADER_NAME ${public_header} NAME)
-    add_custom_command(TARGET CopyPublicHeaders PRE_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E make_directory
-                               "${HEADER_DEST}"
-                       COMMAND ${CMAKE_COMMAND} -E echo
-                       "Copying ${HEADER_NAME} to ${HEADER_DEST}"
-                       COMMAND ${CMAKE_COMMAND} -E
-                           copy_if_different
-                           ${public_header}
-                           "${HEADER_DEST}"
-                      )
-endforeach()
 
 install(TARGETS breakid
     EXPORT ${BREAKID_EXPORT_NAME}
