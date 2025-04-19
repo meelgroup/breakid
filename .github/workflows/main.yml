@@ -43,32 +43,32 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: breakid-linux-amd64
-        path: breakid
+        path: project/build/breakid
 
     - name: Upload Artifact - LinuxARM64
       if: contains(matrix.os, 'ubuntu') && matrix.staticcompile == 'ON' && contains(matrix.os, 'arm')
       uses: actions/upload-artifact@v4
       with:
         name: breakid-linux-arm64
-        path: breakid
+        path: project/build/breakid
 
     - name: Upload Artifact - Mac x86_64
       if: contains(matrix.os, 'macos-13') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-x86_64
-        path: breakid
+        path: project/build/breakid
 
     - name: Upload Artifact - MacARM64
       if: contains(matrix.os, 'macos-14') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-arm64
-        path: breakid
+        path: project/build/breakid
 
     - name: Upload Artifact - Windows
       if: contains(matrix.os, 'windows') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-win64.exe
-        path: Release\breakid.exe
+        path: project\build\Release\breakid.exe
