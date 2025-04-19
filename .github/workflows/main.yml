@@ -56,11 +56,11 @@ jobs:
         name: breakid-linux-arm64
         path: breakid
 
-    - name: Upload Artifact - MacAMD64
+    - name: Upload Artifact - Mac x86_64
       if: contains(matrix.os, 'macos-13') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
-        name: breakid-mac-amd64
+        name: breakid-mac-x86_64
         path: breakid
 
     - name: Upload Artifact - MacARM64
