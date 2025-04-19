@@ -18,42 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
-
-message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
-message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")
-
-if(POLICY CMP0048)
-    #policy for VERSION in cmake 3.0
-    cmake_policy(SET CMP0048 NEW)
-endif()
-
-if(POLICY CMP0022)
-    cmake_policy(SET CMP0022 NEW)
-endif()
-
-if(POLICY CMP0046)
-    cmake_policy(SET CMP0046 NEW)
-endif()
-
-if(POLICY CMP0026)
-    cmake_policy(SET CMP0026 NEW)
-endif()
+cmake_minimum_required(VERSION 3.11)
 
 # -----------------------------------------------------------------------------
 # Make RelWithDebInfo the default build type if otherwise not set
 # -----------------------------------------------------------------------------
 set(build_types Debug Release RelWithDebInfo MinSizeRel)
-if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "You can choose the type of build, options are:${build_types}")
-    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
-        "Options are ${build_types}"
-        FORCE
-    )
+message(STATUS "You can choose the type of build, options are:${build_types}")
+set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Options are ${build_types}")
 
-    # Provide drop down menu options in cmake-gui
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${build_types})
-endif()
+# Provide drop down menu options in cmake-gui
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${build_types})
 message(STATUS "Doing a ${CMAKE_BUILD_TYPE} build")
 
 # -----------------------------------------------------------------------------
@@ -76,26 +51,29 @@ foreach (build_config ${build_types})
 endforeach()
 
 
-PROJECT(breakid)
+project(breakid
+    VERSION 3.1.2
+    LANGUAGES C CXX
+)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 
-enable_language( CXX )
+include(GNUInstallDirs)
+include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
 
-include (GenerateExportHeader)
-include (GNUInstallDirs)
-
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # generate JSON file of compile commands -- useful for code extension
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # static compilation
-option(BUILD_SHARED_LIBS "Build the shared library" ON)
 option(STATICCOMPILE "Compile to static executable" OFF)
-if (STATICCOMPILE)
-    set(BUILD_SHARED_LIBS OFF)
-endif()
+cmake_dependent_option(BUILD_SHARED_LIBS "Build the shared library" ON
+    "NOT STATICCOMPILE" OFF)
+
+message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
+message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")
 
 if (NOT MSVC)
     add_compile_options( -g)
@@ -215,25 +193,14 @@ endif()
 # -----------------------------------------------------------------------------
 # Add GIT version
 # -----------------------------------------------------------------------------
-function(SetVersionNumber PREFIX VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
-  set(${PREFIX}_VERSION_MAJOR ${VERSION_MAJOR} PARENT_SCOPE)
-  set(${PREFIX}_VERSION_MINOR ${VERSION_MINOR} PARENT_SCOPE)
-  set(${PREFIX}_VERSION_PATCH ${VERSION_PATCH} PARENT_SCOPE)
-  set(${PREFIX}_VERSION
-        "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-        PARENT_SCOPE)
-endfunction()
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-set(BREAKID_FULL_VERSION "3.1.2")
-string(REPLACE "." ";" BREAKID_FULL_VERSION_LIST ${BREAKID_FULL_VERSION})
-SetVersionNumber("PROJECT" ${BREAKID_FULL_VERSION_LIST})
-MESSAGE(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
-MESSAGE(STATUS "PROJECT_VERSION_MAJOR: ${PROJECT_VERSION_MAJOR}")
-MESSAGE(STATUS "PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
-MESSAGE(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
+message(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
+message(STATUS "PROJECT_VERSION_MAJOR: ${PROJECT_VERSION_MAJOR}")
+message(STATUS "PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
+message(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
 
 # ----------
 # manpage
@@ -262,20 +229,12 @@ endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-macro(breakid_add_public_header LIBTARGET HEADER)
-    get_target_property(EXISTING_PUBLIC_HEADERS ${LIBTARGET} PUBLIC_HEADER)
-    if(EXISTING_PUBLIC_HEADERS)
-        list(APPEND EXISTING_PUBLIC_HEADERS "${HEADER}")
-    else()
-        # Do not append to empty list
-        set(EXISTING_PUBLIC_HEADERS "${HEADER}")
-    endif()
-    set_target_properties(
-        ${LIBTARGET}
-        PROPERTIES
-        PUBLIC_HEADER "${EXISTING_PUBLIC_HEADERS}"
-     )
-endmacro()
+function(breakid_add_public_header LIBTARGET HEADER)
+    set_property(TARGET ${LIBTARGET}
+        PROPERTY PUBLIC_HEADER "${HEADER}"
+        APPEND
+    )
+endfunction()
 
 # -----------------------------------------------------------------------------
 # Provide an export name to be used by targets that wish to export themselves.
@@ -290,7 +249,7 @@ add_subdirectory(src)
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
+    @ONLY)
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
@@ -299,44 +258,32 @@ add_custom_target(uninstall
 # Export our targets so that other CMake based projects can interface with
 # the build of breakid in the build-tree
 # -----------------------------------------------------------------------------
-set(BREAKID_TARGETS_FILENAME "breakidTargets.cmake")
-set(BREAKID_CONFIG_FILENAME "breakidConfig.cmake")
 
-# Export targets
-export(
-    TARGETS breakid
-    FILE "${PROJECT_BINARY_DIR}/${BREAKID_TARGETS_FILENAME}"
+# Export targets for build tree
+export(TARGETS breakid breakid-bin
+    FILE "${PROJECT_BINARY_DIR}/breakidTargets.cmake"
+    NAMESPACE breakid::
 )
 
-# Create breakidConfig file
-set(EXPORT_TYPE "Build-tree")
-set(CONF_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/include")
-configure_file(breakidConfig.cmake.in
-    "${CMAKE_BINARY_DIR}/${BREAKID_CONFIG_FILENAME}" @ONLY
-)
-
-# Export this package to the CMake user package registry
-# Now the user can just use find_package(breakid) on their system
-export(PACKAGE breakid)
-
-set(DEF_INSTALL_CMAKE_DIR lib/cmake/breakid)
-set(BREAKID_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+set(BREAKID_INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/breakid" CACHE PATH
     "Installation directory for breakid CMake files")
 
 # Create breakidConfig file
-set(EXPORT_TYPE "installed")
-set(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
-configure_file(breakidConfig.cmake.in
-   "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}" @ONLY
+configure_package_config_file(breakidConfig.cmake.in breakidConfig.cmake
+   INSTALL_DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
+)
+write_basic_package_version_file(breakidConfigVersion.cmake
+    COMPATIBILITY SameMinorVersion
 )
 
 install(FILES
-    "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${BREAKID_CONFIG_FILENAME}"
+    "${CMAKE_CURRENT_BINARY_DIR}/breakidConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/breakidConfigVersion.cmake"
     DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
 )
 
 # Install the export set for use with the install-tree
-install(
-    EXPORT ${BREAKID_EXPORT_NAME}
+install(EXPORT breakidTargets
     DESTINATION "${BREAKID_INSTALL_CMAKE_DIR}"
+    NAMESPACE breakid::
 )
