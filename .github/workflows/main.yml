@@ -27,7 +27,7 @@ jobs:
       run: |
         cd project
         mkdir -p build && cd build
-        cmake -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} -DSTATICCOMPILE=${{ matrix.staticcompile }} -S ..
+        cmake -DSTATICCOMPILE=${{ matrix.staticcompile }} -S ..
         cmake --build . --config ${{matrix.build_type}} -v
 
     - name: Upload Artifact - LinuxAMD64
