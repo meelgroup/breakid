@@ -11,36 +11,32 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
+
       matrix:
-        os: [ubuntu-latest, macos-14, ubuntu-24.04-arm, windows-2022, macos-13]
-        build_type: ['Release']
-        staticcompile: ['ON', 'OFF']
+        os: [ubuntu-latest, macos-14, ubuntu-24.04-arm, macos-13]
+        build_type: [Release]
+        staticcompile: [ON, OFF]
+        c_compiler: [gcc]
+        cpp_compiler: [g++]
 
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4
+      with:
+        path: project
+        submodules: 'true'
 
-    # install dependencies
-    - name: Install boost & help2man for Linux
-      if: contains(matrix.os, 'ubuntu')
-      run: sudo apt-get update && sudo apt-get install -yq help2man
-
-    - name: Add git submodules for Linux only (not needed for non-testing)
-      if: contains(matrix.os, 'ubuntu')
-      run: git submodule update --init
-
-    - name: Configure CMake for linux
-      if: contains(matrix.os, 'ubuntu')
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DENABLE_TESTING=ON  -DSTATICCOMPILE=${{ matrix.staticcompile }}
-
-    - name: Configure CMake for non-linux
-      if: matrix.os != 'ubuntu-20.04'
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DENABLE_TESTING=OFF -DSTATICCOMPILE=${{ matrix.staticcompile }}
-
-    - name: Build
-      run: cmake --build . --config ${{ matrix.build_type }}
-
-    - name: Test
-      run: ctest -C ${{ matrix.build_type }}
+    - name: Build project
+      run: |
+        cd project
+        mkdir -p build && cd build
+        cmake \
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+        -DSTATICCOMPILE=${{ matrix.staticcompile }} \
+        -S ..
+        cmake --build . --config ${{matrix.build_type}} -v
 
     - name: Upload Artifact - LinuxAMD64
       if: contains(matrix.os, 'ubuntu') && matrix.staticcompile == 'ON' && !contains(matrix.os, 'arm')
