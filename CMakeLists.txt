@@ -243,6 +243,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     if (HELP2MAN_FOUND)
         ADD_CUSTOM_TARGET(man_breakid ALL DEPENDS breakid-bin)
         ADD_CUSTOM_COMMAND(
+            POST_BUILD
             TARGET man_breakid
             COMMAND help2man
             ARGS --version-string=${BREAKID_FULL_VERSION} $<TARGET_FILE:breakid-bin> -o ${CMAKE_CURRENT_BINARY_DIR}/breakid.1
