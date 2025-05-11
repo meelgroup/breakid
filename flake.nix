@@ -36,7 +36,6 @@
             cmake
             autoPatchelfHook
           ];
-          postInstall = ''mv $out/include/breakid/* $out/include/'';
         };
 
     in
