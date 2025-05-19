@@ -1,8 +1,17 @@
 # BreakID
 A new symmetry detecting and breaking library. This is based on Jo Devriendt's [BreakID code](https://bitbucket.org/krr/breakid/src/master/). It has been re-licensed by the original author to be MIT and hence it's realeased as MIT here. All modifications by Mate Soos.
 
+## Compiling
 
-## Compile & Run
+Use of the [release binaries](https://github.com/meelgroup/ganak/releases) is
+encouraged. The second best thing to use is Nix. Simply [install
+nix](https://nixos.org/download/) and then:
+```shell
+nix profile install github:meelgroup/breakid
+```
+
+Then you will have `breakid` binary available and ready to use. Otherwise,
+you can compile the code yourself via:
 
 ```bash
 git clone https://github.com/meelgroup/breakid
@@ -12,10 +21,12 @@ cmake ..
 make
 ```
 
+## Running BreakID
+
 BreakID detects symmetries in your input CNF file and creates a new CNF file
 that has your original CNF in it, along with some new variables and clauses
 that help break most symmetries:
- 
+
 ```bash
 ./breakid myfile.cnf symmetry-broken-output.cnf
 c BreakID version [...]
