@@ -1,5 +1,8 @@
 # BreakID
-A new symmetry detecting and breaking library. This is based on Jo Devriendt's [BreakID code](https://bitbucket.org/krr/breakid/src/master/). It has been re-licensed by the original author to be MIT and hence it's realeased as MIT here. All modifications by Mate Soos.
+A new symmetry detecting and breaking library. This is based on Jo Devriendt's
+[BreakID code](https://bitbucket.org/krr/breakid/src/master/). It has been
+re-licensed by the original author to be MIT and hence it's realeased as MIT
+here. All modifications by Mate Soos.
 
 ## Compiling
 It is strongly recommended to not build, but to use the precompiled
@@ -61,10 +64,11 @@ ask away in case something is unclear.
 
 # Example CNFs
 To obtain the example CNFs:
-
-```
+```bash
 git submodule update --init
 cd examples
 ```
 
-This folder contains highly symmetrical test cnfs. Particular attention goes to instances in `channel` and `counting`, which both exhibit row interchangeability due to high-level variable or value interchangeability.
+This folder contains highly symmetrical test cnfs. Particular attention goes to
+instances in `channel` and `counting`, which both exhibit row
+interchangeability due to high-level variable or value interchangeability.
