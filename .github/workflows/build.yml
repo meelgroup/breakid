@@ -55,7 +55,7 @@ jobs:
       if: contains(matrix.os, 'macos-15-intel') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
-        name: breakid-mac-x86_64
+        name: breakid-mac-arm64
         path: project/build/breakid
 
     - name: Upload Artifact - Windows
