@@ -34,7 +34,7 @@ jobs:
       if: contains(matrix.os, 'ubuntu') && matrix.staticcompile == 'ON' && !contains(matrix.os, 'arm')
       uses: actions/upload-artifact@v4
       with:
-        name: breakid-linux-amd64
+        name: breakid-linux-x86_64
         path: project/build/breakid
 
     - name: Upload Artifact - LinuxARM64
@@ -55,7 +55,7 @@ jobs:
       if: contains(matrix.os, 'macos-15-intel') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
-        name: breakid-mac-arm64
+        name: breakid-mac-x86_64
         path: project/build/breakid
 
     - name: Upload Artifact - Windows
