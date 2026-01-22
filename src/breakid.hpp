@@ -54,7 +54,7 @@ public:
     constexpr const uint32_t& toInt() const { return x; }
     constexpr BLit  operator~() const { return BLit(x ^ 1); }
     constexpr BLit  operator^(const bool b) const { return BLit(x ^ (uint32_t)b); }
-    constexpr BLit& operator^=(const bool b) {
+    BLit& operator^=(const bool b) {
         x ^= (uint32_t)b;
         return *this;
     }
