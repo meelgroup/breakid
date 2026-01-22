@@ -44,18 +44,18 @@ jobs:
         name: breakid-linux-arm64
         path: project/build/breakid
 
-    - name: Upload Artifact - Mac x86_64
+    - name: Upload Artifact - Mac ARM64
       if: contains(matrix.os, 'macos-15') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
-        name: breakid-mac-x86_64
+        name: breakid-mac-arm64
         path: project/build/breakid
 
-    - name: Upload Artifact - MacARM64
+    - name: Upload Artifact - Mac-intel
       if: contains(matrix.os, 'macos-15-intel') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
-        name: breakid-mac-arm64
+        name: breakid-mac-x86_64-intel
         path: project/build/breakid
 
     - name: Upload Artifact - Windows
