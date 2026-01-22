@@ -2,7 +2,7 @@ name: binary build
 
 on:
   push:
-    branches: ['*']
+    branches: ['master']
   pull_request:
     branches: ['*']
 
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
 
       matrix:
-        os: [ubuntu-latest, macos-14, ubuntu-24.04-arm, macos-13, windows-latest]
+        os: [ubuntu-latest, macos-15, ubuntu-24.04-arm, macos-15-intel, windows-latest]
         build_type: [Release]
         staticcompile: [ON, OFF]
 
@@ -45,14 +45,14 @@ jobs:
         path: project/build/breakid
 
     - name: Upload Artifact - Mac x86_64
-      if: contains(matrix.os, 'macos-13') && matrix.staticcompile == 'ON'
+      if: contains(matrix.os, 'macos-15') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-x86_64
         path: project/build/breakid
 
     - name: Upload Artifact - MacARM64
-      if: contains(matrix.os, 'macos-14') && matrix.staticcompile == 'ON'
+      if: contains(matrix.os, 'macos-15-intel') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-arm64
