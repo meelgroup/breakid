@@ -45,7 +45,7 @@ jobs:
         path: project/build/breakid
 
     - name: Upload Artifact - Mac ARM64
-      if: contains(matrix.os, 'macos-15') && matrix.staticcompile == 'ON'
+      if: contains(matrix.os, 'macos-15') && !contains(matrix.os, 'intel') && matrix.staticcompile == 'ON'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-arm64
