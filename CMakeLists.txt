@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # -----------------------------------------------------------------------------
 # Make RelWithDebInfo the default build type if otherwise not set
@@ -193,6 +193,15 @@ endif()
 # -----------------------------------------------------------------------------
 # Add GIT version
 # -----------------------------------------------------------------------------
+
+function(SetVersionNumber PREFIX VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
+  set(${PREFIX}_VERSION_MAJOR ${VERSION_MAJOR} PARENT_SCOPE)
+  set(${PREFIX}_VERSION_MINOR ${VERSION_MINOR} PARENT_SCOPE)
+  set(${PREFIX}_VERSION_PATCH ${VERSION_PATCH} PARENT_SCOPE)
+  set(${PREFIX}_VERSION
+        "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+        PARENT_SCOPE)
+endfunction()
 
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
