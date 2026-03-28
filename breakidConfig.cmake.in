@@ -19,23 +19,37 @@
 # THE SOFTWARE.
 
 
-# Config file for the @EXPORT_TYPE@ breakid Package
-# It defines the following variables
+# Config file for thebreakid Package
+# It defines the following **DEPRECATED** variables
 #  BREAKID_INCLUDE_DIRS - include directories for breakid
 #  BREAKID_LIBRARIES    - libraries to link against
 #  BREAKID_EXECUTABLE   - the breakid executable
+#
+# Instead use `target_link_libraries(<target> PRIVATE breakid)`
 
 # Compute paths
-get_filename_component(BREAKID_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-set(BREAKID_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+@PACKAGE_INIT@
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-include("${BREAKID_CMAKE_DIR}/@BREAKID_TARGETS_FILENAME@")
+include("${CMAKE_CURRENT_LISTDIR}/@BREAKID_TARGETS_FILENAME@")
+
+get_target_property(BREAKID_INCLUDE_DIRS breakid::breakid INTERFACE_INCLUDE_DIRECTORIES)
 
 # These are IMPORTED targets created by @BREAKID_TARGETS_FILENAME@
-set(BREAKID_LIBRARIES breakid)
-set(BREAKID_STATIC_LIBRARIES breakid)
-set(BREAKID_STATIC_LIBRARIES_DEPS @BREAKID_STATIC_DEPS@)
+set(BREAKID_LIBRARIES breakid::breakid)
+set(BREAKID_STATIC_LIBRARIES breakid::breakid)
+# BREAKID_STATIC_LIBRARIES_DEPS is not defined
+set(BREAKID_STATIC_LIBRARIES_DEPS "")
 set(BREAKID_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
 set(BREAKID_VERSION_MINOR @PROJECT_VERSION_MINOR@)
-set(BREAKID_EXECUTABLE breakid)
+set(BREAKID_EXECUTABLE breakid::bin)
+
+# Compatibility non-namespaced targets
+add_library(breakid INTERFACE)
+target_link_libraries(breakid INTERFACE breakid::breakid)
+set_target_properties(breakid PROPERTIES
+    DEPRECATION "Non-namespaced `breakid` target is deprecated. Use breakid::breakid instead."
+)
+
+add_executable(breakid-bin ALIAS brekid::bin)
+
