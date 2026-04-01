@@ -1,0 +1,19 @@
+# Config file for the Build-tree breakid package (not relocatable).
+include(CMakeFindDependencyMacro)
+find_dependency(Threads)
+
+include("${CMAKE_CURRENT_LIST_DIR}/breakidTargets.cmake")
+
+get_target_property(BREAKID_INCLUDE_DIRS breakid::breakid INTERFACE_INCLUDE_DIRECTORIES)
+set(BREAKID_LIBRARIES breakid::breakid)
+set(BREAKID_STATIC_LIBRARIES breakid::breakid)
+set(BREAKID_STATIC_LIBRARIES_DEPS "")
+set(BREAKID_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(BREAKID_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(BREAKID_EXECUTABLE breakid::bin)
+
+if(NOT TARGET breakid)
+    add_library(breakid INTERFACE)
+    target_link_libraries(breakid INTERFACE breakid::breakid)
+    message(DEPRECATION "Non-namespaced `breakid` target is deprecated. Use breakid::breakid instead.")
+endif()
