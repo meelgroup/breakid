@@ -52,11 +52,15 @@ endforeach()
 
 
 project(breakid
-    VERSION 3.1.2
+    VERSION 3.1.3
     LANGUAGES C CXX
 )
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(GNUInstallDirs)
 include(CMakeDependentOption)
@@ -65,7 +69,7 @@ include(CMakePackageConfigHelpers)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # generate JSON file of compile commands -- useful for code extension
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # static compilation
 option(STATICCOMPILE "Compile to static executable" OFF)
@@ -75,16 +79,16 @@ cmake_dependent_option(BUILD_SHARED_LIBS "Build the shared library" ON
 message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
 message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")
 
+find_package(Threads REQUIRED)
+
 if (NOT MSVC)
-    add_compile_options( -g)
-    add_compile_options( -pthread )
+    add_compile_options(-g)
     add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:-O2>")
     add_compile_options("$<$<CONFIG:RELEASE>:-O2>")
     add_compile_options("$<$<CONFIG:RELEASE>:-g0>")
     add_compile_options("$<$<CONFIG:DEBUG>:-O0>")
     if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -O2")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2")
+        add_link_options(-O2)
     endif()
 else()
     add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:/O2>")
@@ -103,16 +107,16 @@ else()
             #        and DLL-specific version of the run-time library.
             #        Defines _MT and _DLL and causes the compiler to place
             #        the library name MSVCRT.lib into the .obj file.
-            if(${flag_var} MATCHES "/MD")
+            if("${${flag_var}}" MATCHES "/MD")
                 string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-            endif(${flag_var} MATCHES "/MD")
+            endif()
 
             # /MDd	-- Defines _DEBUG, _MT, and _DLL and causes the application to use the debug multithread-specific and DLL-specific version of the run-time library.
             #          It also causes the compiler to place the library name MSVCRTD.lib into the .obj file.
-            if(${flag_var} MATCHES "/MDd")
+            if("${${flag_var}}" MATCHES "/MDd")
                 string(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
-            endif(${flag_var} MATCHES "/MDd")
-        endforeach(flag_var)
+            endif()
+        endforeach()
 
         # Creates a multithreaded executable (static) file using LIBCMT.lib.
         add_compile_options(/MT)
@@ -129,28 +133,28 @@ else()
     add_compile_options(/D_CRT_SECURE_NO_WARNINGS)
     add_compile_options(/fp:precise)
     add_compile_options(/EHsc)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:1572864")
+    add_link_options(/STACK:1572864)
 
     # for windows, cmake definitions are in a different directory
 endif()
 
 include(CheckCXXCompilerFlag)
 macro(add_cxx_flag_if_supported flagname)
-  check_cxx_compiler_flag("${flagname}" HAVE_FLAG_${flagname})
-
-  if(HAVE_FLAG_${flagname})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flagname}")
-    message(STATUS "flag ${flagname} supported")
-  else()
-    message(STATUS "flag ${flagname} NOT supported")
-  endif()
+    string(MAKE_C_IDENTIFIER "HAVE_FLAG${flagname}" _flag_var)
+    check_cxx_compiler_flag("${flagname}" ${_flag_var})
+    if(${_flag_var})
+        add_compile_options("${flagname}")
+        message(STATUS "flag ${flagname} supported")
+    else()
+        message(STATUS "flag ${flagname} NOT supported")
+    endif()
 endmacro()
 
 if (NOT WIN32)
     if(NOT ENABLE_TESTING AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT COVERAGE)
         #add_cxx_flag_if_supported("-fvisibility=hidden")
     endif()
-    add_compile_options("-fPIC")
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
     else()
@@ -185,34 +189,22 @@ if (ENABLE_ASSERTIONS)
     # NDEBUG was already removed.
 else()
     # Note this definition doesn't appear in the cache variables.
-    add_definitions(-DNDEBUG)
+    add_compile_definitions(NDEBUG)
     add_cxx_flag_if_supported("-fno-stack-protector")
-    add_definitions(-D_FORTIFY_SOURCE=0)
+    add_compile_definitions(_FORTIFY_SOURCE=0)
 endif()
 
 # -----------------------------------------------------------------------------
 # Add GIT version
 # -----------------------------------------------------------------------------
-
-function(SetVersionNumber PREFIX VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
-  set(${PREFIX}_VERSION_MAJOR ${VERSION_MAJOR} PARENT_SCOPE)
-  set(${PREFIX}_VERSION_MINOR ${VERSION_MINOR} PARENT_SCOPE)
-  set(${PREFIX}_VERSION_PATCH ${VERSION_PATCH} PARENT_SCOPE)
-  set(${PREFIX}_VERSION
-        "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-        PARENT_SCOPE)
-endfunction()
-
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-set(BREAKID_FULL_VERSION "3.1.3")
-string(REPLACE "." ";" BREAKID_FULL_VERSION_LIST ${BREAKID_FULL_VERSION})
-SetVersionNumber("PROJECT" ${BREAKID_FULL_VERSION_LIST})
-MESSAGE(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
-MESSAGE(STATUS "PROJECT_VERSION_MAJOR: ${PROJECT_VERSION_MAJOR}")
-MESSAGE(STATUS "PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
-MESSAGE(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
+set(BREAKID_FULL_VERSION "${PROJECT_VERSION}")
+message(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
+message(STATUS "PROJECT_VERSION_MAJOR: ${PROJECT_VERSION_MAJOR}")
+message(STATUS "PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
+message(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
 
 # ----------
 # manpage
@@ -220,22 +212,22 @@ MESSAGE(STATUS "PROJECT_VERSION_PATCH: ${PROJECT_VERSION_PATCH}")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     find_program(HELP2MAN_FOUND help2man)
     if (HELP2MAN_FOUND)
-        ADD_CUSTOM_TARGET(man_breakid ALL DEPENDS breakid-bin)
-        ADD_CUSTOM_COMMAND(
+        add_custom_target(man_breakid ALL DEPENDS breakid-bin)
+        add_custom_command(
             POST_BUILD
             TARGET man_breakid
             COMMAND help2man
             ARGS --version-string=${BREAKID_FULL_VERSION} $<TARGET_FILE:breakid-bin> -o ${CMAKE_CURRENT_BINARY_DIR}/breakid.1
         )
 
-        INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/breakid.1
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/breakid.1
             DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
         message(STATUS "Manpage will be created and installed")
     else()
-        MESSAGE(STATUS "Cannot find help2man, not creating manpage")
+        message(STATUS "Cannot find help2man, not creating manpage")
     endif()
 else()
-    MESSAGE(STATUS "Not on Linux, not creating manpage")
+    message(STATUS "Not on Linux, not creating manpage")
 endif()
 
 # headers, install locations, etc

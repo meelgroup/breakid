@@ -33,10 +33,11 @@ target_sources(breakid PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp
     breakid_c.cpp
 )
-target_include_directories(breakid PRIVATE
+target_include_directories(breakid PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/breakid>"
 )
+target_link_libraries(breakid PRIVATE Threads::Threads)
 
 set_target_properties(breakid PROPERTIES
     VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
