@@ -71,10 +71,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # generate JSON file of compile commands -- useful for code extension
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# static compilation
-option(STATICCOMPILE "Compile to static executable" OFF)
-cmake_dependent_option(BUILD_SHARED_LIBS "Build the shared library" ON
-    "NOT STATICCOMPILE" OFF)
+option(BUILD_SHARED_LIBS "Build the shared library" ON)
 
 message(STATUS "LIB directory is '${CMAKE_INSTALL_LIBDIR}'")
 message(STATUS "BIN directory is '${CMAKE_INSTALL_BINDIR}'")

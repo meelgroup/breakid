@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-15, ubuntu-24.04-arm, macos-15-intel, windows-latest]
         build_type: [Release]
-        staticcompile: [ON, OFF]
+        shared_libs: [ON, OFF]
 
     steps:
     - uses: actions/checkout@v4
@@ -28,46 +28,46 @@ jobs:
       if: "!contains(matrix.os, 'windows')"
       uses: hendrikmuhs/ccache-action@v1.2
       with:
-        key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.staticcompile }}
+        key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.shared_libs }}
         append-timestamp: false
 
     - name: Build project
       run: |
         cd project
         mkdir -p build && cd build
-        cmake -DSTATICCOMPILE=${{ matrix.staticcompile }} ${{ !contains(matrix.os, 'windows') && '-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache' || '' }} -S ..
+        cmake -DBUILD_SHARED_LIBS=${{ matrix.shared_libs }} ${{ !contains(matrix.os, 'windows') && '-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache' || '' }} -S ..
         cmake --build . --config ${{matrix.build_type}} -v
 
     - name: Upload Artifact - LinuxAMD64
-      if: contains(matrix.os, 'ubuntu') && matrix.staticcompile == 'ON' && !contains(matrix.os, 'arm')
+      if: contains(matrix.os, 'ubuntu') && matrix.shared_libs == 'OFF' && !contains(matrix.os, 'arm')
       uses: actions/upload-artifact@v4
       with:
         name: breakid-linux-x86_64
         path: project/build/breakid
 
     - name: Upload Artifact - LinuxARM64
-      if: contains(matrix.os, 'ubuntu') && matrix.staticcompile == 'ON' && contains(matrix.os, 'arm')
+      if: contains(matrix.os, 'ubuntu') && matrix.shared_libs == 'OFF' && contains(matrix.os, 'arm')
       uses: actions/upload-artifact@v4
       with:
         name: breakid-linux-arm64
         path: project/build/breakid
 
     - name: Upload Artifact - Mac ARM64
-      if: contains(matrix.os, 'macos-15') && !contains(matrix.os, 'intel') && matrix.staticcompile == 'ON'
+      if: contains(matrix.os, 'macos-15') && !contains(matrix.os, 'intel') && matrix.shared_libs == 'OFF'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-arm64
         path: project/build/breakid
 
     - name: Upload Artifact - Mac-intel
-      if: contains(matrix.os, 'macos-15-intel') && matrix.staticcompile == 'ON'
+      if: contains(matrix.os, 'macos-15-intel') && matrix.shared_libs == 'OFF'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-mac-x86_64-intel
         path: project/build/breakid
 
     - name: Upload Artifact - Windows
-      if: contains(matrix.os, 'windows') && matrix.staticcompile == 'ON'
+      if: contains(matrix.os, 'windows') && matrix.shared_libs == 'OFF'
       uses: actions/upload-artifact@v4
       with:
         name: breakid-win64.exe
